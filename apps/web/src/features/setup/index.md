@@ -9,9 +9,9 @@ This is a file plan. **Existing** files are present; **Planned** files must be i
 | Filename | Status | Responsibility |
 |---|---|---|
 | `index.md` | Existing | Directory file manifest and responsibilities; keep it synchronized with changes. |
-| `OrganizationForm.tsx` | Planned | Set company details and policy-editing permissions. Owner: [issue 3](../../../../../docs/issues/03-auth-company-setup.md). |
-| `EmployeeAssignments.tsx` | Planned | Assign employees to managers within their company. Owner: [issue 3](../../../../../docs/issues/03-auth-company-setup.md). |
-| `useOrganization.ts` | Planned | Load users and persist company setup. Owner: [issue 3](../../../../../docs/issues/03-auth-company-setup.md). |
+| `OrganizationForm.tsx` | Existing | Set company details and policy-editing permissions. Owner: [issue 3](../../../../../docs/issues/03-auth-company-setup.md). |
+| `EmployeeAssignments.tsx` | Existing | Assign employees to managers within their company. Owner: [issue 3](../../../../../docs/issues/03-auth-company-setup.md). |
+| `useOrganization.ts` | Existing | Load users and persist company setup. Owner: [issue 3](../../../../../docs/issues/03-auth-company-setup.md). |
 
 Generated caches, dependencies, runtime uploads, and `.git/` are excluded from directory manifests.
 

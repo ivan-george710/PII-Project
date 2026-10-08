@@ -2,7 +2,7 @@
 
 # Deliver WorkOS authentication, company setup, and employee-manager assignments
 
-Status: Approved for implementation and GitHub publication.
+Status: Implemented on `codex/workos-company-auth`; draft PR for review.
 Suggested ownership: Full-stack authentication / company setup
 
 Implement the complete sign-in and company setup experience, including its frontend, backend, database, and validation. Manager rule settings/reporting are a separate complete workstream (issue 4). Verification and fictional setup data belong inside this implementation, not a separate testing/demo issue.
@@ -117,9 +117,16 @@ Each listed file has one issue owner. Update its directory index when implementi
 | `apps/api/migrations/env.py` | Alembic runtime and model metadata integration (issue 3). |
 | `apps/api/migrations/script.py.mako` | Migration file template (issue 3). |
 | `apps/api/tests/conftest.py` | Shared isolated database/session fixtures (issue 3). |
+| `apps/api/tests/test_seed.py` | Trusted fictional seeding, explicit opt-in, and idempotency checks. |
+| `apps/api/tests/test_workos_live.py` | Optional real scoped-staging session check with temporary-user cleanup. |
+| `scripts/provision-company.py` | Trusted operator mapping of real WorkOS users and active memberships to company roles. |
 
 ## Working independently
 
 Use the documented interfaces and feature-owned development adapters for integration points. Do not wait for another issue to close. Test this workstream against those interfaces, then connect real implementations without changing the contract. Production must never substitute simulated privacy processing.
 
 - Keep all touched directory indexes accurate and distinguish planned files from implemented files.
+
+## Implementation notes
+
+The PR includes the shared React/FastAPI bootstrap needed to exercise authentication and setup independently. These files were originally assigned to issues 2/5 and are implemented here only to connect this feature. Employee chat and manager reports remain with their owners. Additional files are `test_seed.py`, `test_workos_live.py`, and `scripts/provision-company.py`. WorkOS testing uses the existing PIIdtc staging environment; its key is held only in Actions. The feature's runtime database and cookie/auth settings must be configured separately before a deployed account can sign in.

@@ -9,9 +9,9 @@ This is a file plan. **Existing** files are present; **Planned** files must be i
 | Filename | Status | Responsibility |
 |---|---|---|
 | `index.md` | Existing | Directory file manifest and responsibilities; keep it synchronized with changes. |
-| `__init__.py` | Planned | Database package marker. Owner: [issue 3](../../../../docs/issues/03-auth-company-setup.md). |
-| `base.py` | Planned | Shared declarative model base and metadata registration. Owner: [issue 3](../../../../docs/issues/03-auth-company-setup.md). |
-| `session.py` | Planned | Database connection and request/session lifecycle. Owner: [issue 3](../../../../docs/issues/03-auth-company-setup.md). |
+| `__init__.py` | Existing | Database package marker. Owner: [issue 3](../../../../docs/issues/03-auth-company-setup.md). |
+| `base.py` | Existing | Shared declarative model base and metadata registration. Owner: [issue 3](../../../../docs/issues/03-auth-company-setup.md). |
+| `session.py` | Existing | Database connection and request/session lifecycle. Owner: [issue 3](../../../../docs/issues/03-auth-company-setup.md). |
 
 ## Subdirectories
 

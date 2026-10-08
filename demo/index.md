@@ -9,8 +9,8 @@ This is a file plan. **Existing** files are present; **Planned** files must be i
 | Filename | Status | Responsibility |
 |---|---|---|
 | `index.md` | Existing | Directory file manifest and responsibilities; keep it synchronized with changes. |
-| `seed.py` | Planned | Seed synthetic company, users, assignments, policies, and events. Owner: [issue 3](../docs/issues/03-auth-company-setup.md). |
-| `identities.json` | Planned | Fictional demo identity definitions without passwords or tokens. Owner: [issue 3](../docs/issues/03-auth-company-setup.md). |
+| `seed.py` | Existing | Seed synthetic company, users, assignments, policies, and events. Owner: [issue 3](../docs/issues/03-auth-company-setup.md). |
+| `identities.json` | Existing | Fictional demo identity definitions without passwords or tokens. Owner: [issue 3](../docs/issues/03-auth-company-setup.md). |
 | `walkthrough.md` | Planned | Employee-to-manager demonstration and WorkOS identity setup. Owner: [issue 2](../docs/issues/02-employee-chat.md). |
 
 ## Subdirectories

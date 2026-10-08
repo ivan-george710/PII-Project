@@ -11,11 +11,10 @@ This is a file plan. **Existing** files are present; **Planned** files must be i
 | `index.md` | Existing | Directory file manifest and responsibilities; keep it synchronized with changes. |
 | `package.json` | Existing | Frontend dependencies and dev/build/test scripts. Owner: [issue 2](../../docs/issues/02-employee-chat.md). |
 | `index.html` | Existing | Web application mount document. Owner: [issue 2](../../docs/issues/02-employee-chat.md). |
-| `vite.config.ts` | Planned | React development server, build, and API proxy configuration. Owner: [issue 2](../../docs/issues/02-employee-chat.md). |
-| `tsconfig.json` | Planned | Frontend TypeScript configuration. Owner: [issue 2](../../docs/issues/02-employee-chat.md). |
+| `vite.config.ts` | Existing | React development server, build, and API proxy configuration. Owner: [issue 2](../../docs/issues/02-employee-chat.md). |
+| `tsconfig.json` | Existing | Frontend TypeScript configuration. Owner: [issue 2](../../docs/issues/02-employee-chat.md). |
 | `Dockerfile` | Deferred | Optional future work; outside the five current issues. Build and serve the web application. |
 | `package-lock.json` | Existing | Lock minimal frontend build dependencies. |
-| `vite.config.js` | Existing | Current Vite development proxy to FastAPI; replace with the planned TypeScript config when the frontend is implemented. |
 
 ## Subdirectories
 

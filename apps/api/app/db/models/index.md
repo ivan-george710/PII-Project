@@ -9,10 +9,10 @@ This is a file plan. **Existing** files are present; **Planned** files must be i
 | Filename | Status | Responsibility |
 |---|---|---|
 | `index.md` | Existing | Directory file manifest and responsibilities; keep it synchronized with changes. |
-| `__init__.py` | Planned | Export/register all models. Owner: [issue 3](../../../../../docs/issues/03-auth-company-setup.md). |
-| `organization.py` | Planned | Company identity and administrative settings. Owner: [issue 3](../../../../../docs/issues/03-auth-company-setup.md). |
-| `user.py` | Planned | WorkOS identity, company membership, and role. Owner: [issue 3](../../../../../docs/issues/03-auth-company-setup.md). |
-| `manager_assignment.py` | Planned | Employee-to-manager relationship within a company. Owner: [issue 3](../../../../../docs/issues/03-auth-company-setup.md). |
+| `__init__.py` | Existing | Export/register all models. Owner: [issue 3](../../../../../docs/issues/03-auth-company-setup.md). |
+| `organization.py` | Existing | Company identity and administrative settings. Owner: [issue 3](../../../../../docs/issues/03-auth-company-setup.md). |
+| `user.py` | Existing | WorkOS identity, company membership, and role. Owner: [issue 3](../../../../../docs/issues/03-auth-company-setup.md). |
+| `manager_assignment.py` | Existing | Employee-to-manager relationship within a company. Owner: [issue 3](../../../../../docs/issues/03-auth-company-setup.md). |
 | `conversation.py` | Planned | Employee-owned conversations. Owner: [issue 2](../../../../../docs/issues/02-employee-chat.md). |
 | `message.py` | Planned | Conversation turns and safe provider history. Owner: [issue 2](../../../../../docs/issues/02-employee-chat.md). |
 | `attachment.py` | Planned | File ownership, storage references, and processing state. Owner: [issue 2](../../../../../docs/issues/02-employee-chat.md). |

@@ -9,8 +9,8 @@ This is a file plan. **Existing** files are present; **Planned** files must be i
 | Filename | Status | Responsibility |
 |---|---|---|
 | `index.md` | Existing | Directory file manifest and responsibilities; keep it synchronized with changes. |
-| `env.py` | Planned | Alembic runtime and model metadata integration. Owner: [issue 3](../../../docs/issues/03-auth-company-setup.md). |
-| `script.py.mako` | Planned | Migration file template. Owner: [issue 3](../../../docs/issues/03-auth-company-setup.md). |
+| `env.py` | Existing | Alembic runtime and model metadata integration. Owner: [issue 3](../../../docs/issues/03-auth-company-setup.md). |
+| `script.py.mako` | Existing | Migration file template. Owner: [issue 3](../../../docs/issues/03-auth-company-setup.md). |
 
 ## Subdirectories
 

@@ -9,11 +9,11 @@ This is a file plan. **Existing** files are present; **Planned** files must be i
 | Filename | Status | Responsibility |
 |---|---|---|
 | `index.md` | Existing | Directory file manifest and responsibilities; keep it synchronized with changes. |
-| `Login.tsx` | Planned | WorkOS sign-in entry page. Owner: [issue 3](../../../../docs/issues/03-auth-company-setup.md). |
+| `Login.tsx` | Existing | WorkOS sign-in entry page. Owner: [issue 3](../../../../docs/issues/03-auth-company-setup.md). |
 | `Chat.tsx` | Planned | Plain employee conversation page. Owner: [issue 2](../../../../docs/issues/02-employee-chat.md). |
 | `ManagerReports.tsx` | Planned | Assigned-employee event reporting page. Owner: [issue 4](../../../../docs/issues/04-manager-settings-reports.md). |
 | `ManagerSettings.tsx` | Planned | Company policy toggles and custom rules page. Owner: [issue 4](../../../../docs/issues/04-manager-settings-reports.md). |
-| `CompanySetup.tsx` | Planned | Company/users/manager assignment page. Owner: [issue 3](../../../../docs/issues/03-auth-company-setup.md). |
+| `CompanySetup.tsx` | Existing | Company/users/manager assignment page. Owner: [issue 3](../../../../docs/issues/03-auth-company-setup.md). |
 
 Generated caches, dependencies, runtime uploads, and `.git/` are excluded from directory manifests.
 

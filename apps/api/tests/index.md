@@ -17,6 +17,6 @@ This is a file plan. **Existing** files are present; **Planned** files must be i
 | `test_chat.py` | Planned | Safe history, guarded provider calls, streaming, and retry behavior (issue 2). |
 | `test_uploads.py` | Planned | Upload authorization, supported inputs, and output access (issue 2). |
 | `test_guard.py` | Planned | Sanitized-only payloads, disabled rules, and blocked failures (issue 2). |
-| `test_health.py` | Planned | Readiness and production configuration checks (issue 4). |
+| `test_health.py` | Existing | Readiness and production configuration checks (issue 4). |
 
 Generated caches, dependencies, runtime uploads, and `.git/` are excluded from directory manifests.

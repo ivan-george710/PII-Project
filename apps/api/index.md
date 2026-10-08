@@ -9,7 +9,7 @@ This is a file plan. **Existing** files are present; **Planned** files must be i
 | Filename | Status | Responsibility |
 |---|---|---|
 | `index.md` | Existing | Directory file manifest and responsibilities; keep it synchronized with changes. |
-| `pyproject.toml` | Planned | Backend dependencies, package configuration, and test tooling. |
+| `pyproject.toml` | Existing | Backend dependencies, package configuration, and test tooling. |
 | `alembic.ini` | Planned | Database migration configuration. |
 | `Dockerfile` | Planned | API runtime with required document-processing dependencies. |
 

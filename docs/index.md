@@ -15,6 +15,7 @@ This is a file plan. **Existing** files are present; **Planned** files must be i
 | `spark-reuse.md` | Planned | Map Apple/Swift face logic to the backend implementation and test cases. |
 | `reporting-contract.md` | Planned | Define idempotent manager events and safe display fields. |
 | `rule-policy.md` | Planned | Define rule IDs, versions, enabled states, precedence, and regex limits. |
+| `cicd.md` | Existing | Minimal frontend/backend CI/CD configuration, local commands, and deployment verification. |
 
 ## Subdirectories
 

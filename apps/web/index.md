@@ -9,11 +9,13 @@ This is a file plan. **Existing** files are present; **Planned** files must be i
 | Filename | Status | Responsibility |
 |---|---|---|
 | `index.md` | Existing | Directory file manifest and responsibilities; keep it synchronized with changes. |
-| `package.json` | Planned | Frontend dependencies and dev/build/test scripts. |
-| `index.html` | Planned | Web application mount document. |
+| `package.json` | Existing | Frontend dependencies and dev/build/test scripts. |
+| `index.html` | Existing | Web application mount document. |
 | `vite.config.ts` | Planned | React development server, build, and API proxy configuration. |
 | `tsconfig.json` | Planned | Frontend TypeScript configuration. |
 | `Dockerfile` | Planned | Build and serve the web application. |
+| `package-lock.json` | Existing | Lock minimal frontend build dependencies. |
+| `vite.config.js` | Existing | Current Vite development proxy to FastAPI; replace with the planned TypeScript config when the frontend is implemented. |
 
 ## Subdirectories
 

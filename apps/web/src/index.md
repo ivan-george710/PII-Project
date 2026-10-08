@@ -12,6 +12,7 @@ This is a file plan. **Existing** files are present; **Planned** files must be i
 | `main.tsx` | Planned | Mount the React application. |
 | `App.tsx` | Planned | Define routes and assemble auth-aware application layouts. |
 | `vite-env.d.ts` | Planned | Vite environment types. |
+| `main.js` | Existing | Current minimal browser health check; replace with the planned React main.tsx during frontend implementation. |
 
 ## Subdirectories
 

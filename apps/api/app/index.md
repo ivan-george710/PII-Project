@@ -9,8 +9,8 @@ This is a file plan. **Existing** files are present; **Planned** files must be i
 | Filename | Status | Responsibility |
 |---|---|---|
 | `index.md` | Existing | Directory file manifest and responsibilities; keep it synchronized with changes. |
-| `__init__.py` | Planned | Backend package marker. |
-| `main.py` | Planned | Build the API application, register routes, and initialize lifecycle hooks. |
+| `__init__.py` | Existing | Backend package marker. |
+| `main.py` | Existing | Build the API application, register routes, and initialize lifecycle hooks. |
 | `config.py` | Planned | Validate runtime settings; reject production use of demo adapters. |
 | `dependencies.py` | Planned | Inject sessions, database access, policies, engine, and provider interfaces. |
 

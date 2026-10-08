@@ -9,8 +9,8 @@ This is a file plan. **Existing** files are present; **Planned** files must be i
 | Filename | Status | Responsibility |
 |---|---|---|
 | `index.md` | Existing | Directory file manifest and responsibilities; keep it synchronized with changes. |
-| `__init__.py` | Planned | Schema package marker (issue 4). |
-| `common.py` | Planned | Shared pagination and error response types (issue 4). |
+| `__init__.py` | Existing | Schema package marker (issue 4). |
+| `common.py` | Existing | Pydantic v2 strict HealthResponse model; future shared API errors/pagination belong here. |
 | `auth.py` | Planned | Session identity and roles (issue 3). |
 | `chat.py` | Planned | Conversation, message, submission, and stream events (issue 2). |
 | `uploads.py` | Planned | File metadata, processing state, and authorized output responses (issue 2). |

@@ -11,10 +11,13 @@ This is a file plan. **Existing** files are present; **Planned** files must be i
 | `index.md` | Existing | Directory file manifest and responsibilities; keep it synchronized with changes. |
 | `README.md` | Existing | Product overview, setup entry points, and links to directory indexes. |
 | `.env.example` | Planned | Document required configuration with placeholders, never credentials. |
-| `.gitignore` | Planned | Exclude secrets, uploaded/generated files, caches, environments, and model weights. |
+| `.dockerignore` | Planned | Exclude secrets, uploads, caches, and prototype artifacts from repository-root Docker build contexts. |
+| `.gitignore` | Existing | Exclude secrets, uploaded/generated files, caches, environments, and model weights. |
 | `Cadence_Group_Risk_Management_Policy__v6.0.pdf` | Existing | Existing case-study reference PDF; not a synthetic demo fixture. |
 | `Cadence_TPRM_Training.docx` | Existing | Existing case-study reference Word document. |
 | `Cadence_Financial_Group_Organizational_Pack.pptx` | Existing | Existing case-study reference presentation. |
+| `vercel.json` | Existing | Define frontend/backend Vercel Services and same-origin /api routing. |
+| `.vercelignore` | Existing | Exclude prototype files, case-study documents, and local artifacts from CLI deployment uploads. |
 
 ## Subdirectories
 

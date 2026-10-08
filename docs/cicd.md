@@ -12,9 +12,15 @@ From `apps/web`, run `npm ci` and `npm run dev`. Its development proxy forwards 
 
 The repository-root `vercel.json` defines frontend and backend services in one Vercel project. `/api/*` routes to the backend; other traffic routes to the frontend. The browser uses a relative URL, so previews and production always call their own backend.
 
-Connect the Vercel project's Git integration to `ivan-george710/PII-Project`, with `main` as the production branch and the repository root as the project root. Main pushes deploy production; other branch pushes deploy previews. Both services ship in the same deployment. GitHub Actions runs frontend build and backend smoke checks on pushes and PRs. Git integration owns deployment, so no Vercel tokens are stored in GitHub Actions.
+GitHub Actions owns deployment. Each push first builds the frontend and tests the backend, then deploys both Vercel services. Main pushes deploy production; other branches deploy previews. PRs run CI without deploying. No Vercel GitHub app access is required.
 
-GitHub CI and Vercel builds run in parallel; CI is not a release gate in this minimal baseline.
+Repository configuration:
+
+- Actions variable `VERCEL_ORG_ID`: `team_eEyacnrwinZLoAL29yzQ2ouX`.
+- Actions variable `VERCEL_PROJECT_ID`: `prj_pYUwh7wNPrBPOkYTCvERO5AlfN29`.
+- Actions secret `VERCEL_TOKEN`: configure directly in repository settings; never commit or paste it into chat.
+
+The workflow verifies the deployed frontend and `/api/health`, including a commit SHA check. Both services share a URL; the frontend uses relative `/api/health`. Deployment protection is preserved and the CLI authenticates smoke requests. CI success gates deployment, but the post-deployment smoke test does not automatically roll back a failed production release.
 
 ## Verify
 

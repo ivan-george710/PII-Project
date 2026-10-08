@@ -9,9 +9,9 @@ This is a file plan. **Existing** files are present; **Planned** files must be i
 | Filename | Status | Responsibility |
 |---|---|---|
 | `index.md` | Existing | Directory file manifest and responsibilities; keep it synchronized with changes. |
-| `conftest.py` | Planned | Shared isolated database/session fixtures. Owner: [issue 3](../../../docs/issues/03-auth-company-setup.md). |
-| `test_auth.py` | Planned | WorkOS/session behavior and role enforcement. Owner: [issue 3](../../../docs/issues/03-auth-company-setup.md). |
-| `test_organization.py` | Planned | Membership and manager-assignment boundaries. Owner: [issue 3](../../../docs/issues/03-auth-company-setup.md). |
+| `conftest.py` | Existing | Shared isolated database/session fixtures. Owner: [issue 3](../../../docs/issues/03-auth-company-setup.md). |
+| `test_auth.py` | Existing | WorkOS/session behavior and role enforcement. Owner: [issue 3](../../../docs/issues/03-auth-company-setup.md). |
+| `test_organization.py` | Existing | Membership and manager-assignment boundaries. Owner: [issue 3](../../../docs/issues/03-auth-company-setup.md). |
 | `test_rules.py` | Planned | Policy versioning, isolation, preview, and invalid-pattern behavior. Owner: [issue 4](../../../docs/issues/04-manager-settings-reports.md). |
 | `test_reports.py` | Planned | Report authorization and idempotent event ingestion. Owner: [issue 4](../../../docs/issues/04-manager-settings-reports.md). |
 | `test_chat.py` | Planned | Safe history, guarded provider calls, streaming, and retry behavior. Owner: [issue 2](../../../docs/issues/02-employee-chat.md). |
@@ -19,6 +19,8 @@ This is a file plan. **Existing** files are present; **Planned** files must be i
 | `test_guard.py` | Planned | Sanitized-only payloads, disabled rules, and blocked failures. Owner: [issue 2](../../../docs/issues/02-employee-chat.md). |
 | `test_health.py` | Existing | Preserve the existing health smoke test. Owner: [issue 5](../../../docs/issues/05-platform-deployment.md). |
 | `test_demo.py` | Planned | Catalog scoping, feature toggle, selection idempotency, and file limits. Owner: [issue 2](../../../docs/issues/02-employee-chat.md). |
+| `test_seed.py` | Existing | Trusted fictional seeding, explicit opt-in, and idempotency checks. Owner: [issue 3](../../../docs/issues/03-auth-company-setup.md). |
+| `test_workos_live.py` | Existing | Optional real scoped-staging session check with temporary-user cleanup. Owner: [issue 3](../../../docs/issues/03-auth-company-setup.md). |
 
 Generated caches, dependencies, runtime uploads, and `.git/` are excluded from directory manifests.
 

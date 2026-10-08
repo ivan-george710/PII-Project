@@ -30,3 +30,7 @@ The workflow verifies the deployed frontend and `/api/health`, including a commi
 - Check that GitHub CI passes and Vercel deployment metadata matches the pushed commit.
 
 Vercel Services is in beta: https://vercel.com/docs/services.
+
+## WorkOS staging check (issue #3)
+
+The `smoke` job now includes frontend behavior tests and backend pytest checks. `workos-staging` uses only `WORKOS_TEST_API_KEY` and the public `WORKOS_TEST_CLIENT_ID` to verify a real temporary staging session; it is excluded for fork PRs. WorkOS credentials are not passed to Vercel deployment. Backend runtime auth/database configuration is a separate setup step documented in [local setup](local-setup.md).

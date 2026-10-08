@@ -9,10 +9,10 @@ This is a file plan. **Existing** files are present; **Planned** files must be i
 | Filename | Status | Responsibility |
 |---|---|---|
 | `index.md` | Existing | Directory file manifest and responsibilities; keep it synchronized with changes. |
-| `__init__.py` | Planned | Auth package marker. Owner: [issue 3](../../../../docs/issues/03-auth-company-setup.md). |
-| `workos.py` | Planned | WorkOS login/callback/logout integration and identity mapping. Owner: [issue 3](../../../../docs/issues/03-auth-company-setup.md). |
-| `sessions.py` | Planned | Validate sessions and resolve company/user identity. Owner: [issue 3](../../../../docs/issues/03-auth-company-setup.md). |
-| `permissions.py` | Planned | Enforce company, role, manager-assignment, and policy-edit permissions. Owner: [issue 3](../../../../docs/issues/03-auth-company-setup.md). |
+| `__init__.py` | Existing | Auth package marker. Owner: [issue 3](../../../../docs/issues/03-auth-company-setup.md). |
+| `workos.py` | Existing | WorkOS login/callback/logout integration and identity mapping. Owner: [issue 3](../../../../docs/issues/03-auth-company-setup.md). |
+| `sessions.py` | Existing | Validate sessions and resolve company/user identity. Owner: [issue 3](../../../../docs/issues/03-auth-company-setup.md). |
+| `permissions.py` | Existing | Enforce company, role, manager-assignment, and policy-edit permissions. Owner: [issue 3](../../../../docs/issues/03-auth-company-setup.md). |
 
 Generated caches, dependencies, runtime uploads, and `.git/` are excluded from directory manifests.
 

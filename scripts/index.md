@@ -10,10 +10,11 @@ This is a file plan. **Existing** files are present; **Planned** files must be i
 |---|---|---|
 | `index.md` | Existing | Directory file manifest and responsibilities; keep it synchronized with changes. |
 | `dev.sh` | Deferred | Optional future work; outside the five current issues. Start the documented development stack. |
-| `seed-demo.sh` | Planned | Migrate and seed the synthetic demo environment. Owner: [issue 3](../docs/issues/03-auth-company-setup.md). |
+| `seed-demo.sh` | Existing | Migrate and seed the synthetic demo environment. Owner: [issue 3](../docs/issues/03-auth-company-setup.md). |
 | `export-api-schema.sh` | Deferred | Optional future work; outside the five current issues. Regenerate and check contract snapshots. |
 | `provision-models.py` | Deferred | Optional future work; outside the five current issues. Acquire licensed models with checksum validation outside Git. |
 | `verify.sh` | Deferred | Optional future work; outside the five current issues. Run relevant frontend, backend, engine, and integration checks. |
+| `provision-company.py` | Existing | Trusted operator mapping of real WorkOS users and active memberships to company roles. Owner: [issue 3](../docs/issues/03-auth-company-setup.md). |
 
 Generated caches, dependencies, runtime uploads, and `.git/` are excluded from directory manifests.
 

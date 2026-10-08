@@ -9,9 +9,9 @@ This is a file plan. **Existing** files are present; **Planned** files must be i
 | Filename | Status | Responsibility |
 |---|---|---|
 | `index.md` | Existing | Directory file manifest and responsibilities; keep it synchronized with changes. |
-| `api.ts` | Planned | Authenticated API transport and consistent error handling. Owner: [issue 2](../../../../docs/issues/02-employee-chat.md). |
+| `api.ts` | Existing | Authenticated API transport and consistent error handling. Owner: [issue 2](../../../../docs/issues/02-employee-chat.md). |
 | `types.ts` | Planned | Frontend API types generated or checked against OpenAPI. Owner: [issue 2](../../../../docs/issues/02-employee-chat.md). |
-| `schemas.ts` | Planned | Shared strict Zod runtime schemas and discriminated SSE unions. Owner: [issue 2](../../../../docs/issues/02-employee-chat.md). |
+| `schemas.ts` | Existing | Shared strict Zod runtime schemas and discriminated SSE unions. Owner: [issue 2](../../../../docs/issues/02-employee-chat.md). |
 
 Generated caches, dependencies, runtime uploads, and `.git/` are excluded from directory manifests.
 

@@ -11,7 +11,7 @@ This is a file plan. **Existing** files are present; **Planned** files must be i
 | `index.md` | Existing | Directory file manifest and responsibilities; keep it synchronized with changes. |
 | `__init__.py` | Existing | Backend package marker. Owner: [issue 5](../../../docs/issues/05-platform-deployment.md). |
 | `main.py` | Existing | Register feature routers and assemble the FastAPI app. Owner: [issue 5](../../../docs/issues/05-platform-deployment.md). |
-| `config.py` | Planned | Load required settings using pydantic-settings; keep secrets in SecretStr fields. Owner: [issue 5](../../../docs/issues/05-platform-deployment.md). |
+| `config.py` | Existing | Load required settings using pydantic-settings; keep secrets in SecretStr fields. Owner: [issue 5](../../../docs/issues/05-platform-deployment.md). |
 | `dependencies.py` | Planned | Connect feature implementations through ordinary FastAPI dependencies. Owner: [issue 5](../../../docs/issues/05-platform-deployment.md). |
 
 ## Subdirectories

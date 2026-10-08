@@ -1,0 +1,20 @@
+[
+  {
+    "id": "00000000-0000-4000-8000-000000000011",
+    "email": "manager@example.com",
+    "display_name": "Demo Manager",
+    "role": "manager"
+  },
+  {
+    "id": "00000000-0000-4000-8000-000000000012",
+    "email": "employee.one@example.com",
+    "display_name": "Demo Employee One",
+    "role": "employee"
+  },
+  {
+    "id": "00000000-0000-4000-8000-000000000013",
+    "email": "employee.two@example.com",
+    "display_name": "Demo Employee Two",
+    "role": "employee"
+  }
+]

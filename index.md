@@ -10,7 +10,7 @@ This is a file plan. **Existing** files are present; **Planned** files must be i
 |---|---|---|
 | `index.md` | Existing | Directory file manifest and responsibilities; keep it synchronized with changes. |
 | `README.md` | Existing | Short setup instructions and live frontend/backend links. Owner: [issue 5](docs/issues/05-platform-deployment.md). |
-| `.env.example` | Planned | Only configuration actually used by the features, with placeholder values. Owner: [issue 5](docs/issues/05-platform-deployment.md). |
+| `.env.example` | Existing | Only configuration actually used by the features, with placeholder values. Owner: [issue 5](docs/issues/05-platform-deployment.md). |
 | `.dockerignore` | Deferred | Optional future work; outside the five current issues. Exclude secrets, uploads, caches, and prototype artifacts from repository-root Docker build contexts. |
 | `.gitignore` | Existing | Keep secrets, uploads, caches, and model downloads out of Git. Owner: [issue 5](docs/issues/05-platform-deployment.md). |
 | `Cadence_Group_Risk_Management_Policy__v6.0.pdf` | Existing | Existing case-study reference PDF; not a synthetic demo fixture. |

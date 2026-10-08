@@ -10,7 +10,7 @@ This is a file plan. **Existing** files are present; **Planned** files must be i
 |---|---|---|
 | `index.md` | Existing | Directory file manifest and responsibilities; keep it synchronized with changes. |
 | `pyproject.toml` | Existing | Declare backend and engine dependencies needed to run the app. Owner: [issue 5](../../docs/issues/05-platform-deployment.md). |
-| `alembic.ini` | Planned | Database migration configuration. Owner: [issue 3](../../docs/issues/03-auth-company-setup.md). |
+| `alembic.ini` | Existing | Database migration configuration. Owner: [issue 3](../../docs/issues/03-auth-company-setup.md). |
 | `Dockerfile` | Deferred | Optional future work; outside the five current issues. API runtime with required document-processing dependencies. |
 
 ## Subdirectories

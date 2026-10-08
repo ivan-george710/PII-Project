@@ -9,10 +9,10 @@ This is a file plan. **Existing** files are present; **Planned** files must be i
 | Filename | Status | Responsibility |
 |---|---|---|
 | `index.md` | Existing | Directory file manifest and responsibilities; keep it synchronized with changes. |
-| `__init__.py` | Existing | Backend package marker. |
-| `main.py` | Existing | Build the API application, register routes, and initialize lifecycle hooks. |
-| `config.py` | Planned | Validate runtime settings; reject production use of demo adapters. |
-| `dependencies.py` | Planned | Inject sessions, database access, policies, engine, and provider interfaces. |
+| `__init__.py` | Existing | Backend package marker. Owner: [issue 5](../../../docs/issues/05-platform-deployment.md). |
+| `main.py` | Existing | Register feature routers and assemble the FastAPI app. Owner: [issue 5](../../../docs/issues/05-platform-deployment.md). |
+| `config.py` | Planned | Load required settings using pydantic-settings; keep secrets in SecretStr fields. Owner: [issue 5](../../../docs/issues/05-platform-deployment.md). |
+| `dependencies.py` | Planned | Connect feature implementations through ordinary FastAPI dependencies. Owner: [issue 5](../../../docs/issues/05-platform-deployment.md). |
 
 ## Subdirectories
 
@@ -25,3 +25,12 @@ This is a file plan. **Existing** files are present; **Planned** files must be i
 - [storage/](storage/index.md): see its exact file manifest.
 
 Generated caches, dependencies, runtime uploads, and `.git/` are excluded from directory manifests.
+
+## Approved issue scope
+
+- [Issue 2: Deliver employee chat with guarded uploads and LLM responses](../../../docs/issues/02-employee-chat.md) — [GitHub #2](https://github.com/ivan-george710/PII-Project/issues/2)
+- [Issue 3: Deliver WorkOS authentication, company setup, and employee-manager assignments](../../../docs/issues/03-auth-company-setup.md) — [GitHub #3](https://github.com/ivan-george710/PII-Project/issues/3)
+- [Issue 4: Deliver manager rule settings, custom rules, and employee PII reporting](../../../docs/issues/04-manager-settings-reports.md) — [GitHub #4](https://github.com/ivan-george710/PII-Project/issues/4)
+- [Issue 5: Connect the app and document basic setup](../../../docs/issues/05-platform-deployment.md) — [GitHub #5](https://github.com/ivan-george710/PII-Project/issues/5)
+
+Each issue includes its own tests and sample/setup helpers. Implement the listed files; deferred entries are outside the approved scope.

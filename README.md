@@ -1,5 +1,18 @@
 # Cadence PII Guard
 
+The approved implementation plan is in [docs/issues/index.md](docs/issues/index.md). Directory indexes assign exact files to the five issues; the prototype notes below describe the existing reference implementation.
+
+
+## Live CI/CD baseline
+
+- Frontend: [PII Guard](https://pii-guard-mu.vercel.app)
+- Backend API: [API documentation](https://pii-guard-mu.vercel.app/api/docs)
+- Health endpoint: [API health](https://pii-guard-mu.vercel.app/api/health)
+- Verified GitHub Actions run: [build, test, deploy, live smoke check](https://github.com/ivan-george710/PII-Project/actions/runs/37750508093)
+
+Both services deploy together from GitHub Actions. Main pushes deploy production; other branch pushes deploy previews. The current deployed app is only a connectivity baseline; the privacy product is not implemented. See [CI/CD details](docs/cicd.md). Vercel deployment protection may require sign-in.
+
+
 A document processing and PII protection pipeline for the Cadence case study.
 
 The system is designed to process organizational evidence artifacts, extract their

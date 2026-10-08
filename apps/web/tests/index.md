@@ -9,11 +9,20 @@ This is a file plan. **Existing** files are present; **Planned** files must be i
 | Filename | Status | Responsibility |
 |---|---|---|
 | `index.md` | Existing | Directory file manifest and responsibilities; keep it synchronized with changes. |
-| `chat.test.tsx` | Planned | Composer, attachment, streaming, retry, and error behavior (issue 2). |
-| `auth.test.tsx` | Planned | Session and role-aware navigation behavior (issue 3). |
-| `rules.test.tsx` | Planned | Toggle, custom-rule validation, preview, and saving behavior (issue 3). |
-| `reports.test.tsx` | Planned | Authorized reporting states and filters (issue 3). |
-| `setup.test.tsx` | Planned | Company setup and assignment interactions (issue 3). |
-| `setup.ts` | Planned | Shared frontend test environment (issue 4). |
+| `chat.test.tsx` | Planned | Composer, attachment, streaming, retry, and error behavior. Owner: [issue 2](../../../docs/issues/02-employee-chat.md). |
+| `auth.test.tsx` | Planned | Session and role-aware navigation behavior. Owner: [issue 3](../../../docs/issues/03-auth-company-setup.md). |
+| `rules.test.tsx` | Planned | Toggle, custom-rule validation, preview, and saving behavior. Owner: [issue 4](../../../docs/issues/04-manager-settings-reports.md). |
+| `reports.test.tsx` | Planned | Authorized reporting states and filters. Owner: [issue 4](../../../docs/issues/04-manager-settings-reports.md). |
+| `setup.test.tsx` | Planned | Company setup and assignment interactions. Owner: [issue 3](../../../docs/issues/03-auth-company-setup.md). |
+| `setup.ts` | Planned | Shared frontend test environment. Owner: [issue 2](../../../docs/issues/02-employee-chat.md). |
+| `demo_samples.test.tsx` | Planned | Menu accessibility, draft insertion, attachment selection/removal, and failures. Owner: [issue 2](../../../docs/issues/02-employee-chat.md). |
 
 Generated caches, dependencies, runtime uploads, and `.git/` are excluded from directory manifests.
+
+## Approved issue scope
+
+- [Issue 2: Deliver employee chat with guarded uploads and LLM responses](../../../docs/issues/02-employee-chat.md) — [GitHub #2](https://github.com/ivan-george710/PII-Project/issues/2)
+- [Issue 3: Deliver WorkOS authentication, company setup, and employee-manager assignments](../../../docs/issues/03-auth-company-setup.md) — [GitHub #3](https://github.com/ivan-george710/PII-Project/issues/3)
+- [Issue 4: Deliver manager rule settings, custom rules, and employee PII reporting](../../../docs/issues/04-manager-settings-reports.md) — [GitHub #4](https://github.com/ivan-george710/PII-Project/issues/4)
+
+Each issue includes its own tests and sample/setup helpers. Implement the listed files; deferred entries are outside the approved scope.

@@ -9,8 +9,14 @@ This is a file plan. **Existing** files are present; **Planned** files must be i
 | Filename | Status | Responsibility |
 |---|---|---|
 | `index.md` | Existing | Directory file manifest and responsibilities; keep it synchronized with changes. |
-| `AuthProvider.tsx` | Planned | Load session identity and provide company/role state. |
-| `RequireAuth.tsx` | Planned | Route guards and role-aware redirects; backend remains authoritative. |
-| `useAuth.ts` | Planned | Access authentication state and login/logout actions. |
+| `AuthProvider.tsx` | Planned | Load session identity and provide company/role state. Owner: [issue 3](../../../../../docs/issues/03-auth-company-setup.md). |
+| `RequireAuth.tsx` | Planned | Route guards and role-aware redirects; backend remains authoritative. Owner: [issue 3](../../../../../docs/issues/03-auth-company-setup.md). |
+| `useAuth.ts` | Planned | Access authentication state and login/logout actions. Owner: [issue 3](../../../../../docs/issues/03-auth-company-setup.md). |
 
 Generated caches, dependencies, runtime uploads, and `.git/` are excluded from directory manifests.
+
+## Approved issue scope
+
+- [Issue 3: Deliver WorkOS authentication, company setup, and employee-manager assignments](../../../../../docs/issues/03-auth-company-setup.md) — [GitHub #3](https://github.com/ivan-george710/PII-Project/issues/3)
+
+Each issue includes its own tests and sample/setup helpers. Implement the listed files; deferred entries are outside the approved scope.

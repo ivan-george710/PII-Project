@@ -2,13 +2,17 @@
 
 Public static assets for the web application.
 
-This is a file plan. **Existing** files are present; **Planned** files must be implemented in the owning issue. This documentation does not create application code.
+This is a file plan. **Existing** files are present; **Planned** files must be implemented in the owning issue. **Deferred** files are optional future work, outside the current issues. This documentation does not create application code.
 
 ## Files
 
 | Filename | Status | Responsibility |
 |---|---|---|
 | `index.md` | Existing | Directory file manifest and responsibilities; keep it synchronized with changes. |
-| `favicon.svg` | Planned | Simple application browser icon. |
+| `favicon.svg` | Deferred | Optional future work; outside the five current issues. Simple application browser icon. |
 
 Generated caches, dependencies, runtime uploads, and `.git/` are excluded from directory manifests.
+
+## Approved issue scope
+
+See the [five approved issues](../../../docs/issues/index.md). This directory has no required implementation files in the current scope; deferred entries remain optional.

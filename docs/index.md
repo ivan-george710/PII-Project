@@ -30,3 +30,14 @@ Generated caches, dependencies, runtime uploads, and `.git/` are excluded from d
 - [Issue 5: Connect the app and document basic setup](issues/05-platform-deployment.md) — [GitHub #5](https://github.com/ivan-george710/PII-Project/issues/5)
 
 Each issue includes its own tests and sample/setup helpers. Implement the listed files; deferred entries are outside the approved scope.
+
+## Requested network roadmap files
+
+| Filename | Status | Responsibility |
+|---|---|---|
+| `presentation-roadmap.md` | Existing notes | Required PPT slide copy with explicit planned/not implemented status and deployment limits. |
+| `network-enforcement.md` | Planned, issue #14 | Linux gateway/network enrollment, TLS trust, routing, setup and boundaries. |
+| `network-upload-contract.md` | Planned, issue #15 | External submission inspection, service admission, delivery and safe reports. |
+| `website-coverage.md` | Planned, issue #15 | Verified sites/transports/formats and blocked/unverified cases. |
+
+Network roadmap details: [issue #14](issues/06-network-enforcement.md) and [issue #15](issues/07-network-uploads-reporting.md). These capabilities are not implemented.

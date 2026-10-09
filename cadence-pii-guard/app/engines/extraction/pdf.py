@@ -1,8 +1,28 @@
 from pathlib import Path
 
 from pypdf import PdfReader
+from pypdf.errors import FileNotDecryptedError, PdfReadError
 
 from .models import ExtractedPage, ExtractionResult
+
+
+def _open_pdf(path: Path) -> PdfReader:
+    try:
+        reader = PdfReader(str(path))
+        if reader.is_encrypted:
+            raise ValueError(f"PDF is password-protected: {path.name}")
+        if not reader.pages:
+            raise ValueError(f"PDF contains no pages: {path.name}")
+    except FileNotDecryptedError as error:
+        raise ValueError(
+            f"PDF is password-protected: {path.name}"
+        ) from error
+    except (PdfReadError, EOFError) as error:
+        raise ValueError(
+            f"Could not read PDF '{path.name}': {error}"
+        ) from error
+
+    return reader
 
 
 def extract_text_pdf(path: Path) -> ExtractionResult:
@@ -10,7 +30,7 @@ def extract_text_pdf(path: Path) -> ExtractionResult:
     Extract selectable text from a text-based PDF.
     """
 
-    reader = PdfReader(str(path))
+    reader = _open_pdf(path)
 
     pages = []
 
@@ -37,7 +57,7 @@ def extract_hybrid_pdf(
 ) -> ExtractionResult:
     """Extract each PDF page using text extraction or OCR as required."""
 
-    reader = PdfReader(str(path))
+    reader = _open_pdf(path)
 
     pages = []
 

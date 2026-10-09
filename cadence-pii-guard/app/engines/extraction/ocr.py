@@ -5,6 +5,7 @@ from pdf2image import convert_from_path
 from rapidocr_onnxruntime import RapidOCR
 
 from .models import ExtractedPage, ExtractionResult, OCRTextBlock
+from .pdf import _open_pdf
 
 
 class OCREngine:
@@ -34,15 +35,34 @@ class OCREngine:
 
         return blocks
 
+    def extract_image_file(
+        self,
+        image_path: Path,
+        file_type: str,
+    ) -> ExtractionResult:
+        blocks = self.extract_image(image_path)
+        page_text = "\n".join(block.text for block in blocks)
+        return ExtractionResult(
+            source_path=image_path,
+            filename=image_path.name,
+            file_type=file_type,
+            pages=[
+                ExtractedPage(
+                    page_number=1,
+                    text=page_text,
+                    extraction_method="ocr",
+                    blocks=blocks,
+                )
+            ],
+        )
+
     def extract_pdf(
         self,
         pdf_path: Path,
         dpi: int = 150,
     ) -> ExtractionResult:
 
-        from pypdf import PdfReader
-
-        reader = PdfReader(str(pdf_path))
+        reader = _open_pdf(pdf_path)
         total_pages = len(reader.pages)
 
         pages = []
@@ -70,8 +90,17 @@ class OCREngine:
 
                 if not images:
                     print(
-                        f"Warning: page {page_number} produced no image",
+                        f"Warning: page {page_number} produced no image; "
+                        "retaining an empty OCR page",
                         flush=True,
+                    )
+                    pages.append(
+                        ExtractedPage(
+                            page_number=page_number,
+                            text="",
+                            extraction_method="ocr",
+                            blocks=[],
+                        )
                     )
                     continue
 

@@ -101,7 +101,8 @@ jobs:
           DEPLOYMENT_RESULT="$RUNNER_TEMP/vercel-result.txt" node --input-type=module <<'JS'
           import { readFileSync, appendFileSync } from 'node:fs';
           const result = readFileSync(process.env.DEPLOYMENT_RESULT, 'utf8').trim();
-          const deployment = JSON.parse(result).deployment;
+          const payload = JSON.parse(result);
+          const deployment = payload.deployment ?? payload;
           const value = deployment?.url;
           if (!/^dpl_[A-Za-z0-9]+$/.test(deployment?.id ?? '')) {
             throw new Error('Unexpected Vercel deployment ID');

@@ -14,59 +14,14 @@ app = FastAPI(
     openapi_url="/api/openapi.json",
     redoc_url=None,
 )
-
-# Core and implemented feature routers
-app.include_router(health_router)
-app.include_router(auth_router)
-app.include_router(organization_router)
-
-# Feature routers from Issue 2 (Employee Chat, Uploads, Demo Samples)
-try:
-    from app.routes.chat import router as chat_router  # type: ignore
-
-    app.include_router(chat_router)
-except ImportError:
-    # TODO: Issue #2 - Employee chat router (apps/api/app/routes/chat.py)
-    pass
-
-try:
-    from app.routes.uploads import router as uploads_router  # type: ignore
-
-    app.include_router(uploads_router)
-except ImportError:
-    # TODO: Issue #2 - Uploads router (apps/api/app/routes/uploads.py)
-    pass
-
-try:
-    from app.routes.demo import router as demo_router  # type: ignore
-
-    app.include_router(demo_router)
-except ImportError:
-    # TODO: Issue #2 - Demo samples router (apps/api/app/routes/demo.py)
-    pass
-
-# Feature routers from Issue 4 (Manager Rules and Reports)
-try:
-    from app.routes.rules import router as rules_router  # type: ignore
-
-    app.include_router(rules_router)
-except ImportError:
-    # TODO: Issue #4 - Manager rules router (apps/api/app/routes/rules.py)
-    pass
-
-try:
-    from app.routes.reports import router as reports_router  # type: ignore
-
-    app.include_router(reports_router)
-except ImportError:
-    # TODO: Issue #4 - Manager reports router (apps/api/app/routes/reports.py)
-    pass
+for router in (health_router, auth_router, organization_router):
+    app.include_router(router)
 
 
 @app.exception_handler(ApiError)
 async def api_error(request: Request, error: ApiError):
     return JSONResponse(
-        error_body(error.code, error.message, error.fields if hasattr(error, "fields") else None),
+        error_body(error.code, error.message),
         status_code=error.status,
         headers={"Cache-Control": "no-store"},
     )

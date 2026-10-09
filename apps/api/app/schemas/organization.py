@@ -2,7 +2,7 @@ from datetime import UTC, datetime
 from typing import Literal
 from uuid import UUID
 
-from pydantic import EmailStr, Field, field_validator
+from pydantic import Field, field_validator
 
 from app.schemas.common import Schema
 
@@ -31,7 +31,7 @@ class OrganizationResponse(Schema):
 
 class UserSummary(Schema):
     id: UUID
-    email: EmailStr
+    email: str
     display_name: str
     role: Literal["employee", "manager"]
 

@@ -7,12 +7,24 @@ Suggested ownership: App integration / setup
 
 The frontend, backend, and GitHub Actions → Vercel deployment already work. This issue connects the feature modules to that existing app and provides short setup instructions.
 
+## Current implementation to preserve (updated 2026-10-09)
+
+- Start from current upstream `ivan-george710/PII-Project:main`, fetch it again before submitting, and merge current main into existing feature branches. Old branch code must not replace newer working features. Review the final diff against current main.
+- Authentication is local email/password. WorkOS was removed intentionally: do not restore its SDK, redirects, settings, cookies, mocks, secrets or CI jobs. Preserve Argon2 hashing, database sessions, company/user/assignment models, permissions, logout/revocation, CSRF and account lockout.
+- Preserve `POST /api/v1/auth/signup` (201 new isolated company + manager), `POST /api/v1/auth/login` (200), `GET /api/v1/auth/me` (200 session DTO or 401), and `POST /api/v1/auth/logout` (204). Session DTO: `{user:{id,email,display_name,role,organization_id},organization:{id,name},csrf_token}`. Cookie name is `pii-session`; the API resolves roles/company from its database. Signup cannot join an existing company or promote an existing user.
+- Email/password inputs are strings with **no email-format/verification or password-strength/length checks**. Email is lowercased. Duplicate email is 409 ACCOUNT_EXISTS. Public email fields use Pydantic `str` / Zod `z.string()`, not EmailStr or email-format validators. Ordinary feature-specific text/file limits still apply.
+- Preserve `/login`, `/signup` and `/company/setup`. Product screens use black/white and neutral grayscale only, no icons; simple text labels and controls. Keep the existing auth design. Employee chat remains a plain LLM interface, with attachments and built-in test samples in the composer addon menu.
+- Existing migration chain is `0001_company_identity -> 0002_local_auth -> 0003_signup`. Keep those files, revision IDs, models and deployed data. Add a uniquely named feature migration after the current head; reconcile new parallel revisions on integration so there is one head. Never delete/rewrite an applied migration or recreate company/user/session tables.
+- CI currently passes build/tests, migration parity, Vercel deployment and live checks. Preserve these checks; do not delete tests, skip jobs or weaken assertions to get green. Main pushes deploy production, other pushes previews; PRs run tests. Reuse VERCEL_TOKEN / VERCEL_ORG_ID / VERCEL_PROJECT_ID and same-origin `/api` routing. No external-auth credentials are needed.
+- Only auth/company setup is implemented in the product. Chat, reports/policies and `packages/engine` are still feature work; the prototype is reference code. Never label placeholders, empty namespaces or `NotImplementedError` stubs as delivered integration. Missing production processing must block submissions; fake adapters require explicit development/test opt-in. A present feature with a broken import must fail checks/startup, not silently disappear.
+- Before delivery run the existing backend and frontend checks, migration upgrade/parity and the feature's own checks. Verify the actual PR head and resolve conflicts. Update touched indexes and this issue's status to distinguish implemented work from pending work. This is a shared baseline, not a prerequisite issue dependency.
+
 ## Work to do
 
 1. Register the feature routers in `apps/api/app/main.py` and connect the real session, policy, engine, reporting, storage, and LLM implementations through `dependencies.py`. Use the interfaces defined in issues 1–4; keep business logic in those features.
 2. Load configuration with Pydantic Settings. Add the settings each feature actually uses to `.env.example`, with placeholders and a brief description. Use `SecretStr` for credentials; report missing setting names without printing values.
 3. Ensure the API can import the engine package through a normal package dependency. Document its install command and any runtime tools the chosen implementation actually requires.
-4. Document commands to install dependencies, start the API and frontend, apply the auth issue's database migrations, and configure WorkOS/provider credentials. List the live URLs in README.
+4. Document commands to install dependencies, start the API and frontend, apply the auth issue's database migrations, and configure local session settings and LLM credentials. List the live URLs in README.
 5. Keep the existing GitHub Actions workflow and Vercel routing working as feature dependencies are added. Add the features' own check commands to the existing check job when they exist.
 
 ## Inputs and outputs
@@ -26,7 +38,7 @@ The frontend, backend, and GitHub Actions → Vercel deployment already work. Th
 
 ## Configuration
 
-Use the names documented by the feature implementations. At minimum, record the chosen database connection, WorkOS credentials/callback URL, LLM key/model, and file-storage settings. `SHOW_DEMO_SAMPLES` controls the chat's built-in sample menu. Keep credentials on the backend and in environment settings.
+Use the names documented by the feature implementations. At minimum, record the chosen database connection, SESSION_SECRET and public app origin, LLM key/model, and file-storage settings. `SHOW_DEMO_SAMPLES` controls the chat's built-in sample menu. Keep credentials on the backend and in environment settings.
 
 The deployment already uses Actions secret `VERCEL_TOKEN` and variables `VERCEL_ORG_ID` / `VERCEL_PROJECT_ID`. Reuse them. Main pushes deploy production, other pushes deploy previews, and pull requests run checks.
 

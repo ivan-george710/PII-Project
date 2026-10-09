@@ -5,6 +5,7 @@ cadence-pii-guard
 demo
 docs
 experiments
+packages
 tests
 *.pdf
 *.docx

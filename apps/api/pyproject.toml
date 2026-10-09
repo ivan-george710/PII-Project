@@ -2,32 +2,20 @@
 name = "pii-guard-api"
 version = "0.0.1"
 requires-python = ">=3.12"
-description = "PII Guard API backend and engine orchestration"
 dependencies = [
   "fastapi==0.142.4",
   "pydantic==2.13.5",
   "uvicorn==0.42.0",
-  "workos==10.5.0",
+  "pwdlib[argon2]==0.3.0",
   "sqlalchemy==2.1.4",
   "alembic==1.20.0",
   "pydantic-settings==2.15.0",
-  "itsdangerous==2.2.0",
   "email-validator==2.3.0",
   "psycopg[binary]==3.3.4",
-  "cryptography==44.0.2",
 ]
 
 [project.optional-dependencies]
-test = [
-  "httpx==0.28.1",
-  "pytest==9.1.1",
-]
-# Privacy engine package dependency (packages/engine)
-# Install locally with: pip install -e ../../packages/engine
-# Runtime dependencies for engine OCR/NLP: rapidocr-onnxruntime, presidio-analyzer, spacy (en_core_web_sm)
-engine = [
-  "pii-guard-engine",
-]
+test = ["httpx==0.28.1", "pytest==9.1.1"]
 
 [build-system]
 requires = ["setuptools>=68"]

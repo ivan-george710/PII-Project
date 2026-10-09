@@ -3,7 +3,7 @@ const id = z.uuid();
 export const role = z.enum(["employee", "manager"]);
 export const userSummary = z.strictObject({
   id,
-  email: z.email(),
+  email: z.string(),
   display_name: z.string().min(1).max(120),
   role,
 });
@@ -43,3 +43,10 @@ export const apiError = z.strictObject({
   }),
 });
 export type Session = z.infer<typeof session>;
+export const loginInput = z.strictObject({
+  email: z.string().transform((value) => value.toLowerCase()),
+  password: z.string(),
+});
+export const signupInput = loginInput.extend({
+  display_name: z.string(),
+});

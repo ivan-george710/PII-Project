@@ -4,6 +4,9 @@ import { RequireAuth } from "./features/auth/RequireAuth";
 import { useAuth } from "./features/auth/useAuth";
 import Login from "./pages/Login";
 import CompanySetup from "./pages/CompanySetup";
+import ManagerSettings from "./pages/ManagerSettings";
+import ManagerReports from "./pages/ManagerReports";
+import { ManagerLayout } from "./layouts/ManagerLayout";
 function Home() {
   const { identity, loading } = useAuth();
   if (loading) return <p role="status">Loading…</p>;
@@ -43,6 +46,17 @@ function Shell() {
             </RequireAuth>
           }
         />
+        <Route
+          path="/manager"
+          element={
+            <RequireAuth manager>
+              <ManagerLayout />
+            </RequireAuth>
+          }
+        >
+          <Route path="settings" element={<ManagerSettings />} />
+          <Route path="reports" element={<ManagerReports />} />
+        </Route>
         <Route
           path="/chat"
           element={

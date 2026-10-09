@@ -10,7 +10,7 @@ This is a file plan. **Existing** files are present; **Planned** files must be i
 |---|---|---|
 | `index.md` | Existing | Directory file manifest and responsibilities; keep it synchronized with changes. |
 | `ChatLayout.tsx` | Planned | Minimal chat shell and conversation navigation. Owner: [issue 2](../../../../docs/issues/02-employee-chat.md). |
-| `ManagerLayout.tsx` | Planned | Manager reports/settings/setup navigation. Owner: [issue 4](../../../../docs/issues/04-manager-settings-reports.md). |
+| `ManagerLayout.tsx` | Existing | Manager reports/settings/setup navigation. Owner: [issue 4](../../../../docs/issues/04-manager-settings-reports.md). |
 
 Generated caches, dependencies, runtime uploads, and `.git/` are excluded from directory manifests.
 

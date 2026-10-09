@@ -7,8 +7,6 @@ from app.db.models.conversation import Conversation
 from app.db.models.attachment import Attachment
 from app.db.models.submission import Submission
 from app.llm.client import ProviderDelta
-from app.main import app
-from app.routes.chat import router as chat_router
 from app.services.guard import (
     EventBatch,
     LocalEventSink,
@@ -19,7 +17,6 @@ from app.services.guard import (
 )
 from conftest import login_as
 
-app.include_router(chat_router)
 
 
 def test_conversations_are_employee_scoped(env):

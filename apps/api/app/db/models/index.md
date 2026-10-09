@@ -30,3 +30,5 @@ Generated caches, dependencies, runtime uploads, and `.git/` are excluded from d
 - [Issue 4: Deliver manager rule settings, custom rules, and employee PII reporting](../../../../../docs/issues/04-manager-settings-reports.md) — [GitHub #4](https://github.com/ivan-george710/PII-Project/issues/4)
 
 Each issue includes its own tests and sample/setup helpers. Implement the listed files; deferred entries are outside the approved scope.
+
+All implemented models are exported by `__init__.py` so Alembic metadata includes chat tables without importing HTTP routes. Chat metadata types, indexes and constraints match migration `0004_employee_chat`.

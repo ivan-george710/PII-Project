@@ -89,3 +89,21 @@ def test_broken_implemented_router_cannot_silently_disappear(monkeypatch):
     monkeypatch.setattr(dependencies, "import_module", broken_import)
     with pytest.raises(ModuleNotFoundError, match="internal processing"):
         dependencies.register_feature_routers(FastAPI())
+
+
+def test_feature_routes_have_unique_openapi_operations():
+    import warnings
+
+    # Generate afresh after all test modules have been imported: tests must not
+    # install duplicate routes on the shared production app during collection.
+    previous_schema = app.openapi_schema
+    try:
+        app.openapi_schema = None
+        with warnings.catch_warnings():
+            warnings.filterwarnings("error", message="Duplicate Operation ID.*")
+            schema = app.openapi()
+        assert "/api/v1/conversations" in schema["paths"]
+        assert "/api/v1/uploads/init" in schema["paths"]
+        assert "/api/v1/demo/samples" in schema["paths"]
+    finally:
+        app.openapi_schema = previous_schema

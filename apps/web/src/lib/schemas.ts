@@ -22,11 +22,11 @@ export const organizationInput = z.strictObject({
 });
 export const assignmentInput = z.strictObject({ manager_id: id });
 export const loginInput = z.strictObject({
-  email: z.string(),
+  email: z.string().transform((value) => value.toLowerCase()),
   password: z.string(),
 });
 export const signupInput = loginInput.extend({
-  display_name: z.string().min(1).max(120),
+  display_name: z.string(),
 });
 export const assignment = z.strictObject({
   employee_id: id,

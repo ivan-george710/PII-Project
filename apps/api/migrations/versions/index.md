@@ -9,11 +9,11 @@ This is a file plan. **Existing** files are present; **Planned** files must be i
 | Filename | Status | Responsibility |
 |---|---|---|
 | `index.md` | Existing | Directory file manifest and responsibilities; keep it synchronized with changes. |
-| `0002_conversations_messages_attachments.py` | Implemented | Chat and attachment tables; enforce ownership relationships and coordinate migration ordering through shared contracts. Owner: [issue 2](../../../../docs/issues/02-employee-chat.md). |
+| `0004_employee_chat.py` | Implemented | Chat and attachment tables; enforce ownership relationships and extend the deployed 0003_signup head with model-parity checks. Owner: [issue 2](../../../../docs/issues/02-employee-chat.md). |
 | `0001_company_identity.py` | Existing | Company, WorkOS user identities, and manager assignments; company/auth foreign keys. Owner: [issue 3](../../../../docs/issues/03-auth-company-setup.md). |
 | `0002_local_auth.py` | Existing | Local user credentials and session persistence. Owner: [issue 3](../../../../docs/issues/03-auth-company-setup.md). |
 | `0003_signup.py` | Existing | Signup and local authentication schema updates. Owner: [issue 3](../../../../docs/issues/03-auth-company-setup.md). |
-| `0003_company_policy_events.py` | Planned | Versioned company policies and PII event tables; company/employee foreign keys and idempotency constraints. Owner: [issue 4](../../../../docs/issues/04-manager-settings-reports.md). |
+| `0005_company_policy_events.py` | Planned | Versioned company policies and PII event tables; company/employee foreign keys and idempotency constraints. Owner: [issue 4](../../../../docs/issues/04-manager-settings-reports.md). |
 
 Generated caches, dependencies, runtime uploads, and `.git/` are excluded from directory manifests.
 

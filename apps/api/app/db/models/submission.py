@@ -1,6 +1,7 @@
 from uuid import UUID
 
 from sqlalchemy import (
+    CheckConstraint,
     ForeignKeyConstraint,
     Index,
     String,
@@ -17,6 +18,7 @@ from app.db.base import Base, IdentityMixin
 class Submission(IdentityMixin, Base):
     __tablename__ = "submissions"
     __table_args__ = (
+        CheckConstraint("state IN ('processing','completed','failed','cancelled')"),
         UniqueConstraint(
             "employee_id", "conversation_id", "client_request_id",
             name="uq_submission_employee_conversation_request",
@@ -54,9 +56,9 @@ class Submission(IdentityMixin, Base):
             name="fk_submission_assistant_message",
         ),
     )
-    organization_id: Mapped[UUID] = mapped_column(Uuid, nullable=False, index=True)
-    employee_id: Mapped[UUID] = mapped_column(Uuid, nullable=False, index=True)
-    conversation_id: Mapped[UUID] = mapped_column(Uuid, nullable=False, index=True)
+    organization_id: Mapped[UUID] = mapped_column(Uuid, nullable=False)
+    employee_id: Mapped[UUID] = mapped_column(Uuid, nullable=False)
+    conversation_id: Mapped[UUID] = mapped_column(Uuid, nullable=False)
     client_request_id: Mapped[UUID] = mapped_column(Uuid, nullable=False)
     request_hash: Mapped[str] = mapped_column(String(64), nullable=False)
     state: Mapped[str] = mapped_column(String(20), nullable=False, default="processing")

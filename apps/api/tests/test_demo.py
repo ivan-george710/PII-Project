@@ -2,11 +2,8 @@ from uuid import UUID, uuid4
 
 from app.config import get_settings
 from app.db.models.attachment import Attachment
-from app.main import app
-from app.routes.demo import router as demo_router
 from conftest import login_as
 
-app.include_router(demo_router)
 
 
 def test_catalog_toggle_and_employee_scoping(env, monkeypatch):

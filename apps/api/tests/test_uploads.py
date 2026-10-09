@@ -2,12 +2,9 @@ from uuid import uuid4
 from urllib.parse import urlsplit
 
 from app.db.models.attachment import Attachment
-from app.main import app
-from app.routes.uploads import router as uploads_router
 from app.storage.files import LocalFileStorage
 from conftest import login_as
 
-app.include_router(uploads_router)
 
 
 def test_upload_status_is_scoped_to_employee(env, tmp_path):

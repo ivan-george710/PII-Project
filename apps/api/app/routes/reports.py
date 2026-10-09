@@ -13,7 +13,7 @@ router = APIRouter(prefix="/api/v1/reports", tags=["Manager reports"])
 
 @router.get("", response_model=ReportEventsPage)
 def get_reports_endpoint(
-    employee_id: UUID | None = Query(None),
+    employee_id: str | None = Query(None),
     category: str | None = Query(None, min_length=1, max_length=80),
     action: str | None = Query(None),
     from_time: datetime | None = Query(None),
@@ -23,11 +23,19 @@ def get_reports_endpoint(
     identity=Depends(require_manager),
     db: Session = Depends(get_db),
 ):
+    valid_emp_uuid = None
+    if employee_id:
+        try:
+            valid_emp_uuid = UUID(employee_id.strip())
+        except ValueError:
+            # If not a valid UUID yet, return empty page instead of crashing with 422
+            return ReportEventsPage(items=[], next_cursor=None)
+
     return get_reports(
         db=db,
         organization_id=identity.organization_id,
         manager_id=identity.user_id,
-        employee_id=employee_id,
+        employee_id=valid_emp_uuid,
         category=category,
         action=action,
         from_time=from_time,
@@ -39,7 +47,7 @@ def get_reports_endpoint(
 
 @router.get("/summary", response_model=ReportSummaryResponse)
 def get_reports_summary_endpoint(
-    employee_id: UUID | None = Query(None),
+    employee_id: str | None = Query(None),
     category: str | None = Query(None, min_length=1, max_length=80),
     action: str | None = Query(None),
     from_time: datetime | None = Query(None),
@@ -47,11 +55,24 @@ def get_reports_summary_endpoint(
     identity=Depends(require_manager),
     db: Session = Depends(get_db),
 ):
+    valid_emp_uuid = None
+    if employee_id:
+        try:
+            valid_emp_uuid = UUID(employee_id.strip())
+        except ValueError:
+            return ReportSummaryResponse(
+                submission_count=0,
+                failed_count=0,
+                redacted_count=0,
+                allowed_disabled_count=0,
+                by_category=[],
+            )
+
     return get_summary(
         db=db,
         organization_id=identity.organization_id,
         manager_id=identity.user_id,
-        employee_id=employee_id,
+        employee_id=valid_emp_uuid,
         category=category,
         action=action,
         from_time=from_time,

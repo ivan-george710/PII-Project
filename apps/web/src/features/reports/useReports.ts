@@ -72,7 +72,10 @@ export function useReports() {
   }, [buildQuery, csrf, employeeId, category, action, fromTime, toTime]);
 
   useEffect(() => {
-    void loadData();
+    const timer = setTimeout(() => {
+      void loadData();
+    }, 300);
+    return () => clearTimeout(timer);
   }, [loadData]);
 
   const loadMore = async () => {

@@ -73,7 +73,7 @@ export default function ManagerReports() {
         </div>
       )}
 
-      <ReportFilters filters={filters} disabled={loading} />
+      <ReportFilters filters={filters} />
 
       {selectedEvent && (
         <EventDetails

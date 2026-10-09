@@ -58,7 +58,6 @@ describe("ReportFilters component", () => {
           toTime: "",
           setToTime,
         }}
-        disabled={false}
       />
     );
 

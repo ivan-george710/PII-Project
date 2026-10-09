@@ -1,6 +1,5 @@
 export function ReportFilters({
   filters,
-  disabled,
 }: {
   filters: {
     employeeId: string;
@@ -14,10 +13,9 @@ export function ReportFilters({
     toTime: string;
     setToTime: (val: string) => void;
   };
-  disabled: boolean;
 }) {
   return (
-    <fieldset disabled={disabled} style={{ marginBottom: "1.5rem", padding: "1rem" }}>
+    <fieldset style={{ marginBottom: "1.5rem", padding: "1rem" }}>
       <legend>Report Filters</legend>
       <div style={{ display: "flex", flexWrap: "wrap", gap: "1rem" }}>
         <div>

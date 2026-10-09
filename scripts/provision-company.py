@@ -1,85 +1,87 @@
-"""Trusted operator setup for local company accounts; passwords are never printed."""
+"""Trusted operator command to map real WorkOS users to company roles."""
 
 import argparse
-import getpass
+import json
+from pathlib import Path
+from typing import Literal
 from uuid import UUID
 
 from pydantic import EmailStr, Field, TypeAdapter
-from sqlalchemy import delete, select
+from sqlalchemy import select
 
-from app.auth.passwords import hash_password
-from app.db.models import AuthSession, Organization, User
+from app.auth.workos import get_gateway
+from app.db.models import Organization, User
 from app.db.session import session_factory
 from app.schemas.common import Schema
 
 
 class ProvisionUser(Schema):
-    email: EmailStr = Field(max_length=254)
+    workos_user_id: str = Field(pattern=r"^user_[A-Za-z0-9]+$", max_length=100)
+    email: EmailStr
     display_name: str = Field(min_length=1, max_length=120)
-    role: str = Field(pattern=r"^(employee|manager)$")
+    role: Literal["employee", "manager"]
 
 
-def provision(db, organization_id, name, identity, password, reset_password=False):
-    value = ProvisionUser.model_validate(identity)
-    email = str(value.email).lower()
-    user = db.scalar(select(User).where(User.email == email))
-    if user and (user.organization_id != organization_id or user.role != value.role):
-        raise ValueError("Existing company/role mapping conflict")
+def provision(db, gateway, organization_id, name, workos_organization_id, identities):
+    values = TypeAdapter(list[ProvisionUser]).validate_python(identities)
+    if not values or len({v.workos_user_id for v in values}) != len(values):
+        raise ValueError("Provide distinct users")
+    for value in values:
+        remote = gateway.client.user_management.get_user(id=value.workos_user_id)
+        if remote.email != value.email:
+            raise ValueError("WorkOS email mapping mismatch")
+        members = gateway.client.organization_membership.list_organization_memberships(
+            user_id=value.workos_user_id,
+            organization_id=workos_organization_id,
+            statuses=["active"],
+        )
+        if not members.data:
+            raise ValueError("Active WorkOS organization membership required")
     org = db.get(Organization, organization_id)
     if org is None:
-        org = Organization(id=organization_id, name=name)
+        org = Organization(
+            id=organization_id, name=name, workos_organization_id=workos_organization_id
+        )
         db.add(org)
         db.flush()
-    if user is None:
-        user = User(
-            organization_id=org.id,
-            email=email,
-            display_name=value.display_name,
-            role=value.role,
+    elif org.workos_organization_id != workos_organization_id:
+        raise ValueError("Company mapping conflict")
+    for value in values:
+        user = db.scalar(
+            select(User).where(User.workos_user_id == value.workos_user_id)
         )
-        db.add(user)
-    if not user.password_hash or reset_password:
-        user.password_hash = hash_password(password)
-        user.failed_login_attempts = 0
-        user.locked_until = None
-        if user.id:
-            db.execute(delete(AuthSession).where(AuthSession.user_id == user.id))
+        if user is not None:
+            if user.organization_id != organization_id or user.role != value.role:
+                raise ValueError(
+                    "Existing company/role mapping conflict; change it deliberately in the database"
+                )
+        else:
+            db.add(
+                User(organization_id=organization_id, **value.model_dump(mode="json"))
+            )
     db.commit()
-    return {
-        "organization_id": str(org.id),
-        "user_id": str(user.id),
-        "email": email,
-        "role": user.role,
-    }
+    return {"organization_id": str(org.id), "users": len(values)}
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--organization-id", required=True, type=UUID)
-    parser.add_argument("--name", required=True)
-    parser.add_argument("--email", required=True)
-    parser.add_argument("--display-name", required=True)
-    parser.add_argument("--role", choices=["employee", "manager"], default="employee")
-    parser.add_argument("--reset-password", action="store_true")
-    args = parser.parse_args()
-    if not 1 <= len(args.name.strip()) <= 120:
+    p = argparse.ArgumentParser()
+    p.add_argument("--organization-id", required=True, type=UUID)
+    p.add_argument("--name", required=True)
+    p.add_argument("--workos-organization-id", required=True)
+    p.add_argument("--identities", required=True)
+    a = p.parse_args()
+    if not 1 <= len(a.name.strip()) <= 120:
         raise ValueError("Company name must be 1–120 characters")
-    password = getpass.getpass("Password (12–128 characters): ")
-    confirmation = getpass.getpass("Confirm password: ")
-    if password != confirmation:
-        raise ValueError("Passwords do not match")
     with session_factory()() as db:
         print(
-            provision(
-                db,
-                args.organization_id,
-                args.name.strip(),
-                {
-                    "email": args.email,
-                    "display_name": args.display_name,
-                    "role": args.role,
-                },
-                password,
-                args.reset_password,
+            json.dumps(
+                provision(
+                    db,
+                    get_gateway(),
+                    a.organization_id,
+                    a.name.strip(),
+                    a.workos_organization_id,
+                    json.loads(Path(a.identities).read_text()),
+                )
             )
         )

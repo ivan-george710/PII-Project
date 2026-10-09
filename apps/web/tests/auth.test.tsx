@@ -34,11 +34,13 @@ describe("authentication", () => {
   it("rejects malformed API session payloads", async () => {
     vi.stubGlobal(
       "fetch",
-      vi.fn().mockResolvedValue(
-        new Response(JSON.stringify({ user: { role: "manager" } }), {
-          status: 200,
-        }),
-      ),
+      vi
+        .fn()
+        .mockResolvedValue(
+          new Response(JSON.stringify({ user: { role: "manager" } }), {
+            status: 200,
+          }),
+        ),
     );
     render(
       <AuthProvider>
@@ -86,80 +88,5 @@ describe("authentication", () => {
       </MemoryRouter>,
     );
     expect(screen.queryByText("Private setup")).not.toBeInTheDocument();
-  });
-});
-
-import userEvent from "@testing-library/user-event";
-import { Routes, Route } from "react-router-dom";
-import Login from "../src/pages/Login";
-
-describe("local sign-in", () => {
-  function renderLogin() {
-    return render(
-      <MemoryRouter initialEntries={["/login"]}>
-        <AuthProvider>
-          <Routes>
-            <Route path="/login" element={<Login />} />
-            <Route path="/company/setup" element={<p>Company setup</p>} />
-          </Routes>
-        </AuthProvider>
-      </MemoryRouter>,
-    );
-  }
-  it("submits credentials and navigates using the server role", async () => {
-    const manager = { ...value, user: { ...value.user, role: "manager" } };
-    const fetchMock = vi
-      .fn()
-      .mockResolvedValueOnce(new Response("{}", { status: 401 }))
-      .mockResolvedValueOnce(new Response(JSON.stringify(manager)))
-      .mockResolvedValueOnce(new Response(JSON.stringify(manager)));
-    vi.stubGlobal("fetch", fetchMock);
-    renderLogin();
-    await screen.findByRole("button", { name: "Sign in" });
-    const user = userEvent.setup();
-    await user.type(screen.getByLabelText("Email"), "MANAGER@example.com");
-    await user.type(
-      screen.getByLabelText("Password"),
-      "fictional-password-123",
-    );
-    await user.click(screen.getByRole("button", { name: "Sign in" }));
-    await screen.findByText("Company setup");
-    expect(fetchMock.mock.calls[1][0]).toBe("/api/v1/auth/login");
-    expect(JSON.parse(fetchMock.mock.calls[1][1].body)).toEqual({
-      email: "manager@example.com",
-      password: "fictional-password-123",
-    });
-    expect(fetchMock.mock.calls[1][1].credentials).toBe("same-origin");
-  });
-  it("shows failed login feedback without navigating", async () => {
-    vi.stubGlobal(
-      "fetch",
-      vi
-        .fn()
-        .mockResolvedValueOnce(new Response("{}", { status: 401 }))
-        .mockResolvedValueOnce(
-          new Response(
-            JSON.stringify({
-              error: {
-                code: "INVALID_CREDENTIALS",
-                message: "Email or password is incorrect",
-                fields: [],
-                request_id: "00000000-0000-4000-8000-000000000001",
-              },
-            }),
-            { status: 401 },
-          ),
-        ),
-    );
-    renderLogin();
-    await screen.findByRole("button", { name: "Sign in" });
-    const user = userEvent.setup();
-    await user.type(screen.getByLabelText("Email"), "manager@example.com");
-    await user.type(screen.getByLabelText("Password"), "wrong-password-123");
-    await user.click(screen.getByRole("button", { name: "Sign in" }));
-    expect(await screen.findByRole("alert")).toHaveTextContent(
-      "Email or password is incorrect",
-    );
-    expect(screen.queryByText("Company setup")).not.toBeInTheDocument();
   });
 });

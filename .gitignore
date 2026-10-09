@@ -1,19 +1,52 @@
+# Environment & secrets
 .env
 .env.*
+.env*.local
 !.env.example
+
+# Deployment artifacts & tooling
 .vercel/
+.vercel
+
+# Python virtual environment and bytecode
 .venv/
+venv/
 __pycache__/
-*.pyc
-.pytest_cache/
-node_modules/
+*.py[cod]
+*$py.class
+*.egg-info/
 dist/
 build/
-*.egg-info/
-.DS_Store
-.vercel
-.env*
+.pytest_cache/
+.coverage
+htmlcov/
 
+# Node & frontend build outputs
+node_modules/
+.npm
+apps/web/dist/
+
+# OS and editor artifacts
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Local databases
 *.db
 *.sqlite
-!.env.example
+*.sqlite3
+
+# Uploads, processing outputs, and scratch files
+uploads/
+output/
+tmp/
+scratch/
+
+# Model weights, embeddings, and downloads
+*.onnx
+*.bin
+*.pt
+*.safetensors
+models/
+model_assets/downloads/

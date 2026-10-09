@@ -161,7 +161,7 @@ Implement the following file plan. Shared directories assign individual files to
 | `apps/web/src/layouts/ChatLayout.tsx` | Minimal chat shell and conversation navigation (issue 2). |
 | `apps/web/src/pages/Chat.tsx` | Plain employee conversation page (issue 2). |
 | `apps/web/tests/chat.test.tsx` | Composer, attachment, streaming, retry, and error behavior (issue 2). |
-| `demo/walkthrough.md` | Employee-to-manager demonstration and local account setup. |
+| `demo/walkthrough.md` | Employee-to-manager demonstration and WorkOS identity setup. |
 | `demo/adapters/__init__.py` | Feature-owned development adapter package marker. |
 | `demo/adapters/llm.py` | Deterministic provider replies and outgoing payload capture. |
 | `demo/sample_documents/message.txt` | Synthetic text with known PII. |

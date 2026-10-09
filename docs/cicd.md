@@ -1,24 +1,53 @@
-# CI/CD
+# CI/CD and Deployment Baseline
 
-The frontend uses React/Vite and the backend uses FastAPI. Local email/password authentication and company setup are implemented; employee chat, redaction and LLM calls remain with their feature issues. See [local setup](local-setup.md) for installation, account provisioning and migrations.
+The application uses GitHub Actions for continuous integration and Vercel Services for unified frontend/backend hosting.
 
-## GitHub Actions
+---
 
-`.github/workflows/ci.yml` builds/tests both apps and checks migration parity before deployment. Pushes to `main` deploy production; other branch pushes deploy previews. Pull requests run checks without deploying. Required repository settings:
+## Live Deployed URLs
 
-- Secret `VERCEL_TOKEN`: token with access to the linked Vercel team/project.
-- Variables `VERCEL_ORG_ID` and `VERCEL_PROJECT_ID`.
+- **Frontend Application**: [https://pii-guard-mu.vercel.app](https://pii-guard-mu.vercel.app)
+- **Backend API Documentation**: [https://pii-guard-mu.vercel.app/api/docs](https://pii-guard-mu.vercel.app/api/docs)
+- **Health Endpoint**: [https://pii-guard-mu.vercel.app/api/health](https://pii-guard-mu.vercel.app/api/health)
+- **Latest CI Runs**: [GitHub Actions Workflow Runs](https://github.com/anubhav20ch/PII-Project/actions)
 
-No external-auth secrets or staging-auth jobs are required. The workflow verifies the deployed frontend and `/api/health`, including the commit SHA. Production also requires anonymous `/api/v1/auth/me` to return401 UNAUTHENTICATED. Real login/logout behavior is verified in backend tests; the deployment smoke does not store a manager password in Actions.
+---
 
-Both services share `https://pii-guard-mu.vercel.app`; `/api` routes to the backend. Deployment protection is preserved; the CLI authenticates smoke requests. Checks gate deployment, but failed post-deployment smoke tests do not automatically roll back production.
+## Architecture & Routing
 
-## Runtime configuration
+The repository-root `vercel.json` defines both frontend and backend services in one Vercel project:
+- `/api/*` routes to the FastAPI backend service (`apps/api/app/main:app`).
+- All other routes resolve to the Vite React frontend (`apps/web`).
+- Browser requests use relative `/api/...` paths, ensuring seamless same-origin communication across local development, preview deployments, and production.
 
-Configure `DATABASE_URL`, `PUBLIC_APP_URL`, and stable `SESSION_SECRET` separately in Vercel. Use backend-only Secret values for database/session credentials. Production uses `https://pii-guard-mu.vercel.app`; the same-origin frontend always calls `/api`. Preview browser mutations need a public origin matching their preview deployment; a health check alone does not establish full preview login readiness.
+---
 
-Apply migrations with the direct PostgreSQL connection and provision local accounts using [the trusted operator command](local-setup.md). Demo adapters stay disabled. Passwords never enter source, build artifacts, Actions secrets, or frontend variables.
+## GitHub Actions Workflow (`.github/workflows/ci.yml`)
 
-## Current deployment credential limitation
+The CI pipeline runs on every push and pull request with three main jobs:
 
-The supplied Actions token is saved, but Vercel returns404 "User not found" for it. Account/project API probes also returned404. Automatic deployments remain blocked until a token authorized for `lqsky7s-projects` and project `pii-guard` is configured. The local CLI login can deploy manually; passing application tests does not imply automated deployment succeeded.
+1. **`smoke`**:
+   - Builds and tests the React frontend (`npm ci`, `npm run build`, `npm test`).
+   - Installs backend dependencies (`pip install '.[test]'`) and runs pytest (`pytest tests -q`).
+   - Checks database migration integrity (`alembic upgrade head` and `alembic check`).
+
+2. **`workos-staging`**:
+   - Executes live authentication checks against the WorkOS staging environment using configured repository secrets (`WORKOS_TEST_API_KEY`) and variables (`WORKOS_TEST_CLIENT_ID`).
+
+3. **`deploy`** (on pushes only):
+   - Deploys preview environments for feature branches and production for pushes to `main`.
+   - Reuses secret `VERCEL_TOKEN` and variables `VERCEL_ORG_ID` (`team_eEyacnrwinZLoAL29yzQ2ouX`) / `VERCEL_PROJECT_ID` (`prj_pYUwh7wNPrBPOkYTCvERO5AlfN29`).
+   - Verifies the deployed frontend title and verifies `GET /api/health` returns the exact deployed Git SHA (`commit == GITHUB_SHA`).
+
+---
+
+## Verification Commands
+
+To verify health and openapi locally:
+
+```sh
+curl -s http://localhost:8000/api/health
+# {"status":"ok","service":"pii-guard-api","commit":null}
+
+curl -s http://localhost:8000/api/openapi.json | jq .info
+```

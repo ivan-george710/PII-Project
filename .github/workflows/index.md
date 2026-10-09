@@ -9,7 +9,7 @@ This is a file plan. **Existing** files are present; **Planned** files must be i
 | Filename | Status | Responsibility |
 |---|---|---|
 | `index.md` | Existing | Directory file manifest and responsibilities; keep it synchronized with changes. |
-| `ci.yml` | Existing | Build/test both apps and migrations, deploy, and check live SHA plus anonymous-session responses. Owner: [issue 5](../../docs/issues/05-platform-deployment.md). |
+| `ci.yml` | Existing | Keep the existing build, checks, Vercel deployment, and live SHA check working. Owner: [issue 5](../../docs/issues/05-platform-deployment.md). |
 
 Generated caches, dependencies, runtime uploads, and `.git/` are excluded from directory manifests.
 

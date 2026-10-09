@@ -8,9 +8,9 @@ The approved implementation plan is in [docs/issues/index.md](docs/issues/index.
 - Frontend: [PII Guard](https://pii-guard-mu.vercel.app)
 - Backend API: [API documentation](https://pii-guard-mu.vercel.app/api/docs)
 - Health endpoint: [API health](https://pii-guard-mu.vercel.app/api/health)
-- Verified GitHub Actions run: [build, test, deploy, live smoke check](https://github.com/ivan-george710/PII-Project/actions/runs/37750508093)
+- Verified GitHub Actions run: [build, test, deploy, live smoke check](https://github.com/anubhav20ch/PII-Project/actions)
 
-Both services deploy together from GitHub Actions. Main pushes deploy production; other branch pushes deploy previews. The app provides local email/password authentication and company setup; see [setup instructions](docs/local-setup.md). See [CI/CD details](docs/cicd.md). Vercel deployment protection may require sign-in.
+Both services deploy together from GitHub Actions. Main pushes deploy production; other branch pushes deploy previews. The current production app remains the connectivity baseline. This draft branch adds WorkOS authentication and company setup; see [setup instructions](docs/local-setup.md). See [CI/CD details](docs/cicd.md). Vercel deployment protection may require sign-in.
 
 
 A document processing and PII protection pipeline for the Cadence case study.
@@ -214,16 +214,25 @@ Expected responsibility:
 ---
 
 # Engine 5 — Audit / Traceability
-STATUS: NOT STARTED
+STATUS: COMPLETE
 
-Expected responsibility:
+Engine 5 consumes the processing results from upstream engines and produces a tamper-evident audit record (`DocumentAuditRecord`).
 
-- Record what was detected
-- Record where it was detected
-- Record how it was detected
-- Record redaction actions
-- Preserve source/page/block relationships
-- Support internal audit requirements
+### Contract & Responsibilities:
+- **Inputs**: `FileMetadata` (Engine 1), `ExtractionResult` (Engine 2), `PIIDetectionResult` (Engine 3), and optional `RedactionActions` (Engine 4).
+- **Outputs**: `DocumentAuditRecord` (with serialization to JSON and human-readable Markdown summary).
+- **Answers**:
+  - **WHAT** was detected (entity type, confidence score, recognizer name)
+  - **WHERE** (source file, page number, character offsets, OCR block, bounding box)
+  - **HOW** (recognizer, confidence, extraction method: pypdf / OCR / hybrid)
+  - **WHAT was done** (redaction action, replacement token, or "rejected as false positive" with reason)
+  - **WHEN & by which version** (UTC ISO 8601 timestamp, pipeline version, SHA-256 of original file)
+
+### Zero Raw PII Guarantee & Tamper Evidence:
+- **Zero Raw PII**: Raw sensitive values are **never stored** in the audit record, serialized JSON, or Markdown reports.
+- **HMAC-SHA256**: Values are pseudonymized using HMAC-SHA256 keyed by environment variable `AUDIT_HMAC_KEY` (with a random fallback key logged if unset), stored with a masked preview (e.g. last 2 characters or length only).
+- **Tamper Evidence**: Cryptographic hash chaining across all entries and record-level hash verification (`verify_record(record)`).
+- **Decoupled Adapters**: Engine 5 defines its own input models in `app/engines/audit/models.py` and adapter functions in `app/engines/audit/adapters.py` without tight coupling to upstream internals.
 
 ---
 
@@ -285,7 +294,7 @@ Engine 4 should consume validated PII detections and produce:
 
 Engine 5 should consume the processing results and produce:
 
-    Audit / Traceability information
+    Audit / Traceability information (DocumentAuditRecord)
 
 
 Do not tightly couple downstream engines to the implementation details
@@ -318,7 +327,7 @@ Then:
 | Extraction + OCR | COMPLETE |
 | PII Detection | STARTED |
 | Redaction | NOT STARTED |
-| Audit / Traceability | NOT STARTED |
+| Audit / Traceability | COMPLETE |
 | End-to-End Pipeline | NOT STARTED |
 | Demo UI | NOT STARTED |
 

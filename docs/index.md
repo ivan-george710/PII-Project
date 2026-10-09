@@ -15,7 +15,7 @@ This is a file plan. **Existing** files are present; **Planned** files must be i
 | `spark-reuse.md` | Planned | Map Apple/Swift face logic to the backend implementation and test cases. Owner: [issue 1](issues/01-privacy-engine.md). |
 | `reporting-contract.md` | Planned | Define idempotent manager events and safe display fields. Owner: [issue 4](issues/04-manager-settings-reports.md). |
 | `rule-policy.md` | Planned | Define rule IDs, versions, enabled states, precedence, and regex limits. Owner: [issue 4](issues/04-manager-settings-reports.md). |
-| `cicd.md` | Existing | Actions deployment and live health/session checks; required database and local auth setup. Owner: [issue 5](issues/05-platform-deployment.md). |
+| `cicd.md` | Existing | Existing Actions configuration, deployed URLs, and simple verification commands. Owner: [issue 5](issues/05-platform-deployment.md). |
 
 ## Subdirectories
 
@@ -25,8 +25,8 @@ Generated caches, dependencies, runtime uploads, and `.git/` are excluded from d
 
 ## Approved issue scope
 
-- [Issue 1: Build the complete document and image privacy engine](issues/01-privacy-engine.md) — [GitHub #1](https://github.com/ivan-george710/PII-Project/issues/1)
-- [Issue 4: Deliver manager rule settings, custom rules, and employee PII reporting](issues/04-manager-settings-reports.md) — [GitHub #4](https://github.com/ivan-george710/PII-Project/issues/4)
-- [Issue 5: Connect the app and document basic setup](issues/05-platform-deployment.md) — [GitHub #5](https://github.com/ivan-george710/PII-Project/issues/5)
+- [Issue 1: Build the complete document and image privacy engine](issues/01-privacy-engine.md) — [GitHub #1](https://github.com/anubhav20ch/PII-Project/issues/1)
+- [Issue 4: Deliver manager rule settings, custom rules, and employee PII reporting](issues/04-manager-settings-reports.md) — [GitHub #4](https://github.com/anubhav20ch/PII-Project/issues/4)
+- [Issue 5: Connect the app and document basic setup](issues/05-platform-deployment.md) — [GitHub #5](https://github.com/anubhav20ch/PII-Project/issues/5)
 
 Each issue includes its own tests and sample/setup helpers. Implement the listed files; deferred entries are outside the approved scope.

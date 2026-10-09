@@ -12,7 +12,7 @@ The frontend, backend, and GitHub Actions → Vercel deployment already work. Th
 1. Register the feature routers in `apps/api/app/main.py` and connect the real session, policy, engine, reporting, storage, and LLM implementations through `dependencies.py`. Use the interfaces defined in issues 1–4; keep business logic in those features.
 2. Load configuration with Pydantic Settings. Add the settings each feature actually uses to `.env.example`, with placeholders and a brief description. Use `SecretStr` for credentials; report missing setting names without printing values.
 3. Ensure the API can import the engine package through a normal package dependency. Document its install command and any runtime tools the chosen implementation actually requires.
-4. Document commands to install dependencies, start the API and frontend, apply the auth issue's database migrations, and configure local session settings and LLM credentials. List the live URLs in README.
+4. Document commands to install dependencies, start the API and frontend, apply the auth issue's database migrations, and configure WorkOS/provider credentials. List the live URLs in README.
 5. Keep the existing GitHub Actions workflow and Vercel routing working as feature dependencies are added. Add the features' own check commands to the existing check job when they exist.
 
 ## Inputs and outputs
@@ -26,7 +26,7 @@ The frontend, backend, and GitHub Actions → Vercel deployment already work. Th
 
 ## Configuration
 
-Use the names documented by the feature implementations. At minimum, record the chosen database connection, SESSION_SECRET and public app origin, LLM key/model, and file-storage settings. `SHOW_DEMO_SAMPLES` controls the chat's built-in sample menu. Keep credentials on the backend and in environment settings.
+Use the names documented by the feature implementations. At minimum, record the chosen database connection, WorkOS credentials/callback URL, LLM key/model, and file-storage settings. `SHOW_DEMO_SAMPLES` controls the chat's built-in sample menu. Keep credentials on the backend and in environment settings.
 
 The deployment already uses Actions secret `VERCEL_TOKEN` and variables `VERCEL_ORG_ID` / `VERCEL_PROJECT_ID`. Reuse them. Main pushes deploy production, other pushes deploy previews, and pull requests run checks.
 

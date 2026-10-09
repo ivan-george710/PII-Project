@@ -1,48 +1,150 @@
-# Local authentication and company setup
+# Local Setup Guide
 
-Issue #3 provides email/password sign-in, company setup and manager assignments. Employee chat and manager reporting remain with their own issues. Password hashing follows [FastAPI's pwdlib/Argon2 guidance](https://fastapi.tiangolo.com/tutorial/security/oauth2-jwt/#password-hashing).
+This guide describes how to install dependencies, configure environment variables, apply database migrations, provision WorkOS credentials, and start the PII Guard application locally.
 
-## Local run
+---
 
-1. In `apps/api`, use Python 3.12+: `python3 -m venv .venv`, then `.venv/bin/pip install '.[test]'`.
-2. Copy root `.env.example` to `apps/api/.env`. Generate `SESSION_SECRET` with `.venv/bin/python -c "import secrets; print(secrets.token_urlsafe(48))"` and save it there.
-3. Run `.venv/bin/alembic upgrade head`.
-4. Provision accounts with the trusted command below. It prompts for passwords with hidden input.
-5. Run `.venv/bin/uvicorn app.main:app --reload --port 8000`.
-6. In `apps/web`, run `npm ci`, then `npm run dev`. Open `http://localhost:5173`.
+## Prerequisites
 
-The browser calls `/api` on the same origin. Backend settings are `DATABASE_URL`, `PUBLIC_APP_URL`, and `SESSION_SECRET`. Production requires PostgreSQL, HTTPS, and demo adapters disabled.
+- **Python**: 3.12+
+- **Node.js**: 20+ (with npm)
+- **Git**
 
-## Company accounts
+---
 
-From `apps/api` with backend settings loaded:
+## Quickstart
+
+### 1. Configure Environment Variables
+
+Copy the example environment file:
 
 ```sh
-PYTHONPATH=. .venv/bin/python ../../scripts/provision-company.py --organization-id 00000000-0000-4000-8000-000000000010 --name 'Demo Company' --email manager@your-company.example --display-name 'Demo Manager' --role manager
+cp .env.example apps/api/.env
 ```
 
-Enter a password of 12–128 characters twice. To add an employee, use the same company UUID with `--role employee`. Provisioning is idempotent and refuses changes to an existing account's company or role. To reset a password, repeat the command with `--reset-password`; existing sessions are revoked. Passwords are never printed or accepted as command-line arguments.
+Edit `apps/api/.env` with your settings:
 
-There is no public signup or forgot-password email flow. Operators create accounts and reset passwords. Managers open `/company/setup` to rename their company and assign employees to managers. Public session/setup responses never contain password hashes or session credentials.
+```ini
+APP_ENV=development
+DATABASE_URL=sqlite:///./pii-guard.db
+PUBLIC_APP_URL=http://localhost:5173
+WORKOS_CLIENT_ID=client_01M4DB2GA63J2DSF441YB66NZY
+WORKOS_REDIRECT_URI=http://localhost:5173/api/v1/auth/callback
+SHOW_DEMO_SAMPLES=true
+OPENAI_MODEL=gpt-4o-mini
+STORAGE_DIR=./uploads
+```
 
-## Session behavior
+Generate a Fernet cookie encryption key:
 
-Passwords are hashed with Argon2. Seven-day sessions use random opaque HttpOnly/SameSite=Lax cookies, Secure on HTTPS. The database stores only token hashes. Each authenticated request checks session expiry and the user's current active status/role/company. Logout deletes the session; password reset revokes that user's sessions. Login requires the configured Origin; mutations also require the CSRF token returned by login or `/auth/me`.
+```sh
+python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
+```
 
-Five failed attempts lock that account for five minutes, using database state shared across server instances. Unknown emails and wrong passwords return the same error. Roles come from the database; submitting a role/company field during login fails validation.
+Set `WORKOS_COOKIE_PASSWORD` in `apps/api/.env` to this generated key. Add your `WORKOS_API_KEY` and optional `OPENAI_API_KEY`.
 
-## Existing deployments and demo data
+---
 
-Migration `0002_local_auth` keeps company/user UUIDs and manager assignments, removes external-provider identity columns, normalizes emails, and adds password/session storage. It rejects duplicate normalized emails before applying the unique constraint. Existing users start without passwords; provision them with the operator command. Restoring the old provider identity columns requires a database backup; the migration deliberately refuses an automatic downgrade.
+### 2. Backend Setup (API & Engine)
 
-The presentation deployment uses the existing free Neon database. `cafkeemail@gmail.com` remains the manager; its generated login password is kept privately outside tracked files. New environments must migrate/provision their own database. Use the direct database URL for migration commands. Runtime uses the pooled connection. Migrations never run at API import.
+From the repository root or `apps/api`:
 
-`APP_ENV=development DEMO_ADAPTERS_ENABLED=true scripts/seed-demo.sh` creates fictional company/users/assignments idempotently. These seed identities have no usable passwords until provisioned. Synthetic session adapters are explicitly opt-in for development/test and forbidden in production. Issue #4 supplies policy/report fixtures through an optional seed adapter; absent adapters report `policy_seeded=false`.
+```sh
+cd apps/api
+python3 -m venv .venv
 
-## Checks
+# On Linux / macOS:
+source .venv/bin/activate
+# On Windows (PowerShell):
+# .venv\Scripts\Activate.ps1
 
-- API: `.venv/bin/python -m pytest tests -q` from `apps/api`.
-- Web: `npm run build` and `npm test` from `apps/web`.
-- Migration parity: `.venv/bin/alembic check` after upgrading an isolated database.
+pip install -e '.[test]'
+```
 
-CI uses no external authentication key or staging project. The tests exercise real password hashing and database sessions. Frontend API mocks are used only to test form feedback/navigation independently.
+To install the local privacy engine package in editable mode:
+
+```sh
+pip install -e ../../packages/engine
+```
+
+> **Note on Engine Runtime Tools**:
+> The privacy engine requires OCR and NLP runtimes for document processing:
+> - OCR runtime: `rapidocr-onnxruntime` / `onnxruntime`
+> - Presidio Analyzer & NLP: `presidio-analyzer`, `spacy` with `python -m spacy download en_core_web_sm`
+
+---
+
+### 3. Database Migrations
+
+Apply Alembic database migrations to initialize tables for companies, users, and manager assignments:
+
+```sh
+cd apps/api
+.venv/bin/alembic upgrade head
+```
+
+---
+
+### 4. Seed Fictional Development Data (Optional)
+
+To seed a synthetic demo company, manager, employees, and assignments for local development:
+
+```sh
+APP_ENV=development DEMO_ADAPTERS_ENABLED=true scripts/seed-demo.sh
+```
+
+---
+
+### 5. Frontend Setup
+
+From `apps/web`:
+
+```sh
+cd apps/web
+npm ci
+npm run dev
+```
+
+The frontend will start on [http://localhost:5173](http://localhost:5173). The Vite development server automatically proxies `/api` requests to `http://localhost:8000`.
+
+---
+
+### 6. Start the Backend API
+
+From `apps/api`:
+
+```sh
+cd apps/api
+.venv/bin/uvicorn app.main:app --reload --port 8000
+```
+
+The API will be available at:
+- Health check: [http://localhost:8000/api/health](http://localhost:8000/api/health)
+- Interactive API Docs: [http://localhost:8000/api/docs](http://localhost:8000/api/docs)
+- OpenAPI Specification: [http://localhost:8000/api/openapi.json](http://localhost:8000/api/openapi.json)
+
+---
+
+## Running Automated Checks
+
+Run backend unit and integration tests:
+
+```sh
+cd apps/api
+.venv/bin/python -m pytest tests -v
+```
+
+Run frontend tests and production build:
+
+```sh
+cd apps/web
+npm test
+npm run build
+```
+
+Verify migration schema consistency:
+
+```sh
+cd apps/api
+.venv/bin/alembic check
+```

@@ -7,6 +7,18 @@ Suggested ownership: Full-stack authentication / company setup
 
 Implement the complete sign-in and company setup experience, including its frontend, backend, database, and validation. Manager rule settings/reporting are a separate complete workstream (issue 4). Verification and fictional setup data belong inside this implementation, not a separate testing/demo issue.
 
+## Current implementation to preserve (updated 2026-10-09)
+
+- Start from current upstream `ivan-george710/PII-Project:main`, fetch it again before submitting, and merge current main into existing feature branches. Old branch code must not replace newer working features. Review the final diff against current main.
+- Authentication is local email/password. WorkOS was removed intentionally: do not restore its SDK, redirects, settings, cookies, mocks, secrets or CI jobs. Preserve Argon2 hashing, database sessions, company/user/assignment models, permissions, logout/revocation, CSRF and account lockout.
+- Preserve `POST /api/v1/auth/signup` (201 new isolated company + manager), `POST /api/v1/auth/login` (200), `GET /api/v1/auth/me` (200 session DTO or 401), and `POST /api/v1/auth/logout` (204). Session DTO: `{user:{id,email,display_name,role,organization_id},organization:{id,name},csrf_token}`. Cookie name is `pii-session`; the API resolves roles/company from its database. Signup cannot join an existing company or promote an existing user.
+- Email/password inputs are strings with **no email-format/verification or password-strength/length checks**. Email is lowercased. Duplicate email is 409 ACCOUNT_EXISTS. Public email fields use Pydantic `str` / Zod `z.string()`, not EmailStr or email-format validators. Ordinary feature-specific text/file limits still apply.
+- Preserve `/login`, `/signup` and `/company/setup`. Product screens use black/white and neutral grayscale only, no icons; simple text labels and controls. Keep the existing auth design. Employee chat remains a plain LLM interface, with attachments and built-in test samples in the composer addon menu.
+- Existing migration chain is `0001_company_identity -> 0002_local_auth -> 0003_signup`. Keep those files, revision IDs, models and deployed data. Add a uniquely named feature migration after the current head; reconcile new parallel revisions on integration so there is one head. Never delete/rewrite an applied migration or recreate company/user/session tables.
+- CI currently passes build/tests, migration parity, Vercel deployment and live checks. Preserve these checks; do not delete tests, skip jobs or weaken assertions to get green. Main pushes deploy production, other pushes previews; PRs run tests. Reuse VERCEL_TOKEN / VERCEL_ORG_ID / VERCEL_PROJECT_ID and same-origin `/api` routing. No external-auth credentials are needed.
+- Only auth/company setup is implemented in the product. Chat, reports/policies and `packages/engine` are still feature work; the prototype is reference code. Never label placeholders, empty namespaces or `NotImplementedError` stubs as delivered integration. Missing production processing must block submissions; fake adapters require explicit development/test opt-in. A present feature with a broken import must fail checks/startup, not silently disappear.
+- Before delivery run the existing backend and frontend checks, migration upgrade/parity and the feature's own checks. Verify the actual PR head and resolve conflicts. Update touched indexes and this issue's status to distinguish implemented work from pending work. This is a shared baseline, not a prerequisite issue dependency.
+
 ## Scope
 
 - Email/password login/logout, database session validation, and role-aware navigation.
@@ -62,7 +74,7 @@ Use revocable database sessions with a random opaque cookie. Store only SHA-256 
 ### Data models and implementation order
 
 - Organization: UUID id, name1..120, UTC created_at/updated_at.
-- User: UUID id/company_id, unique normalized email text, nullable Argon2 password hash (unprovisioned users cannot log in), failed-attempt counter/lockout, validated email, display_name1..120, employee/manager role, UTC timestamps.
+- User: UUID id/company_id, unique normalized email text, nullable Argon2 password hash (unprovisioned users cannot log in), failed-attempt counter/lockout, unconstrained email text, display_name1..120, employee/manager role, UTC timestamps.
 - ManagerAssignment: employee_id unique, manager_id, company_id, UTC updated_at; foreign keys, same-company validation, correct-role validation. One manager per employee for the presentation.
 - `SessionIdentity` Pydantic contract: `{user_id:UUID,organization_id:UUID,role:"employee"|"manager",email:str,display_name:str}`. Resolve it only after validating the database session. Other workstreams consume this contract through dependency injection.
 - Implement models/migration → session and permission services → typed routes → setup/login frontend → positive and negative checks. Central helpers expose `require_employee`, `require_manager`, `require_company`, and `require_assigned_employee`; manager reports still scope queries on every call.

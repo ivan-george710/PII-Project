@@ -19,6 +19,6 @@ Configure `DATABASE_URL`, `PUBLIC_APP_URL`, and stable `SESSION_SECRET` separate
 
 Apply migrations with the direct PostgreSQL connection and provision local accounts using [the trusted operator command](local-setup.md). Demo adapters stay disabled. Passwords never enter source, build artifacts, Actions secrets, or frontend variables.
 
-## Current deployment credential limitation
+## Verified deployment
 
-The supplied Actions token is saved, but Vercel returns404 "User not found" for it. Account/project API probes also returned404. Automatic deployments remain blocked until a token authorized for `lqsky7s-projects` and project `pii-guard` is configured. The local CLI login can deploy manually; passing application tests does not imply automated deployment succeeded.
+The Actions token was replaced and [run 37968276679](https://github.com/ivan-george710/PII-Project/actions/runs/37968276679) passed tests, deployment and live checks on 2026-10-09. Automatic deployment is working.

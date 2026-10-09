@@ -51,6 +51,7 @@ jobs:
     if: github.event_name == 'push'
     needs: smoke
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     env:
       VERCEL_ORG_ID: ${{ vars.VERCEL_ORG_ID }}
       VERCEL_PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID }}
@@ -70,17 +71,33 @@ jobs:
           test -n "$VERCEL_ORG_ID" || { echo 'Missing VERCEL_ORG_ID variable'; exit 1; }
           test -n "$VERCEL_PROJECT_ID" || { echo 'Missing VERCEL_PROJECT_ID variable'; exit 1; }
           test "$HAS_VERCEL_TOKEN" = true || { echo 'Missing VERCEL_TOKEN repository secret'; exit 1; }
+      - name: Export tested source snapshot
+        id: source
+        run: |
+          set -euo pipefail
+          deploy_dir="$(mktemp -d "$RUNNER_TEMP/pii-deploy.XXXXXX")"
+          git archive "$GITHUB_SHA" | tar -x -C "$deploy_dir"
+          test ! -e "$deploy_dir/.git"
+          printf 'directory=%s\n' "$deploy_dir" >> "$GITHUB_OUTPUT"
       - name: Deploy both services
         id: deployment
+        timeout-minutes: 8
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          DEPLOYMENT_SOURCE: ${{ steps.source.outputs.directory }}
         run: |
           set -euo pipefail
           args=(--yes)
           if [ "$GITHUB_REF" = 'refs/heads/main' ]; then
-            args+=(--prod)
+            args+=(--prod --skip-domain)
           fi
-          vercel deploy "${args[@]}" > "$RUNNER_TEMP/vercel-result.txt"
+          # Deploy the tested snapshot using the authorized CI token. Keep source
+          # attribution and SHA explicit, without a Git-provider deployment link.
+          vercel deploy "$DEPLOYMENT_SOURCE" "${args[@]}" \
+            --env "VERCEL_GIT_COMMIT_SHA=$GITHUB_SHA" \
+            --meta "sourceCommitSha=$GITHUB_SHA" \
+            --meta "sourceRepository=$GITHUB_REPOSITORY" \
+            > "$RUNNER_TEMP/vercel-result.txt"
           DEPLOYMENT_RESULT="$RUNNER_TEMP/vercel-result.txt" node --input-type=module <<'JS'
           import { readFileSync, appendFileSync } from 'node:fs';
           const result = readFileSync(process.env.DEPLOYMENT_RESULT, 'utf8').trim();
@@ -95,15 +112,16 @@ jobs:
           appendFileSync(process.env.GITHUB_STEP_SUMMARY, `Deployment: ${value}\n`);
           JS
       - name: Smoke test deployed frontend and backend
+        timeout-minutes: 3
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
           DEPLOYMENT_URL: ${{ steps.deployment.outputs.url }}
         run: |
           set -euo pipefail
-          vercel curl / --deployment "$DEPLOYMENT_URL" -- --fail-with-body --silent --show-error > "$RUNNER_TEMP/frontend.html"
-          vercel curl /api/health --deployment "$DEPLOYMENT_URL" -- --fail-with-body --silent --show-error > "$RUNNER_TEMP/health.json"
+          vercel curl / --deployment "$DEPLOYMENT_URL" -- --connect-timeout 10 --max-time 30 --fail-with-body --silent --show-error > "$RUNNER_TEMP/frontend.html"
+          vercel curl /api/health --deployment "$DEPLOYMENT_URL" -- --connect-timeout 10 --max-time 30 --fail-with-body --silent --show-error > "$RUNNER_TEMP/health.json"
           if [ "$GITHUB_REF" = 'refs/heads/main' ]; then
-            vercel curl /api/v1/auth/me --deployment "$DEPLOYMENT_URL" -- --silent --show-error --dump-header "$RUNNER_TEMP/auth-me.headers" --output "$RUNNER_TEMP/auth-me.json"
+            vercel curl /api/v1/auth/me --deployment "$DEPLOYMENT_URL" -- --connect-timeout 10 --max-time 30 --silent --show-error --dump-header "$RUNNER_TEMP/auth-me.headers" --output "$RUNNER_TEMP/auth-me.json"
           fi
           python3 - "$RUNNER_TEMP/frontend.html" "$RUNNER_TEMP/health.json" <<'PY'
           import json, os, sys
@@ -121,3 +139,21 @@ jobs:
               assert json.loads((root / 'auth-me.json').read_text())['error']['code'] == 'UNAUTHENTICATED'
           print('Deployed frontend/backend verified; production also verifies anonymous session handling')
           PY
+      - name: Promote verified production deployment
+        if: github.ref == 'refs/heads/main'
+        timeout-minutes: 3
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          DEPLOYMENT_URL: ${{ steps.deployment.outputs.url }}
+        run: |
+          set -euo pipefail
+          vercel promote "$DEPLOYMENT_URL" --yes
+          vercel curl /api/health --deployment https://pii-guard-mu.vercel.app -- --connect-timeout 10 --max-time 30 --fail-with-body --silent --show-error > "$RUNNER_TEMP/production-health.json"
+          python3 - "$RUNNER_TEMP/production-health.json" <<'PYTHON'
+          import json, os, sys
+          from pathlib import Path
+          data = json.loads(Path(sys.argv[1]).read_text())
+          assert data['status'] == 'ok'
+          assert data['commit'] == os.environ['GITHUB_SHA'], 'Production alias must serve the tested commit'
+          print('Production alias verified against the pushed commit')
+          PYTHON

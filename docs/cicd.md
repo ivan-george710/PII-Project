@@ -11,7 +11,7 @@ The frontend uses React/Vite and the backend uses FastAPI. Local email/password 
 
 No external-auth secrets or staging-auth jobs are required. The workflow verifies the deployed frontend and `/api/health`, including the commit SHA. Production also requires anonymous `/api/v1/auth/me` to return401 UNAUTHENTICATED. Real login/logout behavior is verified in backend tests; the deployment smoke does not store a manager password in Actions.
 
-Both services share `https://pii-guard-mu.vercel.app`; `/api` routes to the backend. Deployment protection is preserved; the CLI authenticates smoke requests. Checks gate deployment, but failed post-deployment smoke tests do not automatically roll back production.
+Both services share `https://pii-guard-mu.vercel.app`; `/api` routes to the backend. Deployment protection is preserved; the CLI authenticates smoke requests. Production builds are staged with `--skip-domain`; live frontend/backend/session checks must pass before promotion. The production alias is then checked against the pushed SHA. Failed checks leave the previous production deployment active.
 
 ## Runtime configuration
 
@@ -22,3 +22,9 @@ Apply migrations with the direct PostgreSQL connection and provision local accou
 ## Verified deployment
 
 The Actions token was replaced and [run 37968276679](https://github.com/ivan-george710/PII-Project/actions/runs/37968276679) passed tests, deployment and live checks on 2026-10-09. Automatic deployment is working.
+
+## Deployment source and timeouts
+
+Actions exports the exact tested `GITHUB_SHA` with `git archive` into a temporary source directory and deploys it using the existing owner-authorized token. Git history and local credentials are absent from the upload. Source repository/SHA are recorded as explicit deployment metadata and `VERCEL_GIT_COMMIT_SHA` is passed to the backend, preserving the live commit check. Commit authors and repository history are unchanged.
+
+Deploying directly from a Git checkout caused Vercel to block a merged collaborator-authored commit and leave the CLI waiting. Source snapshots separate the authorized CI release from Git-provider author authorization. The deployment step has an eight-minute timeout, the job has a fifteen-minute timeout, and live HTTP checks have bounded connection/request times. Preview pushes use the same source snapshot path; main deploys stage, verify, promote and verify the production alias.

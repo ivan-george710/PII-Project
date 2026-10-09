@@ -85,3 +85,7 @@ Update the relevant directory indexes when these files change. Existing files ne
 Implement the registration/configuration glue against the interfaces in the other drafts, using their explicit development helpers where needed. Do not require another issue to close before starting, and do not build a second adapter framework.
 
 This specification has been approved by the user for publication and implementation.
+
+## Deployment implementation update
+
+Use the tested source snapshot workflow now in `.github/workflows/ci.yml`: export exact GITHUB_SHA using git archive, deploy with the existing authorized token, supply the real SHA to runtime/metadata, stage production with --skip-domain, run live checks, and promote only after success. Preserve step/job/network timeouts and verify the production alias SHA. Do not revert to deploying the Git checkout or alter commit authors to impersonate the Vercel owner.

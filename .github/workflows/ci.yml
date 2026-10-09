@@ -99,7 +99,7 @@ jobs:
           WORKOS_TEST_CLIENT_ID: ${{ vars.WORKOS_TEST_CLIENT_ID }}
         run: |
           python3 - <<'PY'
-          import os, subprocess
+          import os, re, subprocess
           key = os.environ['WORKOS_TEST_API_KEY']
           client_id = os.environ['WORKOS_TEST_CLIENT_ID']
           if not key.startswith('sk_test_') or not client_id.startswith('client_'):
@@ -116,8 +116,11 @@ jobs:
                       input=value, text=True, capture_output=True,
                   )
                   if result.returncode:
-                      # CLI output may contain sensitive input: never echo it.
-                      raise SystemExit(f'Could not configure {name} for {target}')
+                      diagnostic = result.stderr + result.stdout
+                      for secret in (key, os.environ['VERCEL_TOKEN']):
+                          diagnostic = diagnostic.replace(secret, '[redacted]')
+                      diagnostic = re.sub(r'(?:sk_test_|sk_live_|vcp_)\S+', '[redacted]', diagnostic)
+                      raise SystemExit(f'Could not configure {name} for {target}: {diagnostic}')
           print('Scoped WorkOS backend credentials configured')
           PY
       - name: Deploy both services

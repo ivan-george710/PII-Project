@@ -10,3 +10,11 @@ tests
 *.pdf
 *.docx
 *.pptx
+
+.env
+.env.*
+.agents
+skills-lock.json
+uploads
+.model-cache
+reverend-insanity-quotes.md

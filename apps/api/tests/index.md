@@ -18,7 +18,7 @@ This is a file plan. **Existing** files are present; **Planned** files must be i
 | `test_chat.py` | Planned | Safe history, guarded provider calls, streaming, and retry behavior. Owner: [issue 2](../../../docs/issues/02-employee-chat.md). |
 | `test_uploads.py` | Planned | Upload authorization, supported inputs, and output access. Owner: [issue 2](../../../docs/issues/02-employee-chat.md). |
 | `test_guard.py` | Planned | Sanitized-only payloads, disabled rules, and blocked failures. Owner: [issue 2](../../../docs/issues/02-employee-chat.md). |
-| `test_health.py` | Existing | Preserve the existing health smoke test. Owner: [issue 5](../../../docs/issues/05-platform-deployment.md). |
+| `test_health.py` | Existing | Health/OpenAPI/commit behavior, safe configuration errors, and implemented-router registration failures. Owner: [issue 5](../../../docs/issues/05-platform-deployment.md). |
 | `test_demo.py` | Planned | Catalog scoping, feature toggle, selection idempotency, and file limits. Owner: [issue 2](../../../docs/issues/02-employee-chat.md). |
 | `test_seed.py` | Existing | Trusted fictional seeding, explicit opt-in, and idempotency checks. Owner: [issue 3](../../../docs/issues/03-auth-company-setup.md). |
 

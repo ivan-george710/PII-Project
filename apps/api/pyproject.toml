@@ -1,6 +1,7 @@
 [project]
 name = "pii-guard-api"
 version = "0.0.1"
+description = "PII Guard API and company application"
 requires-python = ">=3.12"
 dependencies = [
   "fastapi==0.142.4",

@@ -17,3 +17,10 @@ build/
 *.db
 *.sqlite
 !.env.example
+
+# Local runtime artifacts and model caches
+uploads/
+.model-cache/
+*.onnx
+*.pt
+*.safetensors

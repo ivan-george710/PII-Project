@@ -21,9 +21,11 @@ From `apps/api` with backend settings loaded:
 PYTHONPATH=. .venv/bin/python ../../scripts/provision-company.py --organization-id 00000000-0000-4000-8000-000000000010 --name 'Demo Company' --email manager@your-company.example --display-name 'Demo Manager' --role manager
 ```
 
-Enter a password of 12–128 characters twice. To add an employee, use the same company UUID with `--role employee`. Provisioning is idempotent and refuses changes to an existing account's company or role. To reset a password, repeat the command with `--reset-password`; existing sessions are revoked. Passwords are never printed or accepted as command-line arguments.
+Enter a password twice. There are no email-format, email-verification, or password-strength/length rules. To add an employee, use the same company UUID with `--role employee`. Provisioning is idempotent and refuses changes to an existing account's company or role. To reset a password, repeat the command with `--reset-password`; existing sessions are revoked. Passwords are never printed or accepted as command-line arguments.
 
-There is no public signup or forgot-password email flow. Operators create accounts and reset passwords. Managers open `/company/setup` to rename their company and assign employees to managers. Public session/setup responses never contain password hashes or session credentials.
+The monochrome, icon-free /login and /signup screens provide sign-in and public account creation. Signup creates a new company workspace, makes the new user its manager, and signs them in. Users cannot choose an existing company or submit their own role. Existing-account signup returns409 and leaves existing access unchanged. There is no forgot-password email flow; operators can reset passwords. Managers open `/company/setup` to rename their company and assign employees to managers. Public session/setup responses never contain password hashes or session credentials.
+
+Email is stored as unconstrained text after migration `0003_signup`. No verification emails are sent. The frontend and API accept email/password strings without format, strength or length checks.
 
 ## Session behavior
 

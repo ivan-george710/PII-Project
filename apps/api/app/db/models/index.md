@@ -12,7 +12,7 @@ This is a file plan. **Existing** files are present; **Planned** files must be i
 | `__init__.py` | Existing | Export/register all models. Owner: [issue 3](../../../../../docs/issues/03-auth-company-setup.md). |
 | `auth_session.py` | Existing | Hashed opaque session tokens, user ownership, and expiry; logout/reset revokes sessions. Owner: [issue 3](../../../../../docs/issues/03-auth-company-setup.md). |
 | `organization.py` | Existing | Company identity and administrative settings. Owner: [issue 3](../../../../../docs/issues/03-auth-company-setup.md). |
-| `user.py` | Existing | Unique email, password hash, company membership, and role. Owner: [issue 3](../../../../../docs/issues/03-auth-company-setup.md). |
+| `user.py` | Existing | Unique email text, password hash, company membership, and role. Owner: [issue 3](../../../../../docs/issues/03-auth-company-setup.md). |
 | `manager_assignment.py` | Existing | Employee-to-manager relationship within a company. Owner: [issue 3](../../../../../docs/issues/03-auth-company-setup.md). |
 | `conversation.py` | Planned | Employee-owned conversations. Owner: [issue 2](../../../../../docs/issues/02-employee-chat.md). |
 | `message.py` | Planned | Conversation turns and safe provider history. Owner: [issue 2](../../../../../docs/issues/02-employee-chat.md). |

@@ -4,7 +4,7 @@ import argparse
 import getpass
 from uuid import UUID
 
-from pydantic import EmailStr, Field, TypeAdapter
+from pydantic import Field
 from sqlalchemy import delete, select
 
 from app.auth.passwords import hash_password
@@ -14,7 +14,7 @@ from app.schemas.common import Schema
 
 
 class ProvisionUser(Schema):
-    email: EmailStr = Field(max_length=254)
+    email: str
     display_name: str = Field(min_length=1, max_length=120)
     role: str = Field(pattern=r"^(employee|manager)$")
 
@@ -64,7 +64,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
     if not 1 <= len(args.name.strip()) <= 120:
         raise ValueError("Company name must be 1–120 characters")
-    password = getpass.getpass("Password (12–128 characters): ")
+    password = getpass.getpass("Password: ")
     confirmation = getpass.getpass("Confirm password: ")
     if password != confirmation:
         raise ValueError("Passwords do not match")

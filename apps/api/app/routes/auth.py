@@ -2,9 +2,10 @@ from datetime import UTC, datetime, timedelta
 
 from fastapi import APIRouter, Depends, Request, Response
 from sqlalchemy import delete, select
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
-from app.auth.passwords import verify_password
+from app.auth.passwords import hash_password, verify_password
 from app.auth.sessions import (
     COOKIE,
     create_session,
@@ -24,6 +25,7 @@ from app.schemas.auth import (
     PublicUser,
     SessionIdentity,
     SessionOrganization,
+    SignupRequest,
 )
 from app.schemas.common import ApiError
 
@@ -39,6 +41,61 @@ def session_response(identity, token, db):
         organization=SessionOrganization(id=org.id, name=org.name),
         csrf_token=csrf_token(token, get_settings().session_secret.get_secret_value()),
     )
+
+
+@router.post("/signup", response_model=MeResponse, status_code=201)
+def signup(
+    body: SignupRequest,
+    request: Request,
+    response: Response,
+    db: Session = Depends(get_db),
+):
+    settings = get_settings().require_auth()
+    if request.headers.get("origin") != settings.public_app_url.rstrip("/"):
+        raise ApiError(403, "CSRF_INVALID", "Request origin is invalid")
+    if db.scalar(select(User.id).where(User.email == body.email)):
+        raise ApiError(
+            409,
+            "ACCOUNT_EXISTS",
+            "An account already uses this email. Sign in instead.",
+        )
+    name = body.display_name.strip() or "New member"
+    company = Organization(
+        name=body.company_name.strip() or (name + "’s workspace")[:120]
+    )
+    db.add(company)
+    db.flush()
+    user = User(
+        organization_id=company.id,
+        email=body.email,
+        display_name=name,
+        role="manager",
+        password_hash=hash_password(body.password.get_secret_value()),
+    )
+    db.add(user)
+    try:
+        db.flush()
+        token = create_session(db, user)
+        db.commit()
+    except IntegrityError:
+        db.rollback()
+        if db.scalar(select(User.id).where(User.email == body.email)):
+            raise ApiError(
+                409,
+                "ACCOUNT_EXISTS",
+                "An account already uses this email. Sign in instead.",
+            ) from None
+        raise
+    set_session_cookie(response, token)
+    response.headers["Cache-Control"] = "no-store"
+    identity = SessionIdentity(
+        user_id=user.id,
+        organization_id=company.id,
+        role=user.role,
+        email=user.email,
+        display_name=user.display_name,
+    )
+    return session_response(identity, token, db)
 
 
 @router.post("/login", response_model=MeResponse)

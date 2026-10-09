@@ -10,7 +10,7 @@ This is a file plan. **Existing** files are present; **Planned** files must be i
 |---|---|---|
 | `index.md` | Existing | Directory file manifest and responsibilities; keep it synchronized with changes. |
 | `main.tsx` | Existing | Mount the React application. Owner: [issue 2](../../../docs/issues/02-employee-chat.md). |
-| `App.tsx` | Existing | Define routes and assemble auth-aware application layouts. Owner: [issue 2](../../../docs/issues/02-employee-chat.md). |
+| `App.tsx` | Existing | Define /login and /signup routes and assemble auth-aware application layouts. Owner: [issue 2](../../../docs/issues/02-employee-chat.md). |
 | `vite-env.d.ts` | Existing | Vite environment types. Owner: [issue 2](../../../docs/issues/02-employee-chat.md). |
 
 ## Subdirectories

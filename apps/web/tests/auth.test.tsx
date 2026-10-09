@@ -94,12 +94,13 @@ import { Routes, Route } from "react-router-dom";
 import Login from "../src/pages/Login";
 
 describe("local sign-in", () => {
-  function renderLogin() {
+  function renderLogin(path = "/login") {
     return render(
-      <MemoryRouter initialEntries={["/login"]}>
+      <MemoryRouter initialEntries={[path]}>
         <AuthProvider>
           <Routes>
             <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<Login />} />
             <Route path="/company/setup" element={<p>Company setup</p>} />
           </Routes>
         </AuthProvider>
@@ -161,5 +162,40 @@ describe("local sign-in", () => {
       "Email or password is incorrect",
     );
     expect(screen.queryByText("Company setup")).not.toBeInTheDocument();
+  });
+  it("offers signup and submits unchecked credentials", async () => {
+    const manager = {
+      ...value,
+      user: { ...value.user, role: "manager", email: "anything" },
+    };
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(new Response("{}", { status: 401 }))
+      .mockResolvedValueOnce(
+        new Response(JSON.stringify(manager), { status: 201 }),
+      )
+      .mockResolvedValueOnce(new Response(JSON.stringify(manager)));
+    vi.stubGlobal("fetch", fetchMock);
+    renderLogin();
+    const user = userEvent.setup();
+    await user.click(
+      await screen.findByRole("link", { name: "Create an account" }),
+    );
+    await screen.findByRole("heading", { name: "Create your account." });
+    await user.type(screen.getByLabelText("Your name"), "Ada");
+    await user.type(screen.getByLabelText("Email"), "anything");
+    await user.type(screen.getByLabelText("Password"), "x");
+    expect(screen.getByLabelText("Email")).not.toHaveAttribute("type", "email");
+    expect(screen.getByLabelText("Password")).not.toHaveAttribute("minlength");
+    await user.click(screen.getByRole("button", { name: "Show password" }));
+    expect(screen.getByLabelText("Password")).toHaveAttribute("type", "text");
+    await user.click(screen.getByRole("button", { name: "Create account" }));
+    await screen.findByText("Company setup");
+    expect(fetchMock.mock.calls[1][0]).toBe("/api/v1/auth/signup");
+    expect(JSON.parse(fetchMock.mock.calls[1][1].body)).toEqual({
+      email: "anything",
+      password: "x",
+      display_name: "Ada",
+    });
   });
 });

@@ -24,7 +24,7 @@ function Home() {
 function Shell() {
   const { identity, logout } = useAuth();
   return (
-    <main>
+    <main className={identity ? undefined : "auth-main"}>
       {identity && (
         <header>
           <span>
@@ -35,6 +35,7 @@ function Shell() {
       )}
       <Routes>
         <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Login />} />
         <Route
           path="/company/setup"
           element={

@@ -3,8 +3,7 @@ from functools import lru_cache
 from typing import Literal
 from urllib.parse import urlsplit
 
-from cryptography.fernet import Fernet
-from pydantic import Field, SecretStr, ValidationError, model_validator
+from pydantic import SecretStr, ValidationError, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -15,11 +14,7 @@ class Settings(BaseSettings):
     )
     database_url: SecretStr = SecretStr("sqlite:///./pii-guard.db")
     public_app_url: str = "http://localhost:5173"
-    workos_api_key: SecretStr | None = None
-    workos_client_id: str | None = Field(default=None, pattern=r"^client_[A-Za-z0-9]+$")
-    workos_issuer: str | None = None
-    workos_cookie_password: SecretStr | None = None
-    workos_redirect_uri: str = "http://localhost:5173/api/v1/auth/callback"
+    session_secret: SecretStr | None = None
     demo_adapters_enabled: bool = False
 
     @model_validator(mode="after")
@@ -37,25 +32,15 @@ class Settings(BaseSettings):
             raise ValueError("PUBLIC_APP_URL must be an HTTP(S) origin")
         if self.app_env == "production":
             if self.demo_adapters_enabled:
-                raise ValueError("Demo sessions are forbidden in production")
+                raise ValueError("DEMO_ADAPTERS_ENABLED must be false in production")
             if not self.database_url.get_secret_value().startswith(
                 ("postgresql://", "postgresql+psycopg://")
             ):
-                raise ValueError("Production requires PostgreSQL")
+                raise ValueError("DATABASE_URL must use PostgreSQL in production")
             if not self.public_app_url.startswith("https://"):
-                raise ValueError("Production requires HTTPS")
-        if self.workos_cookie_password:
-            try:
-                Fernet(self.workos_cookie_password.get_secret_value())
-            except Exception:
-                raise ValueError(
-                    "WORKOS_COOKIE_PASSWORD must be a Fernet key"
-                ) from None
-        if (
-            self.workos_redirect_uri
-            != self.public_app_url.rstrip("/") + "/api/v1/auth/callback"
-        ):
-            raise ValueError("WorkOS callback must match PUBLIC_APP_URL")
+                raise ValueError("PUBLIC_APP_URL must use HTTPS in production")
+        if self.session_secret and len(self.session_secret.get_secret_value()) < 32:
+            raise ValueError("SESSION_SECRET must contain at least 32 characters")
         return self
 
     @property
@@ -67,13 +52,12 @@ class Settings(BaseSettings):
             else value
         )
 
-    def require_workos(self):
+    def require_auth(self):
         from app.schemas.common import ApiError
 
-        if not all(
-            (self.workos_api_key, self.workos_client_id, self.workos_cookie_password)
-        ):
-            raise ApiError(503, "AUTH_UNAVAILABLE", "WorkOS settings are missing")
+        if not self.session_secret:
+            raise ApiError(503, "AUTH_UNAVAILABLE", "Session settings are missing",
+                fields=[{"path": "SESSION_SECRET", "message": "Required setting"}])
         return self
 
 
@@ -81,9 +65,19 @@ class Settings(BaseSettings):
 def get_settings():
     try:
         return Settings()
-    except ValidationError:
+    except ValidationError as error:
         from app.schemas.common import ApiError
 
+        # Return only known setting names; never serialize Pydantic error inputs.
+        names = set()
+        for detail in error.errors(include_input=False):
+            if detail["loc"]:
+                names.add(str(detail["loc"][0]).upper())
+            else:
+                for name in ("PUBLIC_APP_URL", "DATABASE_URL", "SESSION_SECRET", "DEMO_ADAPTERS_ENABLED"):
+                    if name in detail["msg"]:
+                        names.add(name)
         raise ApiError(
-            503, "CONFIGURATION_ERROR", "Required application settings are invalid"
+            503, "CONFIGURATION_ERROR", "Required application settings are invalid",
+            fields=[{"path": name, "message": "Invalid setting"} for name in sorted(names)],
         ) from None

@@ -3,7 +3,7 @@ const id = z.uuid();
 export const role = z.enum(["employee", "manager"]);
 export const userSummary = z.strictObject({
   id,
-  email: z.email(),
+  email: z.string(),
   display_name: z.string().min(1).max(120),
   role,
 });
@@ -21,6 +21,13 @@ export const organizationInput = z.strictObject({
   name: z.string().trim().min(1).max(120),
 });
 export const assignmentInput = z.strictObject({ manager_id: id });
+export const loginInput = z.strictObject({
+  email: z.string(),
+  password: z.string(),
+});
+export const signupInput = loginInput.extend({
+  display_name: z.string().min(1).max(120),
+});
 export const assignment = z.strictObject({
   employee_id: id,
   manager_id: id,
@@ -154,6 +161,6 @@ export const streamEvent = z.discriminatedUnion("type", [
 export type Session = z.infer<typeof session>;
 export type Attachment = z.infer<typeof attachment>;
 export type Conversation = z.infer<typeof conversation>;
-export type Message = z.infer<typeof message>;
 export type DemoSample = z.infer<typeof demoSample>;
+export type Message = z.infer<typeof message>;
 export type StreamEvent = z.infer<typeof streamEvent>;

@@ -3,6 +3,7 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from sqlalchemy.exc import SQLAlchemyError
 
+from app.dependencies import register_feature_routers
 from app.routes.auth import router as auth_router
 from app.routes.chat import router as chat_router
 from app.routes.demo import router as demo_router
@@ -26,12 +27,13 @@ for router in (
     demo_router,
 ):
     app.include_router(router)
+register_feature_routers(app)
 
 
 @app.exception_handler(ApiError)
 async def api_error(request: Request, error: ApiError):
     return JSONResponse(
-        error_body(error.code, error.message),
+        error_body(error.code, error.message, error.fields),
         status_code=error.status,
         headers={"Cache-Control": "no-store"},
     )

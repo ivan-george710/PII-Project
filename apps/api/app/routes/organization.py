@@ -8,10 +8,8 @@ from fastapi import APIRouter, Depends, Query, Response
 from sqlalchemy import and_, or_, select
 from sqlalchemy.orm import Session
 
-from app.auth.permissions import require_manager
-from app.auth.sessions import current_identity
+from app.dependencies import current_identity, get_db, require_manager
 from app.db.models import ManagerAssignment, Organization, User
-from app.db.session import get_db
 from app.schemas.common import ApiError
 from app.schemas.organization import (
     AssignmentInput,

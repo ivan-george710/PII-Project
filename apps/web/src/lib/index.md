@@ -11,7 +11,7 @@ This is a file plan. **Existing** files are present; **Planned** files must be i
 | `index.md` | Existing | Directory file manifest and responsibilities; keep it synchronized with changes. |
 | `api.ts` | Existing | Authenticated API transport and consistent error handling. Owner: [issue 2](../../../../docs/issues/02-employee-chat.md). |
 | `types.ts` | Implemented | Frontend API types generated or checked against OpenAPI. Owner: [issue 2](../../../../docs/issues/02-employee-chat.md). |
-| `schemas.ts` | Implemented | Shared strict Zod runtime schemas and discriminated SSE unions. Owner: [issue 2](../../../../docs/issues/02-employee-chat.md). |
+| `schemas.ts` | Implemented | Shared strict Zod API/SSE runtime schemas, discriminated stream events, and auth request/response validation. Owner: [issue 2](../../../../docs/issues/02-employee-chat.md). |
 
 Generated caches, dependencies, runtime uploads, and `.git/` are excluded from directory manifests.
 

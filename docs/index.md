@@ -13,8 +13,8 @@ This is a file plan. **Existing** files are present; **Planned** files must be i
 | `local-setup.md` | Existing | Exact install/start commands and where to configure credentials. Owner: [issue 5](issues/05-platform-deployment.md). |
 | `engine-contract.md` | Planned | Define content, policy, artifacts, locations, findings, and failures. Owner: [issue 1](issues/01-privacy-engine.md). |
 | `spark-reuse.md` | Planned | Map Apple/Swift face logic to the backend implementation and test cases. Owner: [issue 1](issues/01-privacy-engine.md). |
-| `reporting-contract.md` | Planned | Define idempotent manager events and safe display fields. Owner: [issue 4](issues/04-manager-settings-reports.md). |
-| `rule-policy.md` | Planned | Define rule IDs, versions, enabled states, precedence, and regex limits. Owner: [issue 4](issues/04-manager-settings-reports.md). |
+| `reporting-contract.md` | Existing | Define idempotent manager events and safe display fields. Owner: [issue 4](issues/04-manager-settings-reports.md). |
+| `rule-policy.md` | Existing | Define rule IDs, versions, enabled states, precedence, and regex limits. Owner: [issue 4](issues/04-manager-settings-reports.md). |
 | `cicd.md` | Existing | Actions deployment and live health/session checks; required database and local auth setup. Owner: [issue 5](issues/05-platform-deployment.md). |
 
 ## Subdirectories

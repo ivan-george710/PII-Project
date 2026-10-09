@@ -17,8 +17,8 @@ This is a file plan. **Existing** files are present; **Planned** files must be i
 | `conversation.py` | Planned | Employee-owned conversations. Owner: [issue 2](../../../../../docs/issues/02-employee-chat.md). |
 | `message.py` | Planned | Conversation turns and safe provider history. Owner: [issue 2](../../../../../docs/issues/02-employee-chat.md). |
 | `attachment.py` | Planned | File ownership, storage references, and processing state. Owner: [issue 2](../../../../../docs/issues/02-employee-chat.md). |
-| `rule.py` | Planned | Company built-in overrides, custom rules, and policy versions. Owner: [issue 4](../../../../../docs/issues/04-manager-settings-reports.md). |
-| `pii_event.py` | Planned | Submission findings/actions and idempotency identifiers. Owner: [issue 4](../../../../../docs/issues/04-manager-settings-reports.md). |
+| `rule.py` | Existing | Company built-in overrides, custom rules, and policy versions. Owner: [issue 4](../../../../../docs/issues/04-manager-settings-reports.md). |
+| `pii_event.py` | Existing | Submission findings/actions and idempotency identifiers. Owner: [issue 4](../../../../../docs/issues/04-manager-settings-reports.md). |
 | `submission.py` | Planned | Persist submission state, idempotency, request hash, and stream result. Owner: [issue 2](../../../../../docs/issues/02-employee-chat.md). |
 
 Generated caches, dependencies, runtime uploads, and `.git/` are excluded from directory manifests.

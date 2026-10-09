@@ -1,6 +1,6 @@
 # Minimal CI/CD baseline
 
-The frontend is a plain Vite page. The backend is FastAPI with a Pydantic v2 health response. This baseline implements no authentication, redaction, database, or LLM calls.
+The frontend uses React/Vite and the backend uses FastAPI. WorkOS authentication and company setup are implemented; employee chat, redaction and LLM calls remain with their feature issues.
 
 ## Local check
 
@@ -20,7 +20,7 @@ Repository configuration:
 - Actions variable `VERCEL_PROJECT_ID`: `prj_pYUwh7wNPrBPOkYTCvERO5AlfN29`.
 - Actions secret `VERCEL_TOKEN`: configure directly in repository settings; never commit or paste it into chat.
 
-The workflow verifies the deployed frontend and `/api/health`, including a commit SHA check. Both services share a URL; the frontend uses relative `/api/health`. Deployment protection is preserved and the CLI authenticates smoke requests. CI success gates deployment, but the post-deployment smoke test does not automatically roll back a failed production release.
+The workflow verifies the deployed frontend and `/api/health`, including a commit SHA check. For production it also requires `/api/v1/auth/login` to redirect to WorkOS with PKCE and a secure state cookie, and anonymous `/api/v1/auth/me` to return 401. Configuration errors therefore fail production deployment checks. Preview health checks do not establish that preview sign-in is configured. Both services share a URL. Deployment protection is preserved and the CLI authenticates smoke requests. CI success gates deployment, but the post-deployment smoke test does not automatically roll back a failed production release.
 
 ## Verify
 
@@ -33,4 +33,6 @@ Vercel Services is in beta: https://vercel.com/docs/services.
 
 ## WorkOS staging check (issue #3)
 
-The `smoke` job now includes frontend behavior tests and backend pytest checks. `workos-staging` uses only `WORKOS_TEST_API_KEY` and the public `WORKOS_TEST_CLIENT_ID` to verify a real temporary staging session; it is excluded for fork PRs. WorkOS credentials are not passed to Vercel deployment. Backend runtime auth/database configuration is a separate setup step documented in [local setup](local-setup.md).
+The `smoke` job includes frontend behavior tests and backend pytest checks. `workos-staging` uses only `WORKOS_TEST_API_KEY` and the public `WORKOS_TEST_CLIENT_ID` to verify a real temporary staging session; it is excluded for fork PRs. Deployment waits for this check and syncs these scoped credentials into Vercel's backend-only `WORKOS_API_KEY` Secret and `WORKOS_CLIENT_ID` Config settings. Values travel through stdin and never enter source, frontend variables or command arguments.
+
+Configure `DATABASE_URL`, `PUBLIC_APP_URL`, `WORKOS_REDIRECT_URI`, and a stable `WORKOS_COOKIE_PASSWORD` separately in Vercel, then migrate the database and provision company users as documented in [local setup](local-setup.md). Production uses `https://pii-guard-mu.vercel.app`; preview sign-in requires its own exact public origin/callback registered with WorkOS. A healthy `/api/health` response alone does not establish that authentication is configured.

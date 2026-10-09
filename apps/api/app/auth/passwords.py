@@ -6,8 +6,6 @@ DUMMY_HASH = password_hasher.hash("unused-random-account-placeholder")
 
 
 def hash_password(password: str) -> str:
-    if not 12 <= len(password) <= 128:
-        raise ValueError("Password must contain 12 to 128 characters")
     return password_hasher.hash(password)
 
 

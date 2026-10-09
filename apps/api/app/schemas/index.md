@@ -11,7 +11,7 @@ This is a file plan. **Existing** files are present; **Planned** files must be i
 | `index.md` | Existing | Directory file manifest and responsibilities; keep it synchronized with changes. |
 | `__init__.py` | Existing | Schema package marker. Owner: [issue 5](../../../../docs/issues/05-platform-deployment.md). |
 | `common.py` | Existing | Existing HealthResponse plus shared API error/pagination models. Owner: [issue 5](../../../../docs/issues/05-platform-deployment.md). |
-| `auth.py` | Existing | Session identity and roles. Owner: [issue 3](../../../../docs/issues/03-auth-company-setup.md). |
+| `auth.py` | Existing | Sign-up/login request shapes, session identity and roles; email/password strings have no format/strength constraints. Owner: [issue 3](../../../../docs/issues/03-auth-company-setup.md). |
 | `chat.py` | Planned | Conversation, message, submission, and stream events. Owner: [issue 2](../../../../docs/issues/02-employee-chat.md). |
 | `uploads.py` | Planned | File metadata, processing state, and authorized output responses. Owner: [issue 2](../../../../docs/issues/02-employee-chat.md). |
 | `reports.py` | Planned | Report filters, event summaries, and details. Owner: [issue 4](../../../../docs/issues/04-manager-settings-reports.md). |

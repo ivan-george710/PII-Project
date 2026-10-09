@@ -10,7 +10,7 @@ This is a file plan. **Existing** files are present; **Planned** files must be i
 |---|---|---|
 | `index.md` | Existing | Directory file manifest and responsibilities; keep it synchronized with changes. |
 | `__init__.py` | Existing | Routes package marker. Owner: [issue 5](../../../../docs/issues/05-platform-deployment.md). |
-| `auth.py` | Existing | Email/password login/logout and current-session endpoints. Owner: [issue 3](../../../../docs/issues/03-auth-company-setup.md). |
+| `auth.py` | Existing | Workspace sign-up, email/password login/logout, and current-session endpoints. Owner: [issue 3](../../../../docs/issues/03-auth-company-setup.md). |
 | `chat.py` | Planned | Conversation, submission, and streaming endpoints. Owner: [issue 2](../../../../docs/issues/02-employee-chat.md). |
 | `uploads.py` | Planned | Authorized upload and sanitized-file access endpoints. Owner: [issue 2](../../../../docs/issues/02-employee-chat.md). |
 | `reports.py` | Planned | Assigned-employee report and event detail endpoints. Owner: [issue 4](../../../../docs/issues/04-manager-settings-reports.md). |

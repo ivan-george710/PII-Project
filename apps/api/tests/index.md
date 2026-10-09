@@ -11,7 +11,7 @@ This is a file plan. **Existing** files are present; **Planned** files must be i
 | `index.md` | Existing | Directory file manifest and responsibilities; keep it synchronized with changes. |
 | `conftest.py` | Existing | Shared isolated database/session fixtures. Owner: [issue 3](../../../docs/issues/03-auth-company-setup.md). |
 | `test_migrations.py` | Existing | Upgrade the historical schema with existing company/users/assignments; check data preservation and model parity. Owner: [issue 3](../../../docs/issues/03-auth-company-setup.md). |
-| `test_auth.py` | Existing | Local password/session behavior, expiry, revocation, CSRF, lockout, and role enforcement. Owner: [issue 3](../../../docs/issues/03-auth-company-setup.md). |
+| `test_auth.py` | Existing | Sign-up isolation/duplicate handling, unrestricted credentials, password/session behavior, expiry, revocation, CSRF, lockout, and role enforcement. Owner: [issue 3](../../../docs/issues/03-auth-company-setup.md). |
 | `test_organization.py` | Existing | Membership and manager-assignment boundaries. Owner: [issue 3](../../../docs/issues/03-auth-company-setup.md). |
 | `test_rules.py` | Planned | Policy versioning, isolation, preview, and invalid-pattern behavior. Owner: [issue 4](../../../docs/issues/04-manager-settings-reports.md). |
 | `test_reports.py` | Planned | Report authorization and idempotent event ingestion. Owner: [issue 4](../../../docs/issues/04-manager-settings-reports.md). |

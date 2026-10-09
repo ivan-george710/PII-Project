@@ -14,7 +14,7 @@ This is a file plan. **Existing** files are present; **Planned** files must be i
 | `export-api-schema.sh` | Deferred | Optional future work; outside the five current issues. Regenerate and check contract snapshots. |
 | `provision-models.py` | Deferred | Optional future work; outside the five current issues. Acquire licensed models with checksum validation outside Git. |
 | `verify.sh` | Deferred | Optional future work; outside the five current issues. Run relevant frontend, backend, engine, and integration checks. |
-| `provision-company.py` | Existing | Trusted operator account setup and password reset; preserve company roles and revoke sessions on reset. Owner: [issue 3](../docs/issues/03-auth-company-setup.md). |
+| `provision-company.py` | Existing | Trusted operator account setup and password reset without email/password format rules; preserve roles and revoke sessions on reset. Owner: [issue 3](../docs/issues/03-auth-company-setup.md). |
 
 Generated caches, dependencies, runtime uploads, and `.git/` are excluded from directory manifests.
 

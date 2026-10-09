@@ -2,7 +2,7 @@
 
 # Deliver local authentication, company setup, and employee-manager assignments
 
-Status: Company setup implemented; local email/password authentication replaces the provider integration on `codex/fix-workos-runtime` (PR #10).
+Status: Local auth/company setup merged in PR #10; public signup and monochrome Apple-style auth screens without icons added on `codex/auth-signup-design`.
 Suggested ownership: Full-stack authentication / company setup
 
 Implement the complete sign-in and company setup experience, including its frontend, backend, database, and validation. Manager rule settings/reporting are a separate complete workstream (issue 4). Verification and fictional setup data belong inside this implementation, not a separate testing/demo issue.
@@ -46,7 +46,8 @@ Session roles: `employee|manager`. All company settings are writable by managers
 
 | Endpoint | Exact input | Output |
 |---|---|---|
-| `POST /api/v1/auth/login` | Same-origin; `{email:EmailStr max254,password:str 12..128}`; extra fields forbidden |200 same DTO as `/me`; HttpOnly/Secure/SameSite=Lax opaque session cookie;401 INVALID_CREDENTIALS;429 LOGIN_RATE_LIMITED after 5 failures for 5 minutes |
+| `POST /api/v1/auth/signup` | Same-origin; `{email:str,password:str,display_name?:str max120,company_name?:str max120}`; no credential content checks; no client role/company IDs |201 same session DTO as /me; new isolated company workspace and manager; session cookie;409 ACCOUNT_EXISTS |
+| `POST /api/v1/auth/login` | Same-origin; `{email:str,password:str}` (no format, strength or length checks); extra fields forbidden |200 same DTO as `/me`; HttpOnly/Secure/SameSite=Lax opaque session cookie;401 INVALID_CREDENTIALS;429 LOGIN_RATE_LIMITED after 5 failures for 5 minutes |
 | `POST /api/v1/auth/logout` | `{}`, CSRF required |204, revoke session and clear cookie |
 | `GET /api/v1/auth/me` | No body |200 `{user:{id,email,display_name,role,organization_id},organization:{id,name},csrf_token:"..."}`;401 without session |
 | `GET /api/v1/organization` | Session company |200 `{id,name,created_at}` |
@@ -56,14 +57,14 @@ Session roles: `employee|manager`. All company settings are writable by managers
 | `PUT /api/v1/organization/assignments/{employee_id}` | Manager; `{manager_id:UUID}` |200 assignment; both users must be same company with matching roles; one manager per employee; invalid roles422 |
 | `DELETE /api/v1/organization/assignments/{employee_id}` | Manager; no body |204; subsequent report access denied; manager may not self-assign an employee identity |
 
-Use revocable database sessions with a random opaque cookie. Store only SHA-256 token hashes and Argon2 password hashes. Email is normalized to lowercase and checked using Pydantic EmailStr. Public DTOs exclude password hashes and session tokens. Login requires an exact allowed Origin; mutations require Origin and CSRF. There is no public registration or role-promotion endpoint. Trusted operator provisioning creates accounts or resets passwords, revoking sessions on reset.
+Use revocable database sessions with a random opaque cookie. Store only SHA-256 token hashes and Argon2 password hashes. Email is normalized to lowercase; it and passwords are plain strings with no content checks. Public DTOs exclude password hashes and session tokens. Login requires an exact allowed Origin; mutations require Origin and CSRF. Public signup creates a new isolated workspace and its manager. It never joins an existing company or changes an existing account. There is no public role-promotion endpoint. Trusted operator provisioning creates accounts or resets passwords, revoking sessions on reset.
 
 ### Data models and implementation order
 
 - Organization: UUID id, name1..120, UTC created_at/updated_at.
-- User: UUID id/company_id, unique normalized email, nullable Argon2 password hash (unprovisioned users cannot log in), failed-attempt counter/lockout, validated email, display_name1..120, employee/manager role, UTC timestamps.
+- User: UUID id/company_id, unique normalized email text, nullable Argon2 password hash (unprovisioned users cannot log in), failed-attempt counter/lockout, validated email, display_name1..120, employee/manager role, UTC timestamps.
 - ManagerAssignment: employee_id unique, manager_id, company_id, UTC updated_at; foreign keys, same-company validation, correct-role validation. One manager per employee for the presentation.
-- `SessionIdentity` Pydantic contract: `{user_id:UUID,organization_id:UUID,role:"employee"|"manager",email:EmailStr,display_name:str}`. Resolve it only after validating the database session. Other workstreams consume this contract through dependency injection.
+- `SessionIdentity` Pydantic contract: `{user_id:UUID,organization_id:UUID,role:"employee"|"manager",email:str,display_name:str}`. Resolve it only after validating the database session. Other workstreams consume this contract through dependency injection.
 - Implement models/migration → session and permission services → typed routes → setup/login frontend → positive and negative checks. Central helpers expose `require_employee`, `require_manager`, `require_company`, and `require_assigned_employee`; manager reports still scope queries on every call.
 - Company policy initialization is idempotent through a documented policy-store interface; policy table ownership stays with issue 4. Use an explicit local policy adapter when implementing this workflow independently; do not create competing policy tables.
 
@@ -99,7 +100,7 @@ Each listed file has one issue owner. Update its directory index when implementi
 | `apps/web/src/features/setup/OrganizationForm.tsx` | Set company details and policy-editing permissions. |
 | `apps/web/src/features/setup/EmployeeAssignments.tsx` | Assign employees to managers within their company. |
 | `apps/web/src/features/setup/useOrganization.ts` | Load users and persist company setup. |
-| `apps/web/src/pages/Login.tsx` | Local email/password sign-in form (issue 3). |
+| `apps/web/src/pages/Login.tsx` | Apple-style sign-in/sign-up form, password visibility and inline API feedback (issue 3). |
 | `apps/web/src/pages/CompanySetup.tsx` | Company/users/manager assignment page (issue 3). |
 | `apps/web/tests/auth.test.tsx` | Session and role-aware navigation behavior (issue 3). |
 | `apps/web/tests/setup.test.tsx` | Company setup and assignment interactions (issue 3). |
@@ -120,6 +121,7 @@ Each listed file has one issue owner. Update its directory index when implementi
 | `scripts/provision-company.py` | Trusted operator account setup/password reset, with no public role elevation. |
 | `apps/api/app/db/models/auth_session.py` | Hashed session tokens, user ID, created_at, expires_at; seven-day expiry and revocation. |
 | `apps/api/migrations/versions/0002_local_auth.py` | Preserve IDs/assignments; drop provider identity columns, normalize/uniquely constrain emails, add password/lockout/session fields. Future migrations follow this revision. |
+| `apps/api/migrations/versions/0003_signup.py` | Expand email storage to unrestricted text; no existing identities change. |
 | `apps/api/tests/test_migrations.py` | Existing-data migration preservation and model parity. |
 
 ## Working independently
@@ -130,6 +132,6 @@ Use the documented interfaces and feature-owned development adapters for integra
 
 ## Implementation notes
 
-The React/FastAPI bootstrap connects this feature. Employee chat and manager reports remain with their owners. Accounts are managed by the trusted provisioning command, which reads passwords with hidden terminal input. No public signup, email verification, forgot-password emails, or external provider integration is included. Operators reset passwords with `--reset-password`. All company and authorization APIs keep their existing contracts.
+The React/FastAPI bootstrap connects this feature. Employee chat and manager reports remain with their owners. Accounts are managed by the trusted provisioning command, which reads passwords with hidden terminal input. Public signup is included. Email verification, password-strength/length checks, forgot-password emails and external providers are excluded. Operators reset passwords with `--reset-password`. All company and authorization APIs keep their existing contracts.
 
 The deployment needs only `DATABASE_URL`, `PUBLIC_APP_URL`, and a stable random `SESSION_SECRET` (at least 32 characters). Demo adapters are disabled in production. Password/session behavior is tested against the actual local implementation with no external auth mocks or staging credentials. The requested live manager is `cafkeemail@gmail.com`; its generated password is private and excluded from source/deploy uploads.

@@ -6,6 +6,7 @@ from sqlalchemy import (
     DateTime,
     ForeignKey,
     String,
+    Text,
     UniqueConstraint,
     Uuid,
 )
@@ -23,7 +24,7 @@ class User(IdentityMixin, Base):
     organization_id: Mapped[UUID] = mapped_column(
         Uuid, ForeignKey("organizations.id"), index=True
     )
-    email: Mapped[str] = mapped_column(String(254), unique=True)
+    email: Mapped[str] = mapped_column(Text, unique=True)
     password_hash: Mapped[str | None] = mapped_column(String(255))
     failed_login_attempts: Mapped[int] = mapped_column(default=0)
     locked_until: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))

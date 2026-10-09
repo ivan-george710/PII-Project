@@ -10,7 +10,7 @@ This is a file plan. **Existing** files are present; **Planned** files must be i
 |---|---|---|
 | `index.md` | Existing | Directory file manifest and responsibilities; keep it synchronized with changes. |
 | `__init__.py` | Existing | Auth package marker. Owner: [issue 3](../../../../docs/issues/03-auth-company-setup.md). |
-| `passwords.py` | Existing | Password hashing and verification. Owner: [issue 3](../../../../docs/issues/03-auth-company-setup.md). |
+| `passwords.py` | Existing | Argon2 password hashing/verification without password strength or length rules. Owner: [issue 3](../../../../docs/issues/03-auth-company-setup.md). |
 | `sessions.py` | Existing | Validate sessions and resolve company/user identity. Owner: [issue 3](../../../../docs/issues/03-auth-company-setup.md). |
 | `permissions.py` | Existing | Enforce company, role, manager-assignment, and policy-edit permissions. Owner: [issue 3](../../../../docs/issues/03-auth-company-setup.md). |
 

@@ -87,7 +87,7 @@ jobs:
           DEPLOYMENT_SOURCE: ${{ steps.source.outputs.directory }}
         run: |
           set -euo pipefail
-          args=(--yes)
+          args=(--yes --json)
           if [ "$GITHUB_REF" = 'refs/heads/main' ]; then
             args+=(--prod --skip-domain)
           fi
@@ -101,9 +101,12 @@ jobs:
           DEPLOYMENT_RESULT="$RUNNER_TEMP/vercel-result.txt" node --input-type=module <<'JS'
           import { readFileSync, appendFileSync } from 'node:fs';
           const result = readFileSync(process.env.DEPLOYMENT_RESULT, 'utf8').trim();
-          let value;
-          try { value = JSON.parse(result).deployment?.url; }
-          catch { value = result; }
+          const deployment = JSON.parse(result).deployment;
+          const value = deployment?.url;
+          if (!/^dpl_[A-Za-z0-9]+$/.test(deployment?.id ?? '')) {
+            throw new Error('Unexpected Vercel deployment ID');
+          }
+          appendFileSync(process.env.GITHUB_OUTPUT, `id=${deployment.id}\n`);
           const url = new URL(value);
           if (url.protocol !== 'https:' || !url.hostname.endsWith('.vercel.app') || url.origin !== value) {
             throw new Error('Unexpected Vercel deployment result');
@@ -144,10 +147,27 @@ jobs:
         timeout-minutes: 3
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-          DEPLOYMENT_URL: ${{ steps.deployment.outputs.url }}
+          DEPLOYMENT_ID: ${{ steps.deployment.outputs.id }}
         run: |
           set -euo pipefail
-          vercel promote "$DEPLOYMENT_URL" --yes --scope "$VERCEL_ORG_ID" --timeout 2m
+          python3 <<'PYTHON'
+          import os, re, urllib.request, urllib.error
+          project, team, deployment = (os.environ[name] for name in ('VERCEL_PROJECT_ID', 'VERCEL_ORG_ID', 'DEPLOYMENT_ID'))
+          assert re.fullmatch(r'prj_[A-Za-z0-9]+', project)
+          assert re.fullmatch(r'team_[A-Za-z0-9]+', team)
+          assert re.fullmatch(r'dpl_[A-Za-z0-9]+', deployment)
+          url = f'https://api.vercel.com/v10/projects/{project}/promote/{deployment}?teamId={team}'
+          request = urllib.request.Request(url, data=b'{}', method='POST', headers={
+              'Authorization': 'Bearer ' + os.environ['VERCEL_TOKEN'],
+              'Content-Type': 'application/json',
+          })
+          try:
+              with urllib.request.urlopen(request, timeout=30) as response:
+                  assert response.status in (200, 201, 202)
+          except urllib.error.HTTPError as error:
+              raise SystemExit(f'Project promotion failed: HTTP {error.code}') from None
+          print('Verified deployment promotion requested through scoped project API')
+          PYTHON
           vercel curl /api/health --deployment https://pii-guard-mu.vercel.app -- --connect-timeout 10 --max-time 30 --fail-with-body --silent --show-error > "$RUNNER_TEMP/production-health.json"
           python3 - "$RUNNER_TEMP/production-health.json" <<'PYTHON'
           import json, os, sys

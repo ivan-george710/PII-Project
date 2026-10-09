@@ -32,13 +32,13 @@ class Settings(BaseSettings):
             raise ValueError("PUBLIC_APP_URL must be an HTTP(S) origin")
         if self.app_env == "production":
             if self.demo_adapters_enabled:
-                raise ValueError("Demo sessions are forbidden in production")
+                raise ValueError("DEMO_ADAPTERS_ENABLED must be false in production")
             if not self.database_url.get_secret_value().startswith(
                 ("postgresql://", "postgresql+psycopg://")
             ):
-                raise ValueError("Production requires PostgreSQL")
+                raise ValueError("DATABASE_URL must use PostgreSQL in production")
             if not self.public_app_url.startswith("https://"):
-                raise ValueError("Production requires HTTPS")
+                raise ValueError("PUBLIC_APP_URL must use HTTPS in production")
         if self.session_secret and len(self.session_secret.get_secret_value()) < 32:
             raise ValueError("SESSION_SECRET must contain at least 32 characters")
         return self
@@ -56,7 +56,8 @@ class Settings(BaseSettings):
         from app.schemas.common import ApiError
 
         if not self.session_secret:
-            raise ApiError(503, "AUTH_UNAVAILABLE", "Session settings are missing")
+            raise ApiError(503, "AUTH_UNAVAILABLE", "Session settings are missing",
+                fields=[{"path": "SESSION_SECRET", "message": "Required setting"}])
         return self
 
 
@@ -64,9 +65,19 @@ class Settings(BaseSettings):
 def get_settings():
     try:
         return Settings()
-    except ValidationError:
+    except ValidationError as error:
         from app.schemas.common import ApiError
 
+        # Return only known setting names; never serialize Pydantic error inputs.
+        names = set()
+        for detail in error.errors(include_input=False):
+            if detail["loc"]:
+                names.add(str(detail["loc"][0]).upper())
+            else:
+                for name in ("PUBLIC_APP_URL", "DATABASE_URL", "SESSION_SECRET", "DEMO_ADAPTERS_ENABLED"):
+                    if name in detail["msg"]:
+                        names.add(name)
         raise ApiError(
-            503, "CONFIGURATION_ERROR", "Required application settings are invalid"
+            503, "CONFIGURATION_ERROR", "Required application settings are invalid",
+            fields=[{"path": name, "message": "Invalid setting"} for name in sorted(names)],
         ) from None

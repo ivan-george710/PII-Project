@@ -8,9 +8,16 @@ The approved implementation plan is in [docs/issues/index.md](docs/issues/index.
 - Frontend: [PII Guard](https://pii-guard-mu.vercel.app)
 - Backend API: [API documentation](https://pii-guard-mu.vercel.app/api/docs)
 - Health endpoint: [API health](https://pii-guard-mu.vercel.app/api/health)
-- Verified GitHub Actions run: [build, test, deploy, live smoke check](https://github.com/ivan-george710/PII-Project/actions/runs/37750508093)
+- Verified GitHub Actions run: [build, test, deploy, live smoke check](https://github.com/ivan-george710/PII-Project/actions/runs/37968276679)
 
 Both services deploy together from GitHub Actions. Main pushes deploy production; other branch pushes deploy previews. The app provides local email/password authentication and company setup; see [setup instructions](docs/local-setup.md). See [CI/CD details](docs/cicd.md). Vercel deployment protection may require sign-in.
+
+
+## Run the current app
+
+Use Python 3.12+ and Node 24. In `apps/api`: create a `.venv`, install `'.[test]'`, copy root `.env.example` to `.env`, generate `SESSION_SECRET`, then run `alembic upgrade head` and `uvicorn app.main:app --reload --port 8000` using the venv commands. In `apps/web`: run `npm ci` and `npm run dev`. Open `http://localhost:5173/signup` to create a workspace. See [exact setup commands](docs/local-setup.md) for existing-company employee provisioning and checks.
+
+The product currently delivers local signup/sign-in and company/manager setup. Employee chat, policies/reports and the installable privacy engine remain their owning issues. The prototype descriptions below do not indicate these features are connected to the product.
 
 
 A document processing and PII protection pipeline for the Cadence case study.

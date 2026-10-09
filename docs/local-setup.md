@@ -7,7 +7,7 @@ Issue #3 provides email/password sign-in, company setup and manager assignments.
 1. In `apps/api`, use Python 3.12+: `python3 -m venv .venv`, then `.venv/bin/pip install '.[test]'`.
 2. Copy root `.env.example` to `apps/api/.env`. Generate `SESSION_SECRET` with `.venv/bin/python -c "import secrets; print(secrets.token_urlsafe(48))"` and save it there.
 3. Run `.venv/bin/alembic upgrade head`.
-4. Provision accounts with the trusted command below. It prompts for passwords with hidden input.
+4. Create a new workspace through `/signup` after starting the apps, or provision an existing company/account with the trusted command below.
 5. Run `.venv/bin/uvicorn app.main:app --reload --port 8000`.
 6. In `apps/web`, run `npm ci`, then `npm run dev`. Open `http://localhost:5173`.
 
@@ -48,3 +48,13 @@ The presentation deployment uses the existing free Neon database. `cafkeemail@gm
 - Migration parity: `.venv/bin/alembic check` after upgrading an isolated database.
 
 CI uses no external authentication key or staging project. The tests exercise real password hashing and database sessions. Frontend API mocks are used only to test form feedback/navigation independently.
+
+## Feature integration
+
+The API registers health, local auth and company setup directly. It also registers chat, uploads, demo, rules and reports routers when their modules are implemented. Missing planned modules add no routes. Import errors inside an implemented module fail startup so broken features cannot silently disappear. `app.dependencies` exposes the existing database/session/permission/settings dependencies for feature routers; feature owners connect their actual engine, policy, reporting, storage and LLM services.
+
+`packages/engine` currently contains only directory plans and cannot be installed or used to sanitize employee content. Issue 1 supplies its package metadata, `pii_guard.pipeline.sanitize` and runtime tools. Once that package exists, install it from the repository root with `apps/api/.venv/bin/pip install -e packages/engine` and declare its actual dependency in the backend/deployment setup. Do not install an unrelated public package with the same name, or invent an engine extra before the package exists. The prototype is reference material and stays out of Vercel uploads. No OCR/model tooling is currently required to run auth/company setup.
+
+LLM keys/model, storage and `SHOW_DEMO_SAMPLES` are configured by issue 2 when their implementations exist; the current backend does not consume those settings. Unavailable privacy processing must block real submissions. Simulated adapters are explicit development/test helpers only.
+
+Configuration failures return only setting names in `error.fields`, never their values. `/api/health` and API docs remain available for connectivity checks. Configuration errors are surfaced by the endpoints that need those settings.

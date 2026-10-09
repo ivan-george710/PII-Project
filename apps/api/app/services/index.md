@@ -12,8 +12,8 @@ This is a file plan. **Existing** files are present; **Planned** files must be i
 | `__init__.py` | Existing | Services package marker. Owner: [issue 5](../../../../docs/issues/05-platform-deployment.md). |
 | `guard.py` | Planned | Apply company policy, sanitize, block failures, and publish events. Owner: [issue 2](../../../../docs/issues/02-employee-chat.md). |
 | `chat.py` | Planned | Persist conversation flow, build safe history, and stream LLM results. Owner: [issue 2](../../../../docs/issues/02-employee-chat.md). |
-| `reporting.py` | Planned | Idempotent event ingestion and manager report queries. Owner: [issue 4](../../../../docs/issues/04-manager-settings-reports.md). |
-| `rules.py` | Planned | Policy snapshots/versioning and bounded custom-rule preview. Owner: [issue 4](../../../../docs/issues/04-manager-settings-reports.md). |
+| `reporting.py` | Existing | Idempotent event ingestion and manager report queries. Owner: [issue 4](../../../../docs/issues/04-manager-settings-reports.md). |
+| `rules.py` | Existing | Policy snapshots/versioning and bounded custom-rule preview. Owner: [issue 4](../../../../docs/issues/04-manager-settings-reports.md). |
 | `organization.py` | Existing | Company membership and manager-assignment workflows. Owner: [issue 3](../../../../docs/issues/03-auth-company-setup.md). |
 | `demo.py` | Planned | Load safe sample assets and create employee-owned attachments. Owner: [issue 2](../../../../docs/issues/02-employee-chat.md). |
 

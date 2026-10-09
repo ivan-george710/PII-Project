@@ -11,10 +11,10 @@ This is a file plan. **Existing** files are present; **Planned** files must be i
 | `index.md` | Existing | Directory file manifest and responsibilities; keep it synchronized with changes. |
 | `__init__.py` | Planned | Feature-owned development adapter package marker. Owner: [issue 2](../../docs/issues/02-employee-chat.md). |
 | `sessions.py` | Existing | Explicitly simulated employee/manager identities for development. Owner: [issue 3](../../docs/issues/03-auth-company-setup.md). |
-| `policy.py` | Planned | Supplied versioned company policies for independent workstreams. Owner: [issue 4](../../docs/issues/04-manager-settings-reports.md). |
+| `policy.py` | Existing | Supplied versioned company policies for independent workstreams. Owner: [issue 4](../../docs/issues/04-manager-settings-reports.md). |
 | `engine.py` | Planned | Clearly labeled simulated engine outputs; prohibited for real submissions. Owner: [issue 1](../../docs/issues/01-privacy-engine.md). |
 | `llm.py` | Planned | Deterministic provider replies and outgoing payload capture. Owner: [issue 2](../../docs/issues/02-employee-chat.md). |
-| `reporting.py` | Planned | Synthetic idempotent reporting sink/source. Owner: [issue 4](../../docs/issues/04-manager-settings-reports.md). |
+| `reporting.py` | Existing | Synthetic idempotent reporting sink/source. Owner: [issue 4](../../docs/issues/04-manager-settings-reports.md). |
 
 Generated caches, dependencies, runtime uploads, and `.git/` are excluded from directory manifests.
 

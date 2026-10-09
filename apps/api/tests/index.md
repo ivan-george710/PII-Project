@@ -13,8 +13,8 @@ This is a file plan. **Existing** files are present; **Planned** files must be i
 | `test_migrations.py` | Existing | Upgrade the historical schema with existing company/users/assignments; check data preservation and model parity. Owner: [issue 3](../../../docs/issues/03-auth-company-setup.md). |
 | `test_auth.py` | Existing | Sign-up isolation/duplicate handling, unrestricted credentials, password/session behavior, expiry, revocation, CSRF, lockout, and role enforcement. Owner: [issue 3](../../../docs/issues/03-auth-company-setup.md). |
 | `test_organization.py` | Existing | Membership and manager-assignment boundaries. Owner: [issue 3](../../../docs/issues/03-auth-company-setup.md). |
-| `test_rules.py` | Planned | Policy versioning, isolation, preview, and invalid-pattern behavior. Owner: [issue 4](../../../docs/issues/04-manager-settings-reports.md). |
-| `test_reports.py` | Planned | Report authorization and idempotent event ingestion. Owner: [issue 4](../../../docs/issues/04-manager-settings-reports.md). |
+| `test_rules.py` | Existing | Policy versioning, isolation, preview, and invalid-pattern behavior. Owner: [issue 4](../../../docs/issues/04-manager-settings-reports.md). |
+| `test_reports.py` | Existing | Report authorization and idempotent event ingestion. Owner: [issue 4](../../../docs/issues/04-manager-settings-reports.md). |
 | `test_chat.py` | Planned | Safe history, guarded provider calls, streaming, and retry behavior. Owner: [issue 2](../../../docs/issues/02-employee-chat.md). |
 | `test_uploads.py` | Planned | Upload authorization, supported inputs, and output access. Owner: [issue 2](../../../docs/issues/02-employee-chat.md). |
 | `test_guard.py` | Planned | Sanitized-only payloads, disabled rules, and blocked failures. Owner: [issue 2](../../../docs/issues/02-employee-chat.md). |

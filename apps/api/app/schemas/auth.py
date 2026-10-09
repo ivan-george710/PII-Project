@@ -1,7 +1,7 @@
 from typing import Literal
 from uuid import UUID
 
-from pydantic import EmailStr, Field
+from pydantic import EmailStr, Field, SecretStr, field_validator
 
 from app.schemas.common import Schema
 
@@ -35,3 +35,13 @@ class MeResponse(Schema):
 
 class EmptyRequest(Schema):
     pass
+
+
+class LoginRequest(Schema):
+    email: EmailStr = Field(max_length=254)
+    password: SecretStr = Field(min_length=12, max_length=128)
+
+    @field_validator("email")
+    @classmethod
+    def normalize_email(cls, value):
+        return str(value).lower()

@@ -1,36 +1,24 @@
-# Minimal CI/CD baseline
+# CI/CD
 
-The frontend is a plain Vite page. The backend is FastAPI with a Pydantic v2 health response. This baseline implements no authentication, redaction, database, or LLM calls.
+The frontend uses React/Vite and the backend uses FastAPI. Local email/password authentication and company setup are implemented; employee chat, redaction and LLM calls remain with their feature issues. See [local setup](local-setup.md) for installation, account provisioning and migrations.
 
-## Local check
+## GitHub Actions
 
-From `apps/api`, install `.[test]` into a Python 3.12+ virtual environment, run `python -m unittest discover -s tests -v`, and start `uvicorn app.main:app --port 8000`.
+`.github/workflows/ci.yml` builds/tests both apps and checks migration parity before deployment. Pushes to `main` deploy production; other branch pushes deploy previews. Pull requests run checks without deploying. Required repository settings:
 
-From `apps/web`, run `npm ci` and `npm run dev`. Its development proxy forwards `/api` to the backend. The page displays `Backend connected` after a successful request.
+- Secret `VERCEL_TOKEN`: token with access to the linked Vercel team/project.
+- Variables `VERCEL_ORG_ID` and `VERCEL_PROJECT_ID`.
 
-## Push deployment
+No external-auth secrets or staging-auth jobs are required. The workflow verifies the deployed frontend and `/api/health`, including the commit SHA. Production also requires anonymous `/api/v1/auth/me` to return401 UNAUTHENTICATED. Real login/logout behavior is verified in backend tests; the deployment smoke does not store a manager password in Actions.
 
-The repository-root `vercel.json` defines frontend and backend services in one Vercel project. `/api/*` routes to the backend; other traffic routes to the frontend. The browser uses a relative URL, so previews and production always call their own backend.
+Both services share `https://pii-guard-mu.vercel.app`; `/api` routes to the backend. Deployment protection is preserved; the CLI authenticates smoke requests. Checks gate deployment, but failed post-deployment smoke tests do not automatically roll back production.
 
-GitHub Actions owns deployment. Each push first builds the frontend and tests the backend, then deploys both Vercel services. Main pushes deploy production; other branches deploy previews. PRs run CI without deploying. No Vercel GitHub app access is required.
+## Runtime configuration
 
-Repository configuration:
+Configure `DATABASE_URL`, `PUBLIC_APP_URL`, and stable `SESSION_SECRET` separately in Vercel. Use backend-only Secret values for database/session credentials. Production uses `https://pii-guard-mu.vercel.app`; the same-origin frontend always calls `/api`. Preview browser mutations need a public origin matching their preview deployment; a health check alone does not establish full preview login readiness.
 
-- Actions variable `VERCEL_ORG_ID`: `team_eEyacnrwinZLoAL29yzQ2ouX`.
-- Actions variable `VERCEL_PROJECT_ID`: `prj_pYUwh7wNPrBPOkYTCvERO5AlfN29`.
-- Actions secret `VERCEL_TOKEN`: configure directly in repository settings; never commit or paste it into chat.
+Apply migrations with the direct PostgreSQL connection and provision local accounts using [the trusted operator command](local-setup.md). Demo adapters stay disabled. Passwords never enter source, build artifacts, Actions secrets, or frontend variables.
 
-The workflow verifies the deployed frontend and `/api/health`, including a commit SHA check. Both services share a URL; the frontend uses relative `/api/health`. Deployment protection is preserved and the CLI authenticates smoke requests. CI success gates deployment, but the post-deployment smoke test does not automatically roll back a failed production release.
+## Current deployment credential limitation
 
-## Verify
-
-- `/` serves the frontend and displays `Backend connected`.
-- `GET /api/health` returns `{"status":"ok","service":"pii-guard-api","commit":null}` locally. On Vercel, `commit` contains the Git SHA when available.
-- `/api/openapi.json` serves the backend schema.
-- Check that GitHub CI passes and Vercel deployment metadata matches the pushed commit.
-
-Vercel Services is in beta: https://vercel.com/docs/services.
-
-## WorkOS staging check (issue #3)
-
-The `smoke` job now includes frontend behavior tests and backend pytest checks. `workos-staging` uses only `WORKOS_TEST_API_KEY` and the public `WORKOS_TEST_CLIENT_ID` to verify a real temporary staging session; it is excluded for fork PRs. WorkOS credentials are not passed to Vercel deployment. Backend runtime auth/database configuration is a separate setup step documented in [local setup](local-setup.md).
+The supplied Actions token is saved, but Vercel returns404 "User not found" for it. Account/project API probes also returned404. Automatic deployments remain blocked until a token authorized for `lqsky7s-projects` and project `pii-guard` is configured. The local CLI login can deploy manually; passing application tests does not imply automated deployment succeeded.

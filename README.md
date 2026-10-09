@@ -10,7 +10,7 @@ The approved implementation plan is in [docs/issues/index.md](docs/issues/index.
 - Health endpoint: [API health](https://pii-guard-mu.vercel.app/api/health)
 - Verified GitHub Actions run: [build, test, deploy, live smoke check](https://github.com/ivan-george710/PII-Project/actions/runs/37750508093)
 
-Both services deploy together from GitHub Actions. Main pushes deploy production; other branch pushes deploy previews. The current production app remains the connectivity baseline. This draft branch adds WorkOS authentication and company setup; see [setup instructions](docs/local-setup.md). See [CI/CD details](docs/cicd.md). Vercel deployment protection may require sign-in.
+Both services deploy together from GitHub Actions. Main pushes deploy production; other branch pushes deploy previews. The app provides local email/password authentication and company setup; see [setup instructions](docs/local-setup.md). See [CI/CD details](docs/cicd.md). Vercel deployment protection may require sign-in.
 
 
 A document processing and PII protection pipeline for the Cadence case study.

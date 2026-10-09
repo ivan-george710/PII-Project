@@ -147,7 +147,7 @@ jobs:
           DEPLOYMENT_URL: ${{ steps.deployment.outputs.url }}
         run: |
           set -euo pipefail
-          vercel promote "$DEPLOYMENT_URL" --yes
+          vercel promote "$DEPLOYMENT_URL" --yes --scope "$VERCEL_ORG_ID" --timeout 2m
           vercel curl /api/health --deployment https://pii-guard-mu.vercel.app -- --connect-timeout 10 --max-time 30 --fail-with-body --silent --show-error > "$RUNNER_TEMP/production-health.json"
           python3 - "$RUNNER_TEMP/production-health.json" <<'PYTHON'
           import json, os, sys

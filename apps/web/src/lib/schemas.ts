@@ -43,3 +43,10 @@ export const apiError = z.strictObject({
   }),
 });
 export type Session = z.infer<typeof session>;
+export const loginInput = z.strictObject({
+  email: z
+    .email()
+    .max(254)
+    .transform((value) => value.toLowerCase()),
+  password: z.string().min(12).max(128),
+});

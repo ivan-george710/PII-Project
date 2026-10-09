@@ -1,56 +1,28 @@
 from types import SimpleNamespace
-from uuid import uuid4
 
 import pytest
-from cryptography.fernet import Fernet
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine, event
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 
-from app.auth.sessions import csrf_token
-from app.auth.workos import get_gateway
+from app.auth.passwords import hash_password
+from app.auth.sessions import COOKIE, create_session, csrf_token
 from app.config import get_settings
 from app.db.base import Base
 from app.db.models import Organization, User
 from app.db.session import get_db
 from app.main import app
 
-
-class FakeGateway:
-    def __init__(self):
-        self.sessions = {}
-        self.revoked = []
-        self.verifier = None
-
-    def authorization_url(self, state, challenge):
-        self.state = state
-        self.challenge = challenge
-        return "https://signin.workos.com/authorize?state=" + state
-
-    def exchange(self, code, verifier):
-        self.verifier = verifier
-        return code
-
-    def authenticate(self, cookie):
-        if cookie not in self.sessions:
-            raise ValueError("Invalid test session")
-        return self.sessions[cookie]
-
-    def revoke(self, session_id):
-        self.revoked.append(session_id)
+TEST_PASSWORD = "fictional-test-password-123"
+TEST_HASH = hash_password(TEST_PASSWORD)
 
 
 @pytest.fixture
 def env(monkeypatch):
     monkeypatch.setenv("APP_ENV", "test")
     monkeypatch.setenv("PUBLIC_APP_URL", "http://localhost:5173")
-    monkeypatch.setenv(
-        "WORKOS_REDIRECT_URI", "http://localhost:5173/api/v1/auth/callback"
-    )
-    monkeypatch.setenv("WORKOS_COOKIE_PASSWORD", Fernet.generate_key().decode())
-    monkeypatch.setenv("WORKOS_API_KEY", "sk_test_fixture")
-    monkeypatch.setenv("WORKOS_CLIENT_ID", "client_fixture")
+    monkeypatch.setenv("SESSION_SECRET", "test-session-secret-only-not-production-123")
     get_settings.cache_clear()
     engine = create_engine(
         "sqlite://", connect_args={"check_same_thread": False}, poolclass=StaticPool
@@ -73,27 +45,23 @@ def env(monkeypatch):
         ("Foreign", "employee", companies[1]),
     ]:
         user = User(
-            workos_user_id="user_" + str(uuid4()),
             organization_id=org.id,
-            email=name.replace(" ", "").lower() + "@example.com",
+            email=name.replace(" ", "").lower() + "@example.org",
             display_name=name,
             role=role,
+            password_hash=TEST_HASH,
         )
         users.append(user)
         db.add(user)
     db.commit()
-    gateway = FakeGateway()
-    for u in users:
-        gateway.sessions[str(u.id)] = SimpleNamespace(
-            user={"id": u.workos_user_id},
-            organization_id=None,
-            session_id="session_" + str(u.id),
-        )
     app.dependency_overrides[get_db] = lambda: db
-    app.dependency_overrides[get_gateway] = lambda: gateway
     with TestClient(app) as client:
         yield SimpleNamespace(
-            client=client, db=db, users=users, companies=companies, gateway=gateway
+            client=client,
+            db=db,
+            users=users,
+            companies=companies,
+            password=TEST_PASSWORD,
         )
     app.dependency_overrides.clear()
     db.close()
@@ -102,12 +70,12 @@ def env(monkeypatch):
 
 
 def login_as(env, user):
-    cookie = str(user.id)
-    env.client.cookies.set("wos-session", cookie)
+    token = create_session(env.db, user)
+    env.db.commit()
+    env.client.cookies.set(COOKIE, token)
     return {
         "Origin": "http://localhost:5173",
         "X-CSRF-Token": csrf_token(
-            "session_" + cookie,
-            get_settings().workos_cookie_password.get_secret_value(),
+            token, get_settings().session_secret.get_secret_value()
         ),
     }

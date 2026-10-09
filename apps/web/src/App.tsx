@@ -28,10 +28,19 @@ function Shell() {
   return (
     <main className={identity ? undefined : "auth-main"}>
       {identity && (
-        <header>
-          <span>
-            {identity.organization.name} · {identity.user.display_name}
-          </span>
+        <header style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.5rem" }}>
+          <div>
+            <span>
+              {identity.organization.name} · {identity.user.display_name}
+            </span>
+            {identity.user.role === "manager" && (
+              <nav style={{ display: "inline-flex", gap: "1rem", marginLeft: "1.5rem" }}>
+                <a href="/manager/settings" style={{ color: "#000", textDecoration: "underline" }}>Rules & Policy</a>
+                <a href="/manager/reports" style={{ color: "#000", textDecoration: "underline" }}>Employee Reports</a>
+                <a href="/company/setup" style={{ color: "#000", textDecoration: "underline" }}>Company Setup</a>
+              </nav>
+            )}
+          </div>
           <button onClick={() => void logout()}>Sign out</button>
         </header>
       )}

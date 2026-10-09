@@ -4,8 +4,11 @@ from fastapi.responses import JSONResponse
 from sqlalchemy.exc import SQLAlchemyError
 
 from app.routes.auth import router as auth_router
+from app.routes.chat import router as chat_router
+from app.routes.demo import router as demo_router
 from app.routes.health import router as health_router
 from app.routes.organization import router as organization_router
+from app.routes.uploads import router as uploads_router
 from app.schemas.common import ApiError, error_body
 
 app = FastAPI(
@@ -14,7 +17,14 @@ app = FastAPI(
     openapi_url="/api/openapi.json",
     redoc_url=None,
 )
-for router in (health_router, auth_router, organization_router):
+for router in (
+    health_router,
+    auth_router,
+    organization_router,
+    chat_router,
+    uploads_router,
+    demo_router,
+):
     app.include_router(router)
 
 

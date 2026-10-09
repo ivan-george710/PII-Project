@@ -1,3 +1,4 @@
+import { LoadingIndicator } from "./components/LoadingIndicator";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "./features/auth/AuthProvider";
 import { RequireAuth } from "./features/auth/RequireAuth";
@@ -7,7 +8,7 @@ import CompanySetup from "./pages/CompanySetup";
 import Chat from "./pages/Chat";
 function Home() {
   const { identity, loading } = useAuth();
-  if (loading) return <p role="status">Loading…</p>;
+  if (loading) return <LoadingIndicator label="Getting ready…" />;
   return (
     <Navigate
       to={
@@ -22,17 +23,9 @@ function Home() {
   );
 }
 function Shell() {
-  const { identity, logout } = useAuth();
+  const { identity } = useAuth();
   return (
-    <main className={identity ? undefined : "auth-main"}>
-      {identity && (
-        <header>
-          <span>
-            {identity.organization.name} · {identity.user.display_name}
-          </span>
-          <button onClick={() => void logout()}>Sign out</button>
-        </header>
-      )}
+    <main className={identity ? "app-main" : "auth-main"}>
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Login />} />
@@ -48,9 +41,7 @@ function Shell() {
           path="/chat"
           element={
             <RequireAuth>
-              <section>
-                <Chat />
-              </section>
+              <Chat />
             </RequireAuth>
           }
         />

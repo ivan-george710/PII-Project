@@ -19,6 +19,7 @@ This is a file plan. **Existing** files are present; **Planned** files must be i
 
 ## Subdirectories
 
+- [screenshots/](screenshots/index.md): local browser captures with fictional data.
 - [issues/](issues/index.md): see its exact file manifest.
 
 Generated caches, dependencies, runtime uploads, and `.git/` are excluded from directory manifests.

@@ -45,6 +45,8 @@ describe("sample menu", () => {
     expect(screen.getByRole("region", { name: "Message examples" })).toBeInTheDocument();
     await user.click(screen.getByRole("button", { name: /Contact details/ }));
     expect(select).toHaveBeenCalledWith(messageSample);
+    expect(screen.queryByRole("menu")).not.toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Add attachment" }));
     await user.click(screen.getByRole("button", { name: /Native PDF/ }));
     expect(select).toHaveBeenCalledWith(fileSample);
   });

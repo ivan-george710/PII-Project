@@ -24,3 +24,7 @@ Generated caches, dependencies, runtime uploads, and `.git/` are excluded from d
 - [Issue 2: Deliver employee chat with guarded uploads and LLM responses](../../../../../docs/issues/02-employee-chat.md) — [GitHub #2](https://github.com/ivan-george710/PII-Project/issues/2)
 
 Each issue includes its own tests and sample/setup helpers. Implement the listed files; deferred entries are outside the approved scope.
+
+## Delivered interface update
+
+AttachmentMenu closes after sample selection, supports Escape/outside dismissal, and uses a bounded popup. ChatComposer resizes text input and shows the compact Strands loading status. The UI uses text controls, no icons.

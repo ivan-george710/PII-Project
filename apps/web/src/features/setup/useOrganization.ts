@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useState } from "react";
 import { api } from "../../lib/api";
 import {
+  employeeInput,
+  employeeCreated,
   organization,
   organizationInput,
   assignmentInput,
@@ -97,7 +99,19 @@ export function useOrganization() {
       );
     await reload();
   }
+  async function addEmployee(input: z.input<typeof employeeInput>) {
+    const result = await api(
+      "/organization/employees",
+      employeeCreated,
+      { method: "POST", body: JSON.stringify(employeeInput.parse(input)) },
+      identity?.csrf_token,
+    );
+    setUsers((items) => [result.user, ...items]);
+    setAssignments((items) => [result.assignment, ...items]);
+    return result;
+  }
   return {
+    addEmployee,
     company,
     users,
     assignments,

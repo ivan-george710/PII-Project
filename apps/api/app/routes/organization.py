@@ -12,6 +12,8 @@ from app.dependencies import current_identity, get_db, require_manager
 from app.db.models import ManagerAssignment, Organization, User
 from app.schemas.common import ApiError
 from app.schemas.organization import (
+    EmployeeCreate,
+    EmployeeCreated,
     AssignmentInput,
     AssignmentResponse,
     AssignmentsPage,
@@ -19,7 +21,7 @@ from app.schemas.organization import (
     OrganizationUpdate,
     UsersPage,
 )
-from app.services.organization import assign
+from app.services.organization import assign, create_employee
 
 router = APIRouter(prefix="/api/v1/organization", tags=["Company setup"])
 
@@ -128,3 +130,12 @@ def delete_assignment(
     db.delete(item)
     db.commit()
     return Response(status_code=204)
+
+
+@router.post("/employees", response_model=EmployeeCreated, status_code=201)
+def add_employee(
+    body: EmployeeCreate,
+    identity=Depends(require_manager),
+    db: Session = Depends(get_db),
+):
+    return create_employee(db, identity, body)

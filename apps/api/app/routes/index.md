@@ -29,3 +29,7 @@ Generated caches, dependencies, runtime uploads, and `.git/` are excluded from d
 - [Issue 5: Connect the app and document basic setup](../../../../docs/issues/05-platform-deployment.md) — [GitHub #5](https://github.com/ivan-george710/PII-Project/issues/5)
 
 Each issue includes its own tests and sample/setup helpers. Implement the listed files; deferred entries are outside the approved scope.
+
+## Delivered interface update
+
+`organization.py` now also implements manager-only `POST /api/v1/organization/employees`, creating a same-company employee plus an immediate-manager assignment atomically.

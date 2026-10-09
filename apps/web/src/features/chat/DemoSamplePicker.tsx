@@ -1,3 +1,4 @@
+import { LoadingIndicator } from "../../components/LoadingIndicator";
 import type { DemoSample } from "../../lib/schemas";
 
 const groupFor = (sample: DemoSample) => {
@@ -34,11 +35,13 @@ export function DemoSamplePicker({
   return (
     <div className="sample-picker" role="region" aria-label="Try test data">
       <h3>Try test data</h3>
-      {loading && <p role="status">Loading samples…</p>}
+      {loading && <LoadingIndicator label="Loading samples…" />}
       {error && (
         <div role="alert">
           <span>{error}</span>
-          <button type="button" onClick={onRetry}>Retry</button>
+          <button type="button" onClick={onRetry}>
+            Retry
+          </button>
         </div>
       )}
       {!loading &&
@@ -56,8 +59,12 @@ export function DemoSamplePicker({
                 >
                   <strong>{sample.title}</strong>
                   <span>{sample.description}</span>
-                  <small>{sample.tags.map((tag) => tagText[tag]).join(", ")}</small>
-                  {selecting === sample.id && <span role="status">Adding…</span>}
+                  <small>
+                    {sample.tags.map((tag) => tagText[tag]).join(", ")}
+                  </small>
+                  {selecting === sample.id && (
+                    <span role="status">Adding…</span>
+                  )}
                 </button>
               ))}
             </section>

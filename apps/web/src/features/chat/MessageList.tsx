@@ -5,7 +5,11 @@ import { AttachmentList } from "./AttachmentList";
 export function MessageList({ messages }: { messages: Message[] }) {
   const bottom = useRef<HTMLDivElement>(null);
   useEffect(() => {
-    bottom.current?.scrollIntoView?.({ behavior: "smooth" });
+    bottom.current?.scrollIntoView?.({
+      behavior: window.matchMedia?.("(prefers-reduced-motion: reduce)").matches
+        ? "instant"
+        : "smooth",
+    });
   }, [messages]);
   return (
     <section className="message-list" aria-label="Conversation">

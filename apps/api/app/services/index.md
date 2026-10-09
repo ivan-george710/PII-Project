@@ -27,3 +27,7 @@ Generated caches, dependencies, runtime uploads, and `.git/` are excluded from d
 - [Issue 5: Connect the app and document basic setup](../../../../docs/issues/05-platform-deployment.md) — [GitHub #5](https://github.com/ivan-george710/PII-Project/issues/5)
 
 Each issue includes its own tests and sample/setup helpers. Implement the listed files; deferred entries are outside the approved scope.
+
+## Delivered interface update
+
+`organization.py` atomically creates employee/password hash/assignment, validates manager scope, rejects duplicate accounts and prevents client-selected roles/companies.

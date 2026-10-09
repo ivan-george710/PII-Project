@@ -164,3 +164,11 @@ export type Conversation = z.infer<typeof conversation>;
 export type DemoSample = z.infer<typeof demoSample>;
 export type Message = z.infer<typeof message>;
 export type StreamEvent = z.infer<typeof streamEvent>;
+
+export const employeeInput = z.strictObject({
+  display_name: z.string().trim().min(1).max(120),
+  email: z.string().transform(value => value.toLowerCase()),
+  password: z.string(),
+  manager_id: id.optional(),
+});
+export const employeeCreated = z.strictObject({user: usersPage.shape.items.element, assignment});

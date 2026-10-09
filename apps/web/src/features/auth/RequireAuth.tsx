@@ -1,3 +1,4 @@
+import { LoadingIndicator } from "../../components/LoadingIndicator";
 import type { ReactNode } from "react";
 import { Navigate } from "react-router-dom";
 import { useAuth } from "./useAuth";
@@ -9,7 +10,7 @@ export function RequireAuth({
   manager?: boolean;
 }) {
   const { identity, loading, error } = useAuth();
-  if (loading) return <p role="status">Loading…</p>;
+  if (loading) return <LoadingIndicator label="Getting ready…" />;
   if (!identity) return <Navigate to="/login" replace state={{ error }} />;
   if (manager && identity.user.role !== "manager")
     return <Navigate to="/chat" replace />;

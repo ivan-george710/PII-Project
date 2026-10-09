@@ -12,6 +12,7 @@ export function OrganizationForm({
   const [saving, setSaving] = useState(false);
   return (
     <form
+      className="organization-form"
       onSubmit={async (e) => {
         e.preventDefault();
         const result = organizationInput.safeParse({ name: value });

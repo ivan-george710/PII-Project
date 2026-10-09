@@ -31,3 +31,9 @@ Generated caches, dependencies, runtime uploads, and `.git/` are excluded from d
 - [Issue 4: Deliver manager rule settings, custom rules, and employee PII reporting](../../docs/issues/04-manager-settings-reports.md) — [GitHub #4](https://github.com/ivan-george710/PII-Project/issues/4)
 
 Each issue includes its own tests and sample/setup helpers. Implement the listed files; deferred entries are outside the approved scope.
+
+## Interface and employee creation update
+
+| Filename | Status | Responsibility |
+|---|---|---|
+| components.json | Existing | Shadcn registry configuration for installing React Bits components. |

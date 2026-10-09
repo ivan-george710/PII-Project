@@ -1,6 +1,6 @@
 # Employee chat walkthrough
 
-1. Sign in as an employee using the configured WorkOS session and open Chat.
+1. Sign in as an employee using the local email/password account and open Chat.
 2. Use the composer `+` menu to select fictional message examples or synthetic files. Message examples only populate the draft; file examples become normal employee-owned uploads.
 3. Submit the draft and attachments. The configured company policy, real privacy engine, and reporting sink process the request before any LLM provider receives sanitized content.
 4. Review the sanitized message and streamed response. A failed guard/report/storage stage blocks the provider call.

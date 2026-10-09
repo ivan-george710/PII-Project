@@ -21,3 +21,16 @@ Generated caches, dependencies, runtime uploads, and `.git/` are excluded from d
 - [Issue 2: Deliver employee chat with guarded uploads and LLM responses](../../../../docs/issues/02-employee-chat.md) — [GitHub #2](https://github.com/ivan-george710/PII-Project/issues/2)
 
 Each issue includes its own tests and sample/setup helpers. Implement the listed files; deferred entries are outside the approved scope.
+
+## Interface and employee creation update
+
+| Filename | Status | Responsibility |
+|---|---|---|
+| WorkspaceShell.tsx | Existing | Responsive sidebar, workspace header, keyboard-accessible mobile navigation and account controls. |
+| ThemeToggle.tsx | Existing | Persist system/light/dark preference; update on system appearance changes. |
+| LoadingIndicator.tsx | Existing | Compact lazy-loaded monochrome Strands status with reduced-motion and WebGL fallback. |
+| Strands.jsx | Existing | React Bits upstream Strands canvas animation, installed through shadcn registry. |
+| Strands.css | Existing | Canvas dimensions for the upstream Strands component. |
+| Strands.LICENSE.txt | Existing | Upstream MIT plus Commons Clause license and attribution. |
+
+`BrandMark.tsx` renders the approved shared SVG mark used in the workspace sidebar and sign-in/sign-up header; its geometry matches `public/favicon.svg`.

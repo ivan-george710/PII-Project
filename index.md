@@ -48,3 +48,10 @@ Each issue includes its own tests and sample/setup helpers. Implement the listed
 ## Network roadmap
 
 Network gateway enforcement and direct external-website redaction/reporting are requested roadmap capabilities, not implemented. See [network enforcement](docs/issues/06-network-enforcement.md), [external uploads/reporting](docs/issues/07-network-uploads-reporting.md) and [required PPT slide content](docs/presentation-roadmap.md).
+
+## Interface and employee creation update
+
+| Filename | Status | Responsibility |
+|---|---|---|
+| PRODUCT.md | Existing | Durable product tasks, scope, privacy boundaries and UI constraints. |
+| DESIGN.md | Existing | Monochrome light/dark shell, layout, typography, motion and loading behavior. |

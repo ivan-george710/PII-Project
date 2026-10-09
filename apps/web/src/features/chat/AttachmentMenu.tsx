@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { Attachment, DemoSample } from "../../lib/schemas";
 import { DemoSamplePicker } from "./DemoSamplePicker";
 
@@ -23,10 +23,30 @@ export function AttachmentMenu({
 }) {
   const [open, setOpen] = useState(false);
   const [showSamples, setShowSamples] = useState(false);
+  const root = useRef<HTMLDivElement>(null);
   const menuButton = useRef<HTMLButtonElement>(null);
   const fileInput = useRef<HTMLInputElement>(null);
+  useEffect(() => {
+    if (!open) return;
+    const dismiss = (event: PointerEvent) => {
+      if (!root.current?.contains(event.target as Node)) setOpen(false);
+    };
+    const escape = (event: globalThis.KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setOpen(false);
+        menuButton.current?.focus();
+      }
+    };
+    document.addEventListener("pointerdown", dismiss);
+    document.addEventListener("keydown", escape);
+    root.current?.querySelector<HTMLButtonElement>("[role=menuitem]")?.focus();
+    return () => {
+      document.removeEventListener("pointerdown", dismiss);
+      document.removeEventListener("keydown", escape);
+    };
+  }, [open]);
   return (
-    <div className="attachment-menu">
+    <div ref={root} className="attachment-menu">
       <button
         ref={menuButton}
         type="button"
@@ -36,7 +56,7 @@ export function AttachmentMenu({
         disabled={disabled}
         onClick={() => setOpen((value) => !value)}
       >
-        +
+        Add
       </button>
       {open && (
         <div
@@ -88,7 +108,7 @@ export function AttachmentMenu({
               selecting={selecting}
               onSelect={(sample) => {
                 onSelectSample(sample);
-                if (sample.kind === "file") setOpen(false);
+                setOpen(false);
               }}
               onRetry={onRetrySamples}
             />

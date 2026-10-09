@@ -169,12 +169,23 @@ jobs:
               raise SystemExit(f'Project promotion failed: HTTP {error.code}') from None
           print('Verified deployment promotion requested through scoped project API')
           PYTHON
-          vercel curl /api/health --deployment https://pii-guard-mu.vercel.app -- --connect-timeout 10 --max-time 30 --fail-with-body --silent --show-error > "$RUNNER_TEMP/production-health.json"
-          python3 - "$RUNNER_TEMP/production-health.json" <<'PYTHON'
-          import json, os, sys
-          from pathlib import Path
-          data = json.loads(Path(sys.argv[1]).read_text())
-          assert data['status'] == 'ok'
-          assert data['commit'] == os.environ['GITHUB_SHA'], 'Production alias must serve the tested commit'
-          print('Production alias verified against the pushed commit')
+          python3 <<'PYTHON'
+          import json, os, subprocess, time
+          deadline = time.monotonic() + 90
+          while time.monotonic() < deadline:
+              try:
+                  result = subprocess.run([
+                      'vercel', 'curl', '/api/health', '--deployment', 'https://pii-guard-mu.vercel.app', '--',
+                      '--connect-timeout', '10', '--max-time', '15', '--fail-with-body', '--silent', '--show-error',
+                  ], capture_output=True, text=True, timeout=20)
+                  data = json.loads(result.stdout) if result.returncode == 0 else {}
+                  if data.get('status') == 'ok' and data.get('commit') == os.environ['GITHUB_SHA']:
+                      print('Production alias verified against the pushed commit')
+                      break
+              except (subprocess.TimeoutExpired, json.JSONDecodeError):
+                  pass
+              print('Waiting for production alias to serve the verified commit', flush=True)
+              time.sleep(3)
+          else:
+              raise SystemExit('Production alias did not serve the tested commit within 90 seconds')
           PYTHON

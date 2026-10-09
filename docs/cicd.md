@@ -30,3 +30,5 @@ Actions exports the exact tested `GITHUB_SHA` with `git archive` into a temporar
 Deploying directly from a Git checkout caused Vercel to block a merged collaborator-authored commit and leave the CLI waiting. Source snapshots separate the authorized CI release from Git-provider author authorization. The deployment step has an eight-minute timeout, the job has a fifteen-minute timeout, and live HTTP checks have bounded connection/request times. Preview pushes use the same source snapshot path; main deploys stage, verify, promote and verify the production alias.
 
 Promotion uses the project-specific Vercel REST API with explicit project, deployment and team IDs. The scoped token stays in process memory and never enters command arguments or source. This avoids the user-profile lookup required by the promotion CLI; no broader token permissions are needed.
+
+After requesting promotion, Actions waits up to 90 seconds for the production health endpoint to report the exact tested SHA. Alias switching is asynchronous; a brief response from the previous deployment is retried, not accepted as success.

@@ -4,9 +4,9 @@ The frontend uses React/Vite and the backend uses FastAPI. WorkOS authentication
 
 ## Local check
 
-From `apps/api`, install `.[test]` into a Python 3.12+ virtual environment, run `python -m unittest discover -s tests -v`, and start `uvicorn app.main:app --port 8000`.
+Follow [local setup](local-setup.md) for the database and WorkOS settings. From `apps/api`, install `.[test]` into a Python 3.12+ virtual environment, run `python -m pytest tests -q`, and start `uvicorn app.main:app --port 8000`.
 
-From `apps/web`, run `npm ci` and `npm run dev`. Its development proxy forwards `/api` to the backend. The page displays `Backend connected` after a successful request.
+From `apps/web`, run `npm ci` and `npm run dev`. Its development proxy forwards `/api` to the backend. Sign in to reach the company setup or employee placeholder page.
 
 ## Push deployment
 
@@ -24,7 +24,7 @@ The workflow verifies the deployed frontend and `/api/health`, including a commi
 
 ## Verify
 
-- `/` serves the frontend and displays `Backend connected`.
+- `/` serves the frontend and routes to sign-in or the role-specific page.
 - `GET /api/health` returns `{"status":"ok","service":"pii-guard-api","commit":null}` locally. On Vercel, `commit` contains the Git SHA when available.
 - `/api/openapi.json` serves the backend schema.
 - Check that GitHub CI passes and Vercel deployment metadata matches the pushed commit.

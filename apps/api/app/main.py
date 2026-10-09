@@ -15,7 +15,11 @@ app = FastAPI(
     openapi_url="/api/openapi.json",
     redoc_url=None,
 )
-for router in (health_router, auth_router, organization_router):
+for router in (
+    health_router,
+    auth_router,
+    organization_router,
+):
     app.include_router(router)
 register_feature_routers(app)
 

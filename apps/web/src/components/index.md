@@ -9,10 +9,10 @@ This is a file plan. **Existing** files are present; **Planned** files must be i
 | Filename | Status | Responsibility |
 |---|---|---|
 | `index.md` | Existing | Directory file manifest and responsibilities; keep it synchronized with changes. |
-| `Button.tsx` | Planned | Accessible shared button. Owner: [issue 2](../../../../docs/issues/02-employee-chat.md). |
-| `Dialog.tsx` | Planned | Shared accessible modal. Owner: [issue 2](../../../../docs/issues/02-employee-chat.md). |
-| `FormField.tsx` | Planned | Labeled input with validation messages. Owner: [issue 2](../../../../docs/issues/02-employee-chat.md). |
-| `StatusMessage.tsx` | Planned | Shared loading/error/status feedback. Owner: [issue 2](../../../../docs/issues/02-employee-chat.md). |
+| `Button.tsx` | Implemented | Accessible shared button. Owner: [issue 2](../../../../docs/issues/02-employee-chat.md). |
+| `Dialog.tsx` | Implemented | Shared accessible modal. Owner: [issue 2](../../../../docs/issues/02-employee-chat.md). |
+| `FormField.tsx` | Implemented | Labeled input with validation messages. Owner: [issue 2](../../../../docs/issues/02-employee-chat.md). |
+| `StatusMessage.tsx` | Implemented | Shared loading/error/status feedback. Owner: [issue 2](../../../../docs/issues/02-employee-chat.md). |
 
 Generated caches, dependencies, runtime uploads, and `.git/` are excluded from directory manifests.
 

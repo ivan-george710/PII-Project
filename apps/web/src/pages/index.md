@@ -9,8 +9,10 @@ This is a file plan. **Existing** files are present; **Planned** files must be i
 | Filename | Status | Responsibility |
 |---|---|---|
 | `index.md` | Existing | Directory file manifest and responsibilities; keep it synchronized with changes. |
-| `Login.tsx` | Existing | Monochrome Apple-style sign-in/sign-up screen, password visibility, and inline API errors; no email/password format or strength rules. Owner: [issue 3](../../../../docs/issues/03-auth-company-setup.md). |
-| `Chat.tsx` | Planned | Plain employee conversation page. Owner: [issue 2](../../../../docs/issues/02-employee-chat.md). |
+
+| `Login.tsx` | Existing | Sign-in/sign-up page with password visibility, inline API errors, and no email/password format or strength rules. Owner: [issue 3](../../../../docs/issues/03-auth-company-setup.md). |
+| `Chat.tsx` | Implemented | Plain employee conversation page. Owner: [issue 2](../../../../docs/issues/02-employee-chat.md). |
+
 | `ManagerReports.tsx` | Planned | Assigned-employee event reporting page. Owner: [issue 4](../../../../docs/issues/04-manager-settings-reports.md). |
 | `ManagerSettings.tsx` | Planned | Company policy toggles and custom rules page. Owner: [issue 4](../../../../docs/issues/04-manager-settings-reports.md). |
 | `CompanySetup.tsx` | Existing | Company/users/manager assignment page. Owner: [issue 3](../../../../docs/issues/03-auth-company-setup.md). |

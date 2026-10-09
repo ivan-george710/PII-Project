@@ -11,7 +11,7 @@ This is a file plan. **Existing** files are present; **Planned** files must be i
 | `index.md` | Existing | Directory file manifest and responsibilities; keep it synchronized with changes. |
 | `seed.py` | Existing | Seed synthetic company, users, assignments, policies, and events. Owner: [issue 3](../docs/issues/03-auth-company-setup.md). |
 | `identities.json` | Existing | Fictional demo identity definitions without passwords or tokens. Owner: [issue 3](../docs/issues/03-auth-company-setup.md). |
-| `walkthrough.md` | Planned | Employee-to-manager demonstration and local account setup. Owner: [issue 2](../docs/issues/02-employee-chat.md). |
+| `walkthrough.md` | Implemented | Employee-to-manager demonstration with local account and WorkOS identity setup. Owner: [issue 2](../docs/issues/02-employee-chat.md). |
 
 ## Subdirectories
 

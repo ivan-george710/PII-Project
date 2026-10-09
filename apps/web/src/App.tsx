@@ -4,6 +4,7 @@ import { RequireAuth } from "./features/auth/RequireAuth";
 import { useAuth } from "./features/auth/useAuth";
 import Login from "./pages/Login";
 import CompanySetup from "./pages/CompanySetup";
+import Chat from "./pages/Chat";
 function Home() {
   const { identity, loading } = useAuth();
   if (loading) return <p role="status">Loading…</p>;
@@ -48,10 +49,7 @@ function Shell() {
           element={
             <RequireAuth>
               <section>
-                <h1>PII Guard</h1>
-                <p>
-                  You’re signed in. Employee chat will be connected in issue #2.
-                </p>
+                <Chat />
               </section>
             </RequireAuth>
           }

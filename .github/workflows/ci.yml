@@ -80,9 +80,27 @@ jobs:
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
         run: |
-          vercel env add VERCEL_SUPPORT_LARGE_FUNCTIONS production,preview \
-            --value 1 --type config --force --yes \
-            --project "$VERCEL_PROJECT_ID" --scope "$VERCEL_ORG_ID"
+          python3 <<'PYTHON'
+          import json, os, re, urllib.request, urllib.error
+          project, team = (os.environ[name] for name in ('VERCEL_PROJECT_ID', 'VERCEL_ORG_ID'))
+          assert re.fullmatch(r'prj_[A-Za-z0-9]+', project)
+          assert re.fullmatch(r'team_[A-Za-z0-9]+', team)
+          url = f'https://api.vercel.com/v10/projects/{project}/env?teamId={team}&upsert=true'
+          body = json.dumps({
+              'key': 'VERCEL_SUPPORT_LARGE_FUNCTIONS', 'value': '1',
+              'type': 'plain', 'target': ['production', 'preview'],
+          }).encode()
+          request = urllib.request.Request(url, data=body, method='POST', headers={
+              'Authorization': 'Bearer ' + os.environ['VERCEL_TOKEN'],
+              'Content-Type': 'application/json',
+          })
+          try:
+              with urllib.request.urlopen(request, timeout=30) as response:
+                  assert response.status in (200, 201)
+          except urllib.error.HTTPError as error:
+              raise SystemExit(f'Project model-bundle configuration failed: HTTP {error.code}') from None
+          print('Large privacy-model bundles enabled on the configured project')
+          PYTHON
       - name: Export tested source snapshot
         id: source
         run: |

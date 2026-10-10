@@ -40,3 +40,5 @@ Each issue includes its own tests and sample/setup helpers. Implement the listed
 ## PR 18 integration
 
 `test_engine_flow.py`: actual auth/employee creation, company custom rule, durable upload, real engine, provider spy, sanitized download, replay and assigned-manager report scoping; failed processing reports and zero provider calls.
+
+`test_engine_flow.py` also verifies private bytes across independent storage instances/database sessions and empty-document follow-up messages. `test_health.py` checks production model readiness and safe missing-model errors.

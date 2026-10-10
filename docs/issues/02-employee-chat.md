@@ -7,6 +7,18 @@ Suggested ownership: Full-stack employee experience
 
 Deliver the complete employee workflow: plain chat, file attachments, sanitization before submission, and LLM responses.
 
+## Current implementation to preserve (updated 2026-10-09)
+
+- Start from current upstream `ivan-george710/PII-Project:main`, fetch it again before submitting, and merge current main into existing feature branches. Old branch code must not replace newer working features. Review the final diff against current main.
+- Authentication is local email/password. WorkOS was removed intentionally: do not restore its SDK, redirects, settings, cookies, mocks, secrets or CI jobs. Preserve Argon2 hashing, database sessions, company/user/assignment models, permissions, logout/revocation, CSRF and account lockout.
+- Preserve `POST /api/v1/auth/signup` (201 new isolated company + manager), `POST /api/v1/auth/login` (200), `GET /api/v1/auth/me` (200 session DTO or 401), and `POST /api/v1/auth/logout` (204). Session DTO: `{user:{id,email,display_name,role,organization_id},organization:{id,name},csrf_token}`. Cookie name is `pii-session`; the API resolves roles/company from its database. Signup cannot join an existing company or promote an existing user.
+- Email/password inputs are strings with **no email-format/verification or password-strength/length checks**. Email is lowercased. Duplicate email is 409 ACCOUNT_EXISTS. Public email fields use Pydantic `str` / Zod `z.string()`, not EmailStr or email-format validators. Ordinary feature-specific text/file limits still apply.
+- Preserve `/login`, `/signup` and `/company/setup`. Product screens use black/white and neutral grayscale only, no icons; simple text labels and controls. Keep the existing auth design. Employee chat remains a plain LLM interface, with attachments and built-in test samples in the composer addon menu.
+- Existing migration chain is `0001_company_identity -> 0002_local_auth -> 0003_signup`. Keep those files, revision IDs, models and deployed data. Add a uniquely named feature migration after the current head; reconcile new parallel revisions on integration so there is one head. Never delete/rewrite an applied migration or recreate company/user/session tables.
+- CI currently passes build/tests, migration parity, Vercel deployment and live checks. Preserve these checks; do not delete tests, skip jobs or weaken assertions to get green. Main pushes deploy production, other pushes previews; PRs run tests. Reuse VERCEL_TOKEN / VERCEL_ORG_ID / VERCEL_PROJECT_ID and same-origin `/api` routing. No external-auth credentials are needed.
+- Only auth/company setup is implemented in the product. Chat, reports/policies and `packages/engine` are still feature work; the prototype is reference code. Never label placeholders, empty namespaces or `NotImplementedError` stubs as delivered integration. Missing production processing must block submissions; fake adapters require explicit development/test opt-in. A present feature with a broken import must fail checks/startup, not silently disappear.
+- Before delivery run the existing backend and frontend checks, migration upgrade/parity and the feature's own checks. Verify the actual PR head and resolve conflicts. Update touched indexes and this issue's status to distinguish implemented work from pending work. This is a shared baseline, not a prerequisite issue dependency.
+
 ## Scope
 - Implement the minimal chat page, composer, attachments, conversation history, and streaming responses.
 - Implement authenticated chat/upload routes, conversation/message/attachment persistence, storage access, and file cleanup.
@@ -150,7 +162,7 @@ Implement the following file plan. Shared directories assign individual files to
 | `apps/api/app/storage/__init__.py` | Storage package marker. |
 | `apps/api/app/storage/files.py` | Separate original/sanitized artifact storage and enforce authorized access. |
 | `apps/api/app/storage/cleanup.py` | Apply configured file retention and cleanup. |
-| `apps/api/migrations/versions/0002_conversations_messages_attachments.py` | Chat and attachment tables (issue 2); enforce ownership relationships and coordinate migration ordering through shared contracts. |
+| `apps/api/migrations/versions/0004_conversations_messages_attachments.py` | Chat and attachment tables (issue 2); enforce ownership relationships and coordinate migration ordering through shared contracts. |
 | `apps/api/tests/test_chat.py` | Safe history, guarded provider calls, streaming, and retry behavior (issue 2). |
 | `apps/api/tests/test_uploads.py` | Upload authorization, supported inputs, and output access (issue 2). |
 | `apps/api/tests/test_guard.py` | Sanitized-only payloads, disabled rules, and blocked failures (issue 2). |
@@ -161,7 +173,7 @@ Implement the following file plan. Shared directories assign individual files to
 | `apps/web/src/layouts/ChatLayout.tsx` | Minimal chat shell and conversation navigation (issue 2). |
 | `apps/web/src/pages/Chat.tsx` | Plain employee conversation page (issue 2). |
 | `apps/web/tests/chat.test.tsx` | Composer, attachment, streaming, retry, and error behavior (issue 2). |
-| `demo/walkthrough.md` | Employee-to-manager demonstration and WorkOS identity setup. |
+| `demo/walkthrough.md` | Employee-to-manager demonstration and local account setup. |
 | `demo/adapters/__init__.py` | Feature-owned development adapter package marker. |
 | `demo/adapters/llm.py` | Deterministic provider replies and outgoing payload capture. |
 | `demo/sample_documents/message.txt` | Synthetic text with known PII. |
@@ -196,3 +208,7 @@ Implement the following file plan. Shared directories assign individual files to
 Use the documented interfaces and feature-owned development adapters for integration points. Do not wait for another issue to close. Test this workstream against those interfaces, then connect real implementations without changing the contract. Production must never substitute simulated privacy processing.
 
 - Keep all touched directory indexes accurate and distinguish planned files from implemented files.
+
+## Delivered interface redesign
+
+Use the shared responsive WorkspaceShell, full-height conversation area, bounded composer and above-composer attachment/test-sample popup. Preserve black/white/grayscale and text controls without icons. System/light/dark appearance is stored locally; reduced-motion users receive static loading feedback. Loading uses a small lazy-loaded React Bits Strands canvas with WebGL fallback, never a decorative full-screen background. Empty state and current conversation are distinct from the New chat action. Company setup now creates employee accounts that can sign in to this workspace. Actual document engine/company policy/durable reports remain separate implementation work; local simulated chat responses are explicitly development-only.

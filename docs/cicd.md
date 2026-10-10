@@ -1,36 +1,34 @@
-# Minimal CI/CD baseline
+# CI/CD
 
-The frontend is a plain Vite page. The backend is FastAPI with a Pydantic v2 health response. This baseline implements no authentication, redaction, database, or LLM calls.
+The frontend uses React/Vite and the backend uses FastAPI. Local email/password authentication and company setup are implemented; employee chat, redaction and LLM calls remain with their feature issues. See [local setup](local-setup.md) for installation, account provisioning and migrations.
 
-## Local check
+## GitHub Actions
 
-From `apps/api`, install `.[test]` into a Python 3.12+ virtual environment, run `python -m unittest discover -s tests -v`, and start `uvicorn app.main:app --port 8000`.
+`.github/workflows/ci.yml` builds/tests both apps and checks migration parity before deployment. Pushes to `main` deploy production; other branch pushes deploy previews. Pull requests run checks without deploying. Required repository settings:
 
-From `apps/web`, run `npm ci` and `npm run dev`. Its development proxy forwards `/api` to the backend. The page displays `Backend connected` after a successful request.
+- Secret `VERCEL_TOKEN`: token with access to the linked Vercel team/project.
+- Variables `VERCEL_ORG_ID` and `VERCEL_PROJECT_ID`.
 
-## Push deployment
+No external-auth secrets or staging-auth jobs are required. The workflow verifies the deployed frontend and `/api/health`, including the commit SHA. Production also requires anonymous `/api/v1/auth/me` to return401 UNAUTHENTICATED. Real login/logout behavior is verified in backend tests; the deployment smoke does not store a manager password in Actions.
 
-The repository-root `vercel.json` defines frontend and backend services in one Vercel project. `/api/*` routes to the backend; other traffic routes to the frontend. The browser uses a relative URL, so previews and production always call their own backend.
+Both services share `https://pii-guard-mu.vercel.app`; `/api` routes to the backend. Deployment protection is preserved; the CLI authenticates smoke requests. Production builds are staged with `--skip-domain`; live frontend/backend/session checks must pass before promotion. The production alias is then checked against the pushed SHA. Failed checks leave the previous production deployment active.
 
-GitHub Actions owns deployment. Each push first builds the frontend and tests the backend, then deploys both Vercel services. Main pushes deploy production; other branches deploy previews. PRs run CI without deploying. No Vercel GitHub app access is required.
+## Runtime configuration
 
-Repository configuration:
+Configure `DATABASE_URL`, `PUBLIC_APP_URL`, and stable `SESSION_SECRET` separately in Vercel. Use backend-only Secret values for database/session credentials. Production uses `https://pii-guard-mu.vercel.app`; the same-origin frontend always calls `/api`. Preview browser mutations need a public origin matching their preview deployment; a health check alone does not establish full preview login readiness.
 
-- Actions variable `VERCEL_ORG_ID`: `team_eEyacnrwinZLoAL29yzQ2ouX`.
-- Actions variable `VERCEL_PROJECT_ID`: `prj_pYUwh7wNPrBPOkYTCvERO5AlfN29`.
-- Actions secret `VERCEL_TOKEN`: configure directly in repository settings; never commit or paste it into chat.
+Apply migrations with the direct PostgreSQL connection and provision local accounts using [the trusted operator command](local-setup.md). Demo adapters stay disabled. Passwords never enter source, build artifacts, Actions secrets, or frontend variables.
 
-The workflow verifies the deployed frontend and `/api/health`, including a commit SHA check. Both services share a URL; the frontend uses relative `/api/health`. Deployment protection is preserved and the CLI authenticates smoke requests. CI success gates deployment, but the post-deployment smoke test does not automatically roll back a failed production release.
+## Verified deployment
 
-## Verify
+The Actions token was replaced and [run 37968276679](https://github.com/ivan-george710/PII-Project/actions/runs/37968276679) passed tests, deployment and live checks on 2026-10-09. Automatic deployment is working.
 
-- `/` serves the frontend and displays `Backend connected`.
-- `GET /api/health` returns `{"status":"ok","service":"pii-guard-api","commit":null}` locally. On Vercel, `commit` contains the Git SHA when available.
-- `/api/openapi.json` serves the backend schema.
-- Check that GitHub CI passes and Vercel deployment metadata matches the pushed commit.
+## Deployment source and timeouts
 
-Vercel Services is in beta: https://vercel.com/docs/services.
+Actions exports the exact tested `GITHUB_SHA` with `git archive` into a temporary source directory and deploys it using the existing owner-authorized token. Git history and local credentials are absent from the upload. Source repository/SHA are recorded as explicit deployment metadata and `VERCEL_GIT_COMMIT_SHA` is passed to the backend, preserving the live commit check. Commit authors and repository history are unchanged.
 
-## WorkOS staging check (issue #3)
+Deploying directly from a Git checkout caused Vercel to block a merged collaborator-authored commit and leave the CLI waiting. Source snapshots separate the authorized CI release from Git-provider author authorization. The deployment step has an eight-minute timeout, the job has a fifteen-minute timeout, and live HTTP checks have bounded connection/request times. Preview pushes use the same source snapshot path; main deploys stage, verify, promote and verify the production alias.
 
-The `smoke` job now includes frontend behavior tests and backend pytest checks. `workos-staging` uses only `WORKOS_TEST_API_KEY` and the public `WORKOS_TEST_CLIENT_ID` to verify a real temporary staging session; it is excluded for fork PRs. WorkOS credentials are not passed to Vercel deployment. Backend runtime auth/database configuration is a separate setup step documented in [local setup](local-setup.md).
+Promotion uses the project-specific Vercel REST API with explicit project, deployment and team IDs. The scoped token stays in process memory and never enters command arguments or source. This avoids the user-profile lookup required by the promotion CLI; no broader token permissions are needed.
+
+After requesting promotion, Actions waits up to 90 seconds for the production health endpoint to report the exact tested SHA. Alias switching is asynchronous; a brief response from the previous deployment is retried, not accepted as success.

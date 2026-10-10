@@ -1,0 +1,126 @@
+{
+  "version": 1,
+  "provenance": "All text and generated documents are synthetic and contain fictional data. faces.jpg is intentionally omitted: no redistributable source image is available.",
+  "placeholders": [
+    {
+      "filename": "faces.jpg",
+      "status": "not-distributed",
+      "reason": "No face image with documented redistribution rights was available."
+    },
+    {
+      "filename": "embedded scans and faces in mixed.pdf, embedded.docx, and embedded.pptx",
+      "status": "synthetic-placeholder",
+      "reason": "Generated text/package fixtures document the intended placement; they do not contain licensed photographs or precomputed redactions."
+    }
+  ],
+  "samples": [
+    {
+      "id": "11000000-0000-4000-8000-000000000001",
+      "kind": "message",
+      "title": "Contact details and employee ID",
+      "description": "Fictional name, email, phone, and employee identifier.",
+      "tags": ["text_pii"],
+      "text": "Hi, I am fictional employee Dana Example (EMP-2048). Please contact dana.example@example.test or 202-555-0147."
+    },
+    {
+      "id": "11000000-0000-4000-8000-000000000002",
+      "kind": "message",
+      "title": "Custom project name",
+      "description": "Fictional project name for testing company-specific custom rules.",
+      "tags": ["custom_rules"],
+      "text": "Please share the Northstar project status with fictional employee Dana Example."
+    },
+    {
+      "id": "11000000-0000-4000-8000-000000000003",
+      "kind": "message",
+      "title": "Government and financial identifiers",
+      "description": "Synthetic identifiers for testing local policy rules.",
+      "tags": ["text_pii"],
+      "text": "Fictional account 000123456789 and tax reference 999-12-3456 belong to Sample Person."
+    },
+    {
+      "id": "22000000-0000-4000-8000-000000000001",
+      "kind": "file",
+      "title": "Native-text PDF",
+      "description": "A small synthetic PDF containing searchable fictional text.",
+      "tags": ["text_pii"],
+      "filename": "text.pdf",
+      "mime_type": "application/pdf",
+      "size_bytes": 642,
+      "asset": {
+        "path": "text.pdf",
+        "sha256": "95070b47c8a71c549f08f8ea717641148ed0bb3882a12096c88b9c1eae4ffea8"
+      }
+    },
+    {
+      "id": "22000000-0000-4000-8000-000000000002",
+      "kind": "file",
+      "title": "Mixed-content PDF placeholder",
+      "description": "Searchable fictional text with a note marking omitted scanned/face assets.",
+      "tags": ["text_pii", "scanned_text"],
+      "filename": "mixed.pdf",
+      "mime_type": "application/pdf",
+      "size_bytes": 707,
+      "asset": {
+        "path": "mixed.pdf",
+        "sha256": "4a01c8c575d22c398769187a310444a2134b11ea6eb18910704d7ef7955d8c3c"
+      }
+    },
+    {
+      "id": "22000000-0000-4000-8000-000000000003",
+      "kind": "file",
+      "title": "Scanned PDF placeholder",
+      "description": "Synthetic scan scenario placeholder; this small fixture contains searchable text, not OCR imagery.",
+      "tags": ["scanned_text", "text_pii"],
+      "filename": "scanned.pdf",
+      "mime_type": "application/pdf",
+      "size_bytes": 682,
+      "asset": {
+        "path": "scanned.pdf",
+        "sha256": "3a0c34674ff7dea52726992c14b2685f1c81829542881d4014ff30eedf9d0ae0"
+      }
+    },
+    {
+      "id": "22000000-0000-4000-8000-000000000004",
+      "kind": "file",
+      "title": "Embedded Word content",
+      "description": "Synthetic DOCX with fictional text and a note where licensed embedded image fixtures belong.",
+      "tags": ["text_pii", "scanned_text"],
+      "filename": "embedded.docx",
+      "mime_type": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      "size_bytes": 956,
+      "asset": {
+        "path": "embedded.docx",
+        "sha256": "7ff5fc85dcce632f27342f2f0d3c7eb024b4c446baaf40722e270874ab0ecd80"
+      }
+    },
+    {
+      "id": "22000000-0000-4000-8000-000000000005",
+      "kind": "file",
+      "title": "Embedded PowerPoint content",
+      "description": "Synthetic PPTX package fixture with no external images.",
+      "tags": ["text_pii", "scanned_text"],
+      "filename": "embedded.pptx",
+      "mime_type": "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+      "size_bytes": 871,
+      "asset": {
+        "path": "embedded.pptx",
+        "sha256": "e2478017b08291b9e478e40f36350fc3cdd2277f2c55edb5ca4370f50f021b4b"
+      }
+    },
+    {
+      "id": "22000000-0000-4000-8000-000000000006",
+      "kind": "file",
+      "title": "Synthetic scanned image",
+      "description": "Generated grayscale paper-like texture with a simple geometric illustration, not a photograph.",
+      "tags": ["scanned_text"],
+      "filename": "scan.png",
+      "mime_type": "image/png",
+      "size_bytes": 1334,
+      "asset": {
+        "path": "scan.png",
+        "sha256": "f9daafcca785bfae4e0dfcbed58612d005f6ad71e28da759ebc281fd80f7df5c"
+      }
+    }
+  ]
+}

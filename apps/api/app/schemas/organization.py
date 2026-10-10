@@ -2,7 +2,7 @@ from datetime import UTC, datetime
 from typing import Literal
 from uuid import UUID
 
-from pydantic import EmailStr, Field, field_validator
+from pydantic import Field, SecretStr, field_validator
 
 from app.schemas.common import Schema
 
@@ -31,7 +31,7 @@ class OrganizationResponse(Schema):
 
 class UserSummary(Schema):
     id: UUID
-    email: EmailStr
+    email: str
     display_name: str
     role: Literal["employee", "manager"]
 
@@ -61,3 +61,20 @@ class UsersPage(Schema):
 class AssignmentsPage(Schema):
     items: list[AssignmentResponse]
     next_cursor: str | None
+
+
+class EmployeeCreate(Schema):
+    email: str
+    password: SecretStr
+    display_name: str = Field(min_length=1, max_length=120)
+    manager_id: UUID | None = None
+
+    @field_validator("display_name", mode="before")
+    @classmethod
+    def trim_name(cls, value):
+        return value.strip() if isinstance(value, str) else value
+
+
+class EmployeeCreated(Schema):
+    user: UserSummary
+    assignment: AssignmentResponse

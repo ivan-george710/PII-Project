@@ -17,8 +17,9 @@ class HealthResponse(Schema):
 
 
 class ApiError(Exception):
-    def __init__(self, status, code, message):
+    def __init__(self, status, code, message, fields=None):
         self.status, self.code, self.message = status, code, message
+        self.fields = fields or []
 
 
 def error_body(code, message, fields=None):

@@ -14,8 +14,11 @@ export function EmployeeAssignments({
   const [error, setError] = useState("");
   const managers = users.filter((u) => u.role === "manager");
   return (
-    <section>
-      <h2>Employee managers</h2>
+    <section className="settings-section">
+      <div className="section-heading">
+        <h2>Employees</h2>
+        <p>Manage each employee’s immediate manager.</p>
+      </div>
       {error && <p role="alert">{error}</p>}
       {users
         .filter((u) => u.role === "employee")
@@ -56,7 +59,9 @@ export function EmployeeAssignments({
           );
         })}
       {!users.some((u) => u.role === "employee") && (
-        <p>No employees have been provisioned.</p>
+        <p className="empty-employees">
+          No employees yet. Add your first employee above to get started.
+        </p>
       )}
     </section>
   );

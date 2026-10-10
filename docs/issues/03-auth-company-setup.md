@@ -1,15 +1,27 @@
 **Before starting: refer to the [root index.md](../../index.md) and the `index.md` in every directory you touch. Follow their exact filenames, responsibilities, and shared interfaces; update the indexes when files change.**
 
-# Deliver WorkOS authentication, company setup, and employee-manager assignments
+# Deliver local authentication, company setup, and employee-manager assignments
 
-Status: Implemented on `codex/workos-company-auth`; draft PR for review.
+Status: Local auth/company setup merged in PR #10; public signup and monochrome Apple-style auth screens without icons added on `codex/auth-signup-design`.
 Suggested ownership: Full-stack authentication / company setup
 
 Implement the complete sign-in and company setup experience, including its frontend, backend, database, and validation. Manager rule settings/reporting are a separate complete workstream (issue 4). Verification and fictional setup data belong inside this implementation, not a separate testing/demo issue.
 
+## Current implementation to preserve (updated 2026-10-09)
+
+- Start from current upstream `ivan-george710/PII-Project:main`, fetch it again before submitting, and merge current main into existing feature branches. Old branch code must not replace newer working features. Review the final diff against current main.
+- Authentication is local email/password. WorkOS was removed intentionally: do not restore its SDK, redirects, settings, cookies, mocks, secrets or CI jobs. Preserve Argon2 hashing, database sessions, company/user/assignment models, permissions, logout/revocation, CSRF and account lockout.
+- Preserve `POST /api/v1/auth/signup` (201 new isolated company + manager), `POST /api/v1/auth/login` (200), `GET /api/v1/auth/me` (200 session DTO or 401), and `POST /api/v1/auth/logout` (204). Session DTO: `{user:{id,email,display_name,role,organization_id},organization:{id,name},csrf_token}`. Cookie name is `pii-session`; the API resolves roles/company from its database. Signup cannot join an existing company or promote an existing user.
+- Email/password inputs are strings with **no email-format/verification or password-strength/length checks**. Email is lowercased. Duplicate email is 409 ACCOUNT_EXISTS. Public email fields use Pydantic `str` / Zod `z.string()`, not EmailStr or email-format validators. Ordinary feature-specific text/file limits still apply.
+- Preserve `/login`, `/signup` and `/company/setup`. Product screens use black/white and neutral grayscale only, no icons; simple text labels and controls. Keep the existing auth design. Employee chat remains a plain LLM interface, with attachments and built-in test samples in the composer addon menu.
+- Existing migration chain is `0001_company_identity -> 0002_local_auth -> 0003_signup`. Keep those files, revision IDs, models and deployed data. Add a uniquely named feature migration after the current head; reconcile new parallel revisions on integration so there is one head. Never delete/rewrite an applied migration or recreate company/user/session tables.
+- CI currently passes build/tests, migration parity, Vercel deployment and live checks. Preserve these checks; do not delete tests, skip jobs or weaken assertions to get green. Main pushes deploy production, other pushes previews; PRs run tests. Reuse VERCEL_TOKEN / VERCEL_ORG_ID / VERCEL_PROJECT_ID and same-origin `/api` routing. No external-auth credentials are needed.
+- Only auth/company setup is implemented in the product. Chat, reports/policies and `packages/engine` are still feature work; the prototype is reference code. Never label placeholders, empty namespaces or `NotImplementedError` stubs as delivered integration. Missing production processing must block submissions; fake adapters require explicit development/test opt-in. A present feature with a broken import must fail checks/startup, not silently disappear.
+- Before delivery run the existing backend and frontend checks, migration upgrade/parity and the feature's own checks. Verify the actual PR head and resolve conflicts. Update touched indexes and this issue's status to distinguish implemented work from pending work. This is a shared baseline, not a prerequisite issue dependency.
+
 ## Scope
 
-- WorkOS login/callback/logout/session validation and role-aware navigation.
+- Email/password login/logout, database session validation, and role-aware navigation.
 - Organization/user/manager-assignment models, database connection setup and migrations, company setup APIs, and frontend screens.
 - Central authorization helpers for company, role, assignment, and company-policy edit permissions.
 - Trusted provisioning and idempotent fictional company/user setup; never derive manager privileges from email domains or client claims.
@@ -20,8 +32,8 @@ Implement the complete sign-in and company setup experience, including its front
 - Employee/manager sign-in works and correct routes/permissions are enforced server-side.
 - Managers can update company details and assign only same-company employees to valid managers.
 - All requests/responses are Pydantic validated; frontend session/setup forms and payloads are Zod validated.
-- Unauthorized, cross-company, forged role, bad CSRF/state, and missing membership cases fail explicitly.
-- Provisioning never stores passwords/tokens and refuses accidental production fictional seeding.
+- Unauthorized, cross-company, forged role, bad CSRF, and missing membership cases fail explicitly.
+- Provisioning never stores plaintext passwords/tokens and refuses accidental production fictional seeding.
 - Role/assignment checks are injectable and testable before real reporting is connected.
 
 ## Mandatory validation and shared conventions
@@ -46,8 +58,8 @@ Session roles: `employee|manager`. All company settings are writable by managers
 
 | Endpoint | Exact input | Output |
 |---|---|---|
-| `GET /api/v1/auth/login` | Optional `return_to` string max255, allowlisted relative app path only |302 WorkOS authorization URL; signed expiring state/PKCE where SDK supports it |
-| `GET /api/v1/auth/callback` | WorkOS `code` and validated `state` query |302 allowlisted return path plus HttpOnly/Secure/SameSite=Lax session cookie; invalid state400 AUTH_STATE_INVALID; unprovisioned membership403 |
+| `POST /api/v1/auth/signup` | Same-origin; `{email:str,password:str,display_name?:str max120,company_name?:str max120}`; no credential content checks; no client role/company IDs |201 same session DTO as /me; new isolated company workspace and manager; session cookie;409 ACCOUNT_EXISTS |
+| `POST /api/v1/auth/login` | Same-origin; `{email:str,password:str}` (no format, strength or length checks); extra fields forbidden |200 same DTO as `/me`; HttpOnly/Secure/SameSite=Lax opaque session cookie;401 INVALID_CREDENTIALS;429 LOGIN_RATE_LIMITED after 5 failures for 5 minutes |
 | `POST /api/v1/auth/logout` | `{}`, CSRF required |204, revoke session and clear cookie |
 | `GET /api/v1/auth/me` | No body |200 `{user:{id,email,display_name,role,organization_id},organization:{id,name},csrf_token:"..."}`;401 without session |
 | `GET /api/v1/organization` | Session company |200 `{id,name,created_at}` |
@@ -57,22 +69,22 @@ Session roles: `employee|manager`. All company settings are writable by managers
 | `PUT /api/v1/organization/assignments/{employee_id}` | Manager; `{manager_id:UUID}` |200 assignment; both users must be same company with matching roles; one manager per employee; invalid roles422 |
 | `DELETE /api/v1/organization/assignments/{employee_id}` | Manager; no body |204; subsequent report access denied; manager may not self-assign an employee identity |
 
-Use WorkOS SDK session validation, not a frontend role assertion. WorkOS email is checked using Pydantic EmailStr (declare email-validator dependency); public DTO never contains WorkOS session/token secrets. Seed or trusted provisioning creates users and roles, never password storage in this database.
+Use revocable database sessions with a random opaque cookie. Store only SHA-256 token hashes and Argon2 password hashes. Email is normalized to lowercase; it and passwords are plain strings with no content checks. Public DTOs exclude password hashes and session tokens. Login requires an exact allowed Origin; mutations require Origin and CSRF. Public signup creates a new isolated workspace and its manager. It never joins an existing company or changes an existing account. There is no public role-promotion endpoint. Trusted operator provisioning creates accounts or resets passwords, revoking sessions on reset.
 
 ### Data models and implementation order
 
 - Organization: UUID id, name1..120, UTC created_at/updated_at.
-- User: UUID id/company_id, unique WorkOS user ID, validated email, display_name1..120, employee/manager role, UTC timestamps.
+- User: UUID id/company_id, unique normalized email text, nullable Argon2 password hash (unprovisioned users cannot log in), failed-attempt counter/lockout, unconstrained email text, display_name1..120, employee/manager role, UTC timestamps.
 - ManagerAssignment: employee_id unique, manager_id, company_id, UTC updated_at; foreign keys, same-company validation, correct-role validation. One manager per employee for the presentation.
-- `SessionIdentity` Pydantic contract: `{user_id:UUID,organization_id:UUID,role:"employee"|"manager",email:EmailStr,display_name:str}`. Resolve it only after validating the WorkOS session. Other workstreams consume this contract through dependency injection.
+- `SessionIdentity` Pydantic contract: `{user_id:UUID,organization_id:UUID,role:"employee"|"manager",email:str,display_name:str}`. Resolve it only after validating the database session. Other workstreams consume this contract through dependency injection.
 - Implement models/migration → session and permission services → typed routes → setup/login frontend → positive and negative checks. Central helpers expose `require_employee`, `require_manager`, `require_company`, and `require_assigned_employee`; manager reports still scope queries on every call.
 - Company policy initialization is idempotent through a documented policy-store interface; policy table ownership stays with issue 4. Use an explicit local policy adapter when implementing this workflow independently; do not create competing policy tables.
 
 ### Fictional setup included with this feature
 
-`seed.py --environment demo --organization-name 'Demo Company'` is idempotent by fixed seed keys and refuses production. Creates one company, one manager, two employees, assignments,13 enabled built-ins, one custom exact rule, one regex rule. WorkOS identities must be provisioned through approved account setup and mapped to local rows; local synthetic identities do not grant real login automatically. `identities.json` contains only fictional emails/names/roles; no tokens/passwords.
+`seed.py --environment demo --organization-name 'Demo Company'` is idempotent by fixed seed keys and refuses production. It creates one company, one manager, two employees and assignments with no usable passwords. The feature-owned policy adapter is optional; it reports `policy_seeded=false` when issue 4 is absent. `identities.json` contains fictional emails/names/roles only. Configure usable passwords through `scripts/provision-company.py`; never commit them. Local synthetic identity adapters are opt-in and unavailable in production.
 
-Use adapter interfaces to seed rules/events if those implementations are present; document exactly what was populated. WorkOS identity provisioning is real and distinct from local synthetic session adapters. `scripts/seed-demo.sh` must use an explicit non-production target. Tests cover idempotent setup, assignment changes, deactivation/missing membership, and subsequent authorization checks.
+Use adapter interfaces to seed rules/events if those implementations are present; document exactly what was populated. Local password provisioning is distinct from synthetic session adapters. `scripts/seed-demo.sh` must use an explicit non-production target. Tests cover idempotent setup, assignment changes, deactivation/missing membership, and subsequent authorization checks.
 
 ## Exact file ownership
 
@@ -81,18 +93,18 @@ Each listed file has one issue owner. Update its directory index when implementi
 | File | Responsibility |
 |---|---|
 | `apps/api/app/auth/__init__.py` | Auth package marker. |
-| `apps/api/app/auth/workos.py` | WorkOS login/callback/logout integration and identity mapping. |
+| `apps/api/app/auth/passwords.py` | Argon2 password hashing and verification. |
 | `apps/api/app/auth/sessions.py` | Validate sessions and resolve company/user identity. |
 | `apps/api/app/auth/permissions.py` | Enforce company, role, manager-assignment, and policy-edit permissions. |
 | `apps/api/app/db/models/organization.py` | Company identity and administrative settings (issue 3). |
-| `apps/api/app/db/models/user.py` | WorkOS identity, company membership, and role (issue 3). |
+| `apps/api/app/db/models/user.py` | Unique email, password hash, company membership, and role (issue 3). |
 | `apps/api/app/db/models/manager_assignment.py` | Employee-to-manager relationship within a company (issue 3). |
-| `apps/api/app/routes/auth.py` | Login/callback/logout and current-session endpoints (issue 3). |
+| `apps/api/app/routes/auth.py` | Login/logout and current-session endpoints (issue 3). |
 | `apps/api/app/routes/organization.py` | Company setup, user, and manager-assignment endpoints (issue 3). |
 | `apps/api/app/schemas/auth.py` | Session identity and roles (issue 3). |
 | `apps/api/app/schemas/organization.py` | Company/user/assignment request/response types (issue 3). |
 | `apps/api/app/services/organization.py` | Company membership and manager-assignment workflows (issue 3). |
-| `apps/api/tests/test_auth.py` | WorkOS/session behavior and role enforcement (issue 3). |
+| `apps/api/tests/test_auth.py` | Password/session behavior and role enforcement (issue 3). |
 | `apps/api/tests/test_organization.py` | Membership and manager-assignment boundaries (issue 3). |
 | `apps/web/src/features/auth/AuthProvider.tsx` | Load session identity and provide company/role state. |
 | `apps/web/src/features/auth/RequireAuth.tsx` | Route guards and role-aware redirects; backend remains authoritative. |
@@ -100,11 +112,11 @@ Each listed file has one issue owner. Update its directory index when implementi
 | `apps/web/src/features/setup/OrganizationForm.tsx` | Set company details and policy-editing permissions. |
 | `apps/web/src/features/setup/EmployeeAssignments.tsx` | Assign employees to managers within their company. |
 | `apps/web/src/features/setup/useOrganization.ts` | Load users and persist company setup. |
-| `apps/web/src/pages/Login.tsx` | WorkOS sign-in entry page (issue 3). |
+| `apps/web/src/pages/Login.tsx` | Apple-style sign-in/sign-up form, password visibility and inline API feedback (issue 3). |
 | `apps/web/src/pages/CompanySetup.tsx` | Company/users/manager assignment page (issue 3). |
 | `apps/web/tests/auth.test.tsx` | Session and role-aware navigation behavior (issue 3). |
 | `apps/web/tests/setup.test.tsx` | Company setup and assignment interactions (issue 3). |
-| `apps/api/migrations/versions/0001_company_identity.py` | Company, WorkOS user identities, and manager assignments; company/auth foreign keys. |
+| `apps/api/migrations/versions/0001_company_identity.py` | Historical company/provider identities and manager assignments; company/auth foreign keys. |
 | `demo/seed.py` | Seed synthetic company, users, assignments, policies, and events. |
 | `demo/identities.json` | Fictional demo identity definitions without passwords or tokens. |
 | `demo/adapters/sessions.py` | Explicitly simulated employee/manager identities for development. |
@@ -118,8 +130,11 @@ Each listed file has one issue owner. Update its directory index when implementi
 | `apps/api/migrations/script.py.mako` | Migration file template (issue 3). |
 | `apps/api/tests/conftest.py` | Shared isolated database/session fixtures (issue 3). |
 | `apps/api/tests/test_seed.py` | Trusted fictional seeding, explicit opt-in, and idempotency checks. |
-| `apps/api/tests/test_workos_live.py` | Optional real scoped-staging session check with temporary-user cleanup. |
-| `scripts/provision-company.py` | Trusted operator mapping of real WorkOS users and active memberships to company roles. |
+| `scripts/provision-company.py` | Trusted operator account setup/password reset, with no public role elevation. |
+| `apps/api/app/db/models/auth_session.py` | Hashed session tokens, user ID, created_at, expires_at; seven-day expiry and revocation. |
+| `apps/api/migrations/versions/0002_local_auth.py` | Preserve IDs/assignments; drop provider identity columns, normalize/uniquely constrain emails, add password/lockout/session fields. Future migrations follow this revision. |
+| `apps/api/migrations/versions/0003_signup.py` | Expand email storage to unrestricted text; no existing identities change. |
+| `apps/api/tests/test_migrations.py` | Existing-data migration preservation and model parity. |
 
 ## Working independently
 
@@ -129,4 +144,12 @@ Use the documented interfaces and feature-owned development adapters for integra
 
 ## Implementation notes
 
-The PR includes the shared React/FastAPI bootstrap needed to exercise authentication and setup independently. These files were originally assigned to issues 2/5 and are implemented here only to connect this feature. Employee chat and manager reports remain with their owners. Additional files are `test_seed.py`, `test_workos_live.py`, and `scripts/provision-company.py`. WorkOS testing uses the existing PIIdtc staging environment; its key is held only in Actions. The feature's runtime database and cookie/auth settings must be configured separately before a deployed account can sign in.
+The React/FastAPI bootstrap connects this feature. Employee chat and manager reports remain with their owners. Accounts are managed by the trusted provisioning command, which reads passwords with hidden terminal input. Public signup is included. Email verification, password-strength/length checks, forgot-password emails and external providers are excluded. Operators reset passwords with `--reset-password`. All company and authorization APIs keep their existing contracts.
+
+The deployment needs only `DATABASE_URL`, `PUBLIC_APP_URL`, and a stable random `SESSION_SECRET` (at least 32 characters). Demo adapters are disabled in production. Password/session behavior is tested against the actual local implementation with no external auth mocks or staging credentials. The requested live manager is `cafkeemail@gmail.com`; its generated password is private and excluded from source/deploy uploads.
+
+## Delivered extension: manager adds employees from workspace settings
+
+The UI now exposes Add an employee, with name, unrestricted email/password and selected immediate manager. Manager-only `POST /api/v1/organization/employees` creates an employee and assignment atomically within the authenticated company; client roles/company IDs are forbidden. Input `{display_name,email,password,manager_id?}`, default manager is the caller. Output 201 `{user:{id,email,display_name,role:"employee"},assignment:{employee_id,manager_id,updated_at}}`. No password/hash in output. Existing email 409, wrong role/CSRF 403, foreign/inactive manager 404, extra fields 422. Public signup still creates a separate workspace. There is no invitation email service; manager shares login details directly.
+
+File addition: `apps/web/src/features/setup/AddEmployeeForm.tsx`. Existing organization route/schema/service, useOrganization, CompanySetup and indexes are updated. Backend tests cover permission/scope/CSRF, duplicate protection and employee login/chat access; frontend tests cover unrestricted credentials and success/error handling.

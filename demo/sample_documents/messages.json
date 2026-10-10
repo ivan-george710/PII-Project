@@ -1,0 +1,23 @@
+[
+  {
+    "id": "11000000-0000-4000-8000-000000000001",
+    "title": "Contact details and employee ID",
+    "description": "Fictional name, email, phone, and employee identifier.",
+    "tags": ["text_pii"],
+    "text": "Hi, I am fictional employee Dana Example (EMP-2048). Please contact dana.example@example.test or 202-555-0147."
+  },
+  {
+    "id": "11000000-0000-4000-8000-000000000002",
+    "title": "Custom project name",
+    "description": "Fictional project name for testing company-specific custom rules.",
+    "tags": ["custom_rules"],
+    "text": "Please share the Northstar project status with fictional employee Dana Example."
+  },
+  {
+    "id": "11000000-0000-4000-8000-000000000003",
+    "title": "Government and financial identifiers",
+    "description": "Synthetic identifiers for testing local policy rules.",
+    "tags": ["text_pii"],
+    "text": "Fictional account 000123456789 and tax reference 999-12-3456 belong to Sample Person."
+  }
+]

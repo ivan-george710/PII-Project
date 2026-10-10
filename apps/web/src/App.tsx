@@ -27,7 +27,7 @@ function Home() {
   );
 }
 function Shell() {
-  const { identity } = useAuth();
+  const { identity, logout } = useAuth();
   return (
     <main className={identity ? undefined : "auth-main"}>
       {identity && (

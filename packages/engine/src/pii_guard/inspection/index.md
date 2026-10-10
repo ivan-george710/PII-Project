@@ -2,6 +2,9 @@
 
 Content-based file detection and PDF page analysis to select processing strategies.
 
+Inspection enforces configurable file/page bounds and expanded OpenXML size limits;
+PDF routing includes inline/form/vector content and does not suppress image errors.
+
 This is a file plan. **Existing** files are present; **Planned** files must be implemented in the owning issue. This documentation does not create application code.
 
 ## Files
@@ -9,9 +12,9 @@ This is a file plan. **Existing** files are present; **Planned** files must be i
 | Filename | Status | Responsibility |
 |---|---|---|
 | `index.md` | Existing | Directory file manifest and responsibilities; keep it synchronized with changes. |
-| `__init__.py` | Planned | Package marker and relevant public exports. Owner: [issue 1](../../../../../docs/issues/01-privacy-engine.md). |
-| `file_type.py` | Planned | Detect real file format and reject unsupported inputs. Owner: [issue 1](../../../../../docs/issues/01-privacy-engine.md). |
-| `pdf_analysis.py` | Planned | Classify native text, scans, mixed content, and blank PDF pages. Owner: [issue 1](../../../../../docs/issues/01-privacy-engine.md). |
+| `__init__.py` | Existing | Package marker and relevant public exports. Owner: [issue 1](../../../../../docs/issues/01-privacy-engine.md). |
+| `file_type.py` | Existing | Detect real file format and reject unsupported inputs. Owner: [issue 1](../../../../../docs/issues/01-privacy-engine.md). |
+| `pdf_analysis.py` | Existing | Classify native text, scans, mixed content, and blank PDF pages. Owner: [issue 1](../../../../../docs/issues/01-privacy-engine.md). |
 
 Generated caches, dependencies, runtime uploads, and `.git/` are excluded from directory manifests.
 

@@ -9,10 +9,10 @@ This is a file plan. **Existing** files are present; **Planned** files must be i
 | Filename | Status | Responsibility |
 |---|---|---|
 | `index.md` | Existing | Directory file manifest and responsibilities; keep it synchronized with changes. |
-| `__init__.py` | Planned | Package marker and relevant public exports. Owner: [issue 1](../../../../../docs/issues/01-privacy-engine.md). |
-| `text.py` | Planned | Run Presidio and custom recognizers on extracted text. Owner: [issue 1](../../../../../docs/issues/01-privacy-engine.md). |
+| `__init__.py` | Existing | Export TextDetector and DetectionConfig. Owner: [issue 1](../../../../../docs/issues/01-privacy-engine.md). |
+| `text.py` | Existing | Run all built-in Presidio text recognizers and employee IDs per message/block; preserve sources, fail on missing models/components. Custom rules remain pending. Owner: [issue 1](../../../../../docs/issues/01-privacy-engine.md). |
 | `faces.py` | Planned | Backend-compatible whole-image/crop face detection and duplicate suppression. Owner: [issue 1](../../../../../docs/issues/01-privacy-engine.md). |
-| `validation.py` | Planned | Entity-specific confidence/context validation and overlap handling. Owner: [issue 1](../../../../../docs/issues/01-privacy-engine.md). |
+| `validation.py` | Existing | Private validated candidates/rejections, configurable thresholds, format/context checks and exact deduplication without overlap pruning. Owner: [issue 1](../../../../../docs/issues/01-privacy-engine.md). |
 
 ## Subdirectories
 

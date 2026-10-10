@@ -9,8 +9,8 @@ This is a file plan. **Existing** files are present; **Planned** files must be i
 | Filename | Status | Responsibility |
 |---|---|---|
 | `index.md` | Existing | Directory file manifest and responsibilities; keep it synchronized with changes. |
-| `pyproject.toml` | Planned | Installable engine dependencies, supported Python version, and test configuration. Owner: [issue 1](../../docs/issues/01-privacy-engine.md). |
-| `README.md` | Planned | Standalone usage, supported inputs, policy examples, and limitations. Owner: [issue 1](../../docs/issues/01-privacy-engine.md). |
+| `pyproject.toml` | Existing | Installable engine dependencies, including bounded regex and PyMuPDF content rewriting, supported Python version, and test configuration. Owner: [issue 1](../../docs/issues/01-privacy-engine.md). |
+| `README.md` | Existing | Extraction, detection, policy, rewriting, metadata and independent output verification APIs, source conventions, dependencies, integration checks and supported limits; full sanitize usage remains pending. Owner: [issue 1](../../docs/issues/01-privacy-engine.md). |
 
 ## Subdirectories
 

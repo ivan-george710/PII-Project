@@ -2,6 +2,12 @@
 
 PDF, DOCX, PPTX, and standalone image extraction, including embedded images and scanned pages inside documents. Preserve source locations for redaction.
 
+PDF OCR uses full-page PDFium rendering (including fallback content) with rotated
+crop-box coordinates. DOCX traverses reachable text/image parts; PPTX includes
+nested text and ancillary parts. Shared image helpers manage temporary resources,
+part/relationship references and cropped/rotated picture coordinates. Unsupported
+image placements fail explicitly. See ../../../README.md for current limits.
+
 This is a file plan. **Existing** files are present; **Planned** files must be implemented in the owning issue. This documentation does not create application code.
 
 ## Files
@@ -9,12 +15,12 @@ This is a file plan. **Existing** files are present; **Planned** files must be i
 | Filename | Status | Responsibility |
 |---|---|---|
 | `index.md` | Existing | Directory file manifest and responsibilities; keep it synchronized with changes. |
-| `__init__.py` | Planned | Package marker and relevant public exports. Owner: [issue 1](../../../../../docs/issues/01-privacy-engine.md). |
-| `pdf.py` | Planned | Extract PDF native text and image/rendered content with page references. Owner: [issue 1](../../../../../docs/issues/01-privacy-engine.md). |
-| `docx.py` | Planned | Extract Word text, embedded images, and source relationships. Owner: [issue 1](../../../../../docs/issues/01-privacy-engine.md). |
-| `pptx.py` | Planned | Extract slide text and embedded images with slide/shape references. Owner: [issue 1](../../../../../docs/issues/01-privacy-engine.md). |
-| `image.py` | Planned | Normalize standalone images and expose image content. Owner: [issue 1](../../../../../docs/issues/01-privacy-engine.md). |
-| `embedded_images.py` | Planned | Shared embedded-image enumeration and source relationships. Owner: [issue 1](../../../../../docs/issues/01-privacy-engine.md). |
+| `__init__.py` | Existing | Package marker and relevant public exports. Owner: [issue 1](../../../../../docs/issues/01-privacy-engine.md). |
+| `pdf.py` | Existing | Extract PDF native text and image/rendered content with page references. Owner: [issue 1](../../../../../docs/issues/01-privacy-engine.md). |
+| `docx.py` | Existing | Extract Word text, embedded images, and source relationships. Owner: [issue 1](../../../../../docs/issues/01-privacy-engine.md). |
+| `pptx.py` | Existing | Extract slide text and embedded images with slide/shape references. Owner: [issue 1](../../../../../docs/issues/01-privacy-engine.md). |
+| `image.py` | Existing | Normalize standalone images and expose image content. Owner: [issue 1](../../../../../docs/issues/01-privacy-engine.md). |
+| `embedded_images.py` | Existing | Shared embedded-image enumeration and source relationships. Owner: [issue 1](../../../../../docs/issues/01-privacy-engine.md). |
 
 Generated caches, dependencies, runtime uploads, and `.git/` are excluded from directory manifests.
 

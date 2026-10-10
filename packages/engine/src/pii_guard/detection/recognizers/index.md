@@ -9,8 +9,8 @@ This is a file plan. **Existing** files are present; **Planned** files must be i
 | Filename | Status | Responsibility |
 |---|---|---|
 | `index.md` | Existing | Directory file manifest and responsibilities; keep it synchronized with changes. |
-| `__init__.py` | Planned | Package marker and relevant public exports. Owner: [issue 1](../../../../../../docs/issues/01-privacy-engine.md). |
-| `employee_id.py` | Planned | Recognize Cadence employee identifier patterns. Owner: [issue 1](../../../../../../docs/issues/01-privacy-engine.md). |
+| `__init__.py` | Existing | Export EmployeeIdRecognizer. Owner: [issue 1](../../../../../../docs/issues/01-privacy-engine.md). |
+| `employee_id.py` | Existing | Recognize uppercase EMP-five-ASCII-digit identifiers with Unicode-aware word/hyphen boundaries and 0.95 base confidence. Owner: [issue 1](../../../../../../docs/issues/01-privacy-engine.md). |
 
 Generated caches, dependencies, runtime uploads, and `.git/` are excluded from directory manifests.
 

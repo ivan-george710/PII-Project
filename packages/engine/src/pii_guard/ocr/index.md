@@ -2,6 +2,12 @@
 
 OCR on scanned content and embedded images; coordinate mapping back to document pages, slides, and image regions.
 
+engine.py validates provider regions and normalizes failures to safe ProcessingError
+messages. RapidOCR remains optional; opt-in real-model verification is documented
+in the engine README and uses the synthetic scan fixture without model downloads.
+coordinates.py maps picture crops/rotations in physical slide units before
+normalization, and clips fully invisible regions without inventing coordinates.
+
 This is a file plan. **Existing** files are present; **Planned** files must be implemented in the owning issue. This documentation does not create application code.
 
 ## Files
@@ -9,9 +15,9 @@ This is a file plan. **Existing** files are present; **Planned** files must be i
 | Filename | Status | Responsibility |
 |---|---|---|
 | `index.md` | Existing | Directory file manifest and responsibilities; keep it synchronized with changes. |
-| `__init__.py` | Planned | Package marker and relevant public exports. Owner: [issue 1](../../../../../docs/issues/01-privacy-engine.md). |
-| `engine.py` | Planned | Recognize text in scans and image content with confidence and boxes. Owner: [issue 1](../../../../../docs/issues/01-privacy-engine.md). |
-| `coordinates.py` | Planned | Map OCR pixel regions to page/slide/image coordinates. Owner: [issue 1](../../../../../docs/issues/01-privacy-engine.md). |
+| `__init__.py` | Existing | Package marker and relevant public exports. Owner: [issue 1](../../../../../docs/issues/01-privacy-engine.md). |
+| `engine.py` | Existing | Recognize text in scans and image content with confidence and boxes. Owner: [issue 1](../../../../../docs/issues/01-privacy-engine.md). |
+| `coordinates.py` | Existing | Map OCR pixel regions to page/slide/image coordinates. Owner: [issue 1](../../../../../docs/issues/01-privacy-engine.md). |
 
 Generated caches, dependencies, runtime uploads, and `.git/` are excluded from directory manifests.
 

@@ -15,7 +15,8 @@ This is a file plan. **Existing** files are present; **Planned** files must be i
 | `scanned.pdf` | Planned | Image-only scanned document. Owner: [issue 1](../../../../docs/issues/01-privacy-engine.md). |
 | `embedded.docx` | Planned | Word document with native text, scans, and faces. Owner: [issue 1](../../../../docs/issues/01-privacy-engine.md). |
 | `embedded.pptx` | Planned | Slides containing native text, scans, and faces. Owner: [issue 1](../../../../docs/issues/01-privacy-engine.md). |
-| `scan.png` | Planned | Synthetic scanned paper image. Owner: [issue 1](../../../../docs/issues/01-privacy-engine.md). |
+| `scan.png` | Existing | Synthetic HELLO image for opt-in real OCR verification; generated locally, no personal data. |
+| `generate_scan.py` | Existing | Reproduce scan.png using Pillow and local Arial; normal tests use the checked-in image. |
 | `faces.jpg` | Planned | Face-detection example with documented redistribution rights. Owner: [issue 1](../../../../docs/issues/01-privacy-engine.md). |
 | `expected.json` | Planned | Expected categories, source locations, actions, and coverage assertions. Owner: [issue 1](../../../../docs/issues/01-privacy-engine.md). |
 

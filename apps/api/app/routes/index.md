@@ -33,3 +33,5 @@ Each issue includes its own tests and sample/setup helpers. Implement the listed
 ## Delivered interface update
 
 `organization.py` now also implements manager-only `POST /api/v1/organization/employees`, creating a same-company employee plus an immediate-manager assignment atomically.
+
+Production `health.py` initializes the cached privacy engine; deployment smoke checks fail if bundled OCR/face/NLP models cannot load. Provider availability is enforced separately by chat.

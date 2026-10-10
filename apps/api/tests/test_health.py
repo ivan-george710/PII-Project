@@ -107,3 +107,24 @@ def test_feature_routes_have_unique_openapi_operations():
         assert "/api/v1/demo/samples" in schema["paths"]
     finally:
         app.openapi_schema = previous_schema
+
+
+def test_production_health_checks_models(env, monkeypatch):
+    from app.services import engine_adapter
+    calls = []
+    monkeypatch.setenv("APP_ENV", "production")
+    monkeypatch.setattr(engine_adapter, "privacy_engine", lambda: calls.append(True))
+    assert env.client.get("/api/health").status_code == 200
+    assert calls == [True]
+
+
+def test_production_health_fails_when_models_are_missing(env, monkeypatch):
+    from app.services import engine_adapter
+    monkeypatch.setenv("APP_ENV", "production")
+    def unavailable():
+        raise RuntimeError("private model path and internal dependency details")
+    monkeypatch.setattr(engine_adapter, "privacy_engine", unavailable)
+    response = env.client.get("/api/health")
+    assert response.status_code == 503
+    assert response.json()["error"]["code"] == "GUARD_UNAVAILABLE"
+    assert "private model path" not in response.text

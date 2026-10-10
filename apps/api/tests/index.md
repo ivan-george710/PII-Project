@@ -36,3 +36,7 @@ Each issue includes its own tests and sample/setup helpers. Implement the listed
 ## Delivered interface update
 
 `test_organization.py` covers employee creation, role/company/CSRF boundaries, duplicates and successful employee login/chat access.
+
+## PR 18 integration
+
+`test_engine_flow.py`: actual auth/employee creation, company custom rule, durable upload, real engine, provider spy, sanitized download, replay and assigned-manager report scoping; failed processing reports and zero provider calls.

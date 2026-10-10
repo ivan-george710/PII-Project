@@ -9,6 +9,7 @@ description = "Independent PII Guard privacy engine package."
 requires-python = ">=3.11"
 dependencies = [
     "lxml>=4.9",
+    "opencv-python-headless>=4.10,<5",
     "pillow>=10",
     "presidio-analyzer>=2.2.364,<3",
     "pydantic>=2.0,<3",
@@ -22,8 +23,10 @@ dependencies = [
 
 [project.optional-dependencies]
 ocr = [
-    "rapidocr-onnxruntime>=1.2",
+    "rapidocr==3.10.0",
+    "onnxruntime>=1.20,<2",
 ]
+runtime = ["en-core-web-sm @ https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.8.0/en_core_web_sm-3.8.0-py3-none-any.whl"]
 test = [
     "pytest>=8",
     "reportlab>=4",
@@ -36,3 +39,6 @@ where = ["src"]
 testpaths = ["tests"]
 pythonpath = ["src"]
 markers = ["integration: actual provider/model integration; OCR is opt-in", "presidio: actual Presidio and local spaCy model integration"]
+
+[tool.setuptools.package-data]
+pii_guard = ["model_assets/*.onnx", "model_assets/*.txt"]

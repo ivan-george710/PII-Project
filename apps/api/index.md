@@ -29,3 +29,7 @@ Generated caches, dependencies, runtime uploads, and `.git/` are excluded from d
 - [Issue 5: Connect the app and document basic setup](../../docs/issues/05-platform-deployment.md) — [GitHub #5](https://github.com/ivan-george710/PII-Project/issues/5)
 
 Each issue includes its own tests and sample/setup helpers. Implement the listed files; deferred entries are outside the approved scope.
+
+## PR 18 integration
+
+`uv.lock` locks deployment dependencies, the local engine package and bundled OCR/face/NLP models. `pyproject.toml` declares the engine runtime extras and a local uv source.

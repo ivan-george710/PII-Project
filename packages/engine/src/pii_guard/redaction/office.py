@@ -346,7 +346,7 @@ def rewrite_unit(nodes, text, targets, source, namespace):
     return expected
 
 
-def validate_inputs(artifact_id, blocks, targets, native, images):
+def validate_inputs(artifact_id, blocks, targets, native, images, region_sources=()):
     if not isinstance(artifact_id, UUID):
         raise ValueError('Invalid artifact identity')
     known = {}
@@ -367,6 +367,13 @@ def validate_inputs(artifact_id, blocks, targets, native, images):
             if not sep or not index.isascii() or not index.isdigit() or image is None or image[1] != loc.slide_number:
                 raise ValueError('Unmapped original OCR block')
         known[loc.source_ref] = block
+    from types import SimpleNamespace
+    for source in region_sources:
+        loc = SourceLocation.model_validate(source.model_dump())
+        base, sep, index = loc.source_ref.rpartition(':face:')
+        if loc.kind != 'face' or loc.artifact_id != artifact_id or loc.page_number is not None or not sep or not index.isascii() or not index.isdigit() or base not in images or images[base][1] != loc.slide_number or loc.source_ref in known:
+            raise ValueError('Unmapped original face region')
+        known[loc.source_ref] = SimpleNamespace(location=loc)
     grouped = defaultdict(list)
     for target in targets:
         if not isinstance(target, RedactionTarget):
@@ -376,7 +383,7 @@ def validate_inputs(artifact_id, blocks, targets, native, images):
         block = known.get(loc.source_ref)
         if block is None or _source_key(loc) != _source_key(block.location) or loc.bbox != block.location.bbox:
             raise ValueError('Unrecognized target source')
-        if not 0 <= loc.start < loc.end <= len(block.text):
+        if loc.kind != "face" and not 0 <= loc.start < loc.end <= len(block.text):
             raise ValueError('Invalid original span')
         grouped[loc.source_ref].append(target)
     return known, grouped
@@ -388,9 +395,9 @@ def rewrite_media(parts, images, known, grouped, artifact_id):
     sources_by_media = defaultdict(list)
     used_media = {image[0] for image in images.values()}
     for ref, block in known.items():
-        if block.location.kind != 'ocr':
+        if block.location.kind not in {'ocr', 'face'}:
             continue
-        image_ref = ref.rpartition(':ocr:')[0]
+        image_ref = ref.rpartition(':face:' if block.location.kind == 'face' else ':ocr:')[0]
         media, slide, placement = images[image_ref]
         loc = block.location
         if placement is None:
@@ -403,7 +410,7 @@ def rewrite_media(parts, images, known, grouped, artifact_id):
                 raise ValueError('OCR outside its picture placement')
             left, top = max(0, vals[0]), max(0, vals[1])
             bbox = (left, top, min(vals[2], 1-left), min(vals[3], 1-top))
-        local_ref = f'image:ocr:{len(sources_by_media[media])}'
+        local_ref = 'image' if loc.kind == 'face' else f'image:ocr:{len(sources_by_media[media])}'
         source = loc.model_copy(update={'source_ref': local_ref, 'slide_number': None, 'bbox': bbox})
         source = SourceLocation.model_validate(source.model_dump())
         sources_by_media[media].append(source)

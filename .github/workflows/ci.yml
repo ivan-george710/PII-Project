@@ -34,7 +34,12 @@ jobs:
         working-directory: apps/api
         run: |
           python3 -m venv .venv
-          .venv/bin/python -m pip install '.[test]'
+          .venv/bin/python -m pip install '../../packages/engine[test,ocr,runtime]' '.[test]'
+      - name: Check real privacy engine
+        working-directory: packages/engine
+        env:
+          PII_GUARD_REAL_OCR: '1'
+        run: ../../apps/api/.venv/bin/python -m pytest tests -q
       - name: Check backend
         working-directory: apps/api
         run: .venv/bin/python -m pytest tests -q

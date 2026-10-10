@@ -41,7 +41,7 @@ def _presentation_structure(parts):
 
 
 def redact_pptx(data: bytes, targets: Iterable[RedactionTarget] = (), *, artifact_id: UUID,
-                blocks: Iterable[ExtractedTextBlock] = (), submission_id: UUID | None = None) -> bytes:
+                blocks: Iterable[ExtractedTextBlock] = (), region_sources=(), submission_id: UUID | None = None) -> bytes:
     """Rewrite ordinary shape text, notes and unrotated, uncropped pictures.
 
     Shared media is replaced once using the union of enabled image-local regions.
@@ -122,7 +122,7 @@ def redact_pptx(data: bytes, targets: Iterable[RedactionTarget] = (), *, artifac
                 raise ValueError('Unsupported slide image placement')
         if any(list(root.iter(f'{{{A}}}blip')) for name, root in roots.items() if '/notesSlides/' in name):
             raise ValueError('Unsupported notes image placement')
-        known, grouped = validate_inputs(artifact_id, blocks, targets, native, images)
+        known, grouped = validate_inputs(artifact_id, blocks, targets, native, images, region_sources)
         for ref, unit_targets in grouped.items():
             if known[ref].location.kind != 'native_text':
                 continue

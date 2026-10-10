@@ -20,3 +20,7 @@ Generated caches, dependencies, runtime uploads, and `.git/` are excluded from d
 - [Issue 2: Deliver employee chat with guarded uploads and LLM responses](../../../../docs/issues/02-employee-chat.md) — [GitHub #2](https://github.com/ivan-george710/PII-Project/issues/2)
 
 Each issue includes its own tests and sample/setup helpers. Implement the listed files; deferred entries are outside the approved scope.
+
+## PR 18 integration
+
+`database.py`: minimal private durable PostgreSQL upload storage for production, with stable signed upload grants and ownership-bound keys. Development retains local storage. Original file bytes are never manager-report payloads.

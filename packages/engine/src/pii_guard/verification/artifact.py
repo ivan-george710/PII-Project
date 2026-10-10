@@ -78,10 +78,9 @@ def prepare_verification(original: bytes, *, artifact_id: UUID, mime_type: str,
             from pii_guard.redaction.office import unpack
             from pii_guard.redaction.metadata import sanitize_office_metadata
             from . import office
-            if any(t.location.kind=='face' for t in accepted):raise ValueError('Office face binding unsupported')
-            if any(t.location.source_ref not in known for t in accepted):raise ValueError('Missing Office block')
+            if any(t.location.kind != 'face' and t.location.source_ref not in known for t in accepted):raise ValueError('Missing Office block')
             parts=unpack(original);sanitize_office_metadata(parts,kind)
-            plan=office.prepare(parts,kind,artifact_id,known,accepted)
+            plan=office.prepare(parts,kind,artifact_id,known,accepted,tuple(loc for loc in source_map.values() if loc.kind == "face"))
         else:
             from . import pdf
             if not original.startswith(b'%PDF-') or not original.rstrip().endswith(b'%%EOF'):

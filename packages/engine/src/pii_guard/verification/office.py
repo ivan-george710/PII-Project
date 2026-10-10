@@ -110,7 +110,7 @@ def _zip_bytes(parts):
     return out.getvalue()
 
 
-def prepare(parts,kind,artifact_id,blocks,targets):
+def prepare(parts,kind,artifact_id,blocks,targets,sources=()):
     units,images,geometry,editable=inventory(parts,kind)
     grouped={}
     for target in targets: grouped.setdefault(target.location.source_ref,[]).append(target.location)
@@ -137,6 +137,18 @@ def prepare(parts,kind,artifact_id,blocks,targets):
                     x,y,w,h=placement;bx,by,bw,bh=box
                     box=((bx-x)/w,(by-y)/h,bw/w,bh/h)
                 media_boxes[media].append(box)
+    for loc in sources:
+        base,sep,index=loc.source_ref.rpartition(':face:')
+        if not sep or not index.isascii() or not index.isdigit() or base not in images:
+            raise ValueError('Wrong face picture source')
+        media,slide,placement=images[base]
+        if loc.slide_number!=slide or loc.page_number is not None or loc.start is not None or loc.end is not None:
+            raise ValueError('Wrong face identity')
+        if loc.source_ref in grouped:
+            box=loc.bbox
+            if placement is not None:
+                x,y,w,h=placement;bx,by,bw,bh=box;box=((bx-x)/w,(by-y)/h,bw/w,bh/h)
+            media_boxes[media].append(box)
     plans=tuple(image_evidence(parts[name],(artifact_id,name),boxes)
         for name,boxes in sorted(media_boxes.items()))
     # The original's metadata is already removed in the private preparation copy.

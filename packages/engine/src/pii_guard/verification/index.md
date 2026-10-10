@@ -19,3 +19,7 @@ model changes belong here. Public dumps of evidence contain no hashes or content
 Shared security guards enforce the existing supported subset; verification never
 calls a redactor. Staging ownership and mutation prevention remain pipeline duties.
 Owner: [Issue 1](../../../../../docs/issues/01-privacy-engine.md).
+
+## PR 18 integration
+
+Office verification binds face sources to original media relationships/slide placement and independently checks the serialized redacted pixels.

@@ -17,7 +17,7 @@ from pii_guard.redaction.office import (
 
 
 def redact_docx(data: bytes, targets: Iterable[RedactionTarget] = (), *, artifact_id: UUID,
-                blocks: Iterable[ExtractedTextBlock] = (), submission_id: UUID | None = None) -> bytes:
+                blocks: Iterable[ExtractedTextBlock] = (), region_sources=(), submission_id: UUID | None = None) -> bytes:
     """Rewrite supported Word paragraphs, tables and inline PNG/JPEG pictures.
 
     Original extraction blocks bind private targets to exact part-local text.
@@ -56,7 +56,7 @@ def redact_docx(data: bytes, targets: Iterable[RedactionTarget] = (), *, artifac
             images[f'docx:part:/word/document.xml:image:{rid}'] = (media, None, None)
         if used != {rid for rid, (_, typ) in rels['word/document.xml'].items() if typ == R + '/image'}:
             raise ValueError('Unplaced Word image')
-        known, grouped = validate_inputs(artifact_id, blocks, targets, native, images)
+        known, grouped = validate_inputs(artifact_id, blocks, targets, native, images, region_sources)
         for ref, unit_targets in grouped.items():
             if known[ref].location.kind != 'native_text':
                 continue

@@ -8,9 +8,11 @@ from .conversation import Conversation
 from .message import Message
 from .attachment import Attachment
 from .submission import Submission
+from .file_blob import FileBlob
 
 __all__ = [
     "AuthSession",
+    "FileBlob",
     "CompanyRulePolicy",
     "Conversation",
     "Message",

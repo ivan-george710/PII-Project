@@ -86,7 +86,9 @@ def _page(db: Session, model, identity, limit: int, cursor: str | None, extra=No
         except (ValueError, KeyError, TypeError):
             raise ApiError(422, "INVALID_CURSOR", "Invalid page cursor") from None
         query = query.where(or_(stamp < time, and_(stamp == time, ident < row_id)))
-    values = list(db.scalars(query.order_by(stamp.desc(), ident.desc()).limit(limit + 1)))
+    values = list(
+        db.scalars(query.order_by(stamp.desc(), ident.desc()).limit(limit + 1))
+    )
     next_cursor = None
     if len(values) > limit:
         last = values[limit - 1]
@@ -218,7 +220,9 @@ def submit_message(
         if existing.state == "processing":
             raise ApiError(409, "SUBMISSION_ACTIVE", "A request is already processing")
         if not existing.stream_result:
-            raise ApiError(503, "PROCESSING_FAILED", "The previous request could not be completed")
+            raise ApiError(
+                503, "PROCESSING_FAILED", "The previous request could not be completed"
+            )
         return StreamingResponse(
             iter((existing.stream_result or "").encode("utf-8") for _ in [0]),
             media_type="text/event-stream",
@@ -245,7 +249,9 @@ def submit_message(
             )
         ):
             raise ApiError(404, "NOT_FOUND", "Conversation unavailable") from None
-        raise ApiError(409, "SUBMISSION_ACTIVE", "A request is already processing") from None
+        raise ApiError(
+            409, "SUBMISSION_ACTIVE", "A request is already processing"
+        ) from None
     db.refresh(submission)
     try:
         conversation = _conversation(db, identity, conversation_id)
@@ -273,6 +279,22 @@ def submit_message(
     event_sink: EventSink | None = getattr(request.app.state, "event_sink", None)
     llm = getattr(request.app.state, "llm_client", None)
     storage: LocalFileStorage = storage_for_request()
+    from app.config import get_settings
+
+    if get_settings().app_env != "test":
+        from app.services.engine_adapter import (
+            DatabasePolicyStore,
+            PipelineAdapter,
+            DatabaseEventSink,
+        )
+        from app.llm.providers.openai import OpenAIProvider
+        import os
+
+        policy_store = policy_store or DatabasePolicyStore(db)
+        engine = engine or PipelineAdapter()
+        event_sink = event_sink or DatabaseEventSink(db, submission, identity.user_id)
+        if not llm and os.environ.get("OPENAI_API_KEY"):
+            llm = OpenAIProvider()
     if not policy_store or not engine or not event_sink or not llm:
         from app.config import get_settings
 
@@ -284,18 +306,16 @@ def submit_message(
             from app.services.guard import LocalEventSink, RuleEngine, StaticPolicyStore
             from demo.adapters.llm import DemoLLM
 
-            request.app.state.policy_store = policy_store or StaticPolicyStore()
-            request.app.state.sanitization_engine = engine or RuleEngine()
-            request.app.state.event_sink = event_sink or LocalEventSink()
-            request.app.state.llm_client = llm or DemoLLM()
-            policy_store = request.app.state.policy_store
-            engine = request.app.state.sanitization_engine
-            event_sink = request.app.state.event_sink
-            llm = request.app.state.llm_client
+            policy_store = policy_store or StaticPolicyStore()
+            engine = engine or RuleEngine()
+            event_sink = event_sink or LocalEventSink()
+            llm = llm or DemoLLM()
     if not policy_store or not engine or not event_sink or not llm:
         submission.state = "failed"
         db.commit()
-        raise ApiError(503, "GUARD_UNAVAILABLE", "Required privacy services are unavailable")
+        raise ApiError(
+            503, "GUARD_UNAVAILABLE", "Required privacy services are unavailable"
+        )
 
     async def stream():
         frames: list[bytes] = []
@@ -306,6 +326,8 @@ def submit_message(
             frames.append(_event("processing", processing))
             yield frames[-1]
             policy = require_current_policy(policy_store, identity.organization_id)
+            if hasattr(event_sink, "policy_version"):
+                event_sink.policy_version = policy.version
             # Re-sanitize every retained turn under this exact immutable snapshot.
             history = list(
                 db.scalars(
@@ -346,6 +368,7 @@ def submit_message(
                             rule=finding.rule,
                             action=finding.action,
                             count=finding.count,
+                            details=finding.details,
                             policy_version=policy.version,
                         )
                     )
@@ -360,13 +383,16 @@ def submit_message(
                         )
                         if retained_attachment is None:
                             raise ValueError("Historical attachment unavailable")
-                        original = storage.read_original(retained_attachment.original_key)
+                        original = storage.read_original(
+                            retained_attachment.original_key
+                        )
                         retained_result = SanitizeResult.model_validate(
                             engine.sanitize(
                                 SanitizeRequest(
                                     organization_id=identity.organization_id,
                                     policy=policy,
                                     text="",
+                                    artifact_id=retained_attachment.id,
                                     filename=retained_attachment.filename,
                                     mime_type=retained_attachment.mime_type,
                                     original_bytes=original,
@@ -374,7 +400,9 @@ def submit_message(
                             ).model_dump()
                         )
                         if retained_result.sanitized_bytes is None:
-                            raise ValueError("Historical sanitized artifact unavailable")
+                            raise ValueError(
+                                "Historical sanitized artifact unavailable"
+                            )
                         key = storage.write_sanitized(
                             identity.organization_id,
                             identity.user_id,
@@ -386,17 +414,19 @@ def submit_message(
                         if retained_attachment.mime_type in {"image/png", "image/jpeg"}:
                             historical_artifacts.append(
                                 ProviderArtifact.from_image(
-                                    retained_attachment.filename,
+                                    f"attachment-{retained_attachment.id}",
                                     retained_attachment.mime_type,
                                     retained_result.sanitized_bytes,
                                 )
                             )
                         else:
                             if not retained_result.sanitized_text.strip():
-                                raise ValueError("Historical sanitized text unavailable")
+                                raise ValueError(
+                                    "Historical sanitized text unavailable"
+                                )
                             historical_artifacts.append(
                                 ProviderArtifact.from_text(
-                                    retained_attachment.filename,
+                                    f"attachment-{retained_attachment.id}",
                                     retained_result.sanitized_text,
                                 )
                             )
@@ -411,6 +441,7 @@ def submit_message(
                                     rule=finding.rule,
                                     action=finding.action,
                                     count=finding.count,
+                                    details=finding.details,
                                     policy_version=policy.version,
                                 )
                             )
@@ -443,6 +474,7 @@ def submit_message(
                             organization_id=identity.organization_id,
                             policy=policy,
                             text="",
+                            artifact_id=attachment.id,
                             filename=attachment.filename,
                             mime_type=attachment.mime_type,
                             original_bytes=raw,
@@ -462,7 +494,7 @@ def submit_message(
                 if attachment.mime_type in {"image/png", "image/jpeg"}:
                     safe_artifacts.append(
                         ProviderArtifact.from_image(
-                            attachment.filename,
+                            f"attachment-{attachment.id}",
                             attachment.mime_type,
                             artifact_result.sanitized_bytes,
                         )
@@ -470,8 +502,12 @@ def submit_message(
                 else:
                     extracted = artifact_result.sanitized_text
                     if not extracted.strip():
-                        raise ValueError("Sanitized document text unavailable")
-                    safe_artifacts.append(ProviderArtifact.from_text(attachment.filename, extracted))
+                        extracted = "[Sanitized document contains no readable text.]"
+                    safe_artifacts.append(
+                        ProviderArtifact.from_text(
+                            f"attachment-{attachment.id}", extracted
+                        )
+                    )
                 sanitized_rows.append(_attachment_dto(attachment))
                 for index, finding in enumerate(artifact_result.findings):
                     report_events.append(
@@ -484,23 +520,25 @@ def submit_message(
                             rule=finding.rule,
                             action=finding.action,
                             count=finding.count,
+                            details=finding.details,
                             policy_version=policy.version,
                         )
                     )
             all_findings = sanitized.findings
             report_events.extend(
                 [
-                        EventRecord(
-                            event_key=f"{submission.id}:{policy.version}:text:{i}",
-                            organization_id=identity.organization_id,
-                            employee_id=identity.user_id,
-                            conversation_id=conversation.id,
-                            rule=finding.rule,
-                            action=finding.action,
-                            count=finding.count,
-                            policy_version=policy.version,
-                        )
-                        for i, finding in enumerate(all_findings)
+                    EventRecord(
+                        event_key=f"{submission.id}:{policy.version}:text:{i}",
+                        organization_id=identity.organization_id,
+                        employee_id=identity.user_id,
+                        conversation_id=conversation.id,
+                        rule=finding.rule,
+                        action=finding.action,
+                        count=finding.count,
+                        details=finding.details,
+                        policy_version=policy.version,
+                    )
+                    for i, finding in enumerate(all_findings)
                 ]
             )
             event_sink.record(EventBatch(events=report_events))
@@ -518,7 +556,9 @@ def submit_message(
                 submission_id=submission.id,
                 messages=[
                     *safe_history,
-                    ProviderMessage(role="user", sanitized_text=sanitized.sanitized_text),
+                    ProviderMessage(
+                        role="user", sanitized_text=sanitized.sanitized_text
+                    ),
                 ],
                 artifacts=[*historical_artifacts, *safe_artifacts],
             )
@@ -584,6 +624,8 @@ def submit_message(
             raise
         except Exception:
             db.rollback()
+            if hasattr(event_sink, "record_failure"):
+                event_sink.record_failure()
             submission.state = "failed"
             db.commit()
             failure = ErrorEvent(

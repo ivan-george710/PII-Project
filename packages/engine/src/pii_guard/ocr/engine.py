@@ -5,6 +5,7 @@ from pathlib import Path
 from typing import Protocol
 from uuid import UUID
 from math import isfinite
+from threading import Lock
 
 from PIL import Image, UnidentifiedImageError
 
@@ -20,7 +21,13 @@ class OCRBlock:
 
     def __post_init__(self) -> None:
         x, y, width, height = self.bbox
-        if not all(isfinite(v) and 0 <= v <= 1 for v in (*self.bbox, self.confidence)) or width <= 0 or height <= 0 or x + width > 1 or y + height > 1:
+        if (
+            not all(isfinite(v) and 0 <= v <= 1 for v in (*self.bbox, self.confidence))
+            or width <= 0
+            or height <= 0
+            or x + width > 1
+            or y + height > 1
+        ):
             raise ValueError("Invalid OCR geometry or confidence")
 
 
@@ -31,14 +38,14 @@ class OCRProvider(Protocol):
         *,
         artifact_id: UUID | None = None,
         source_ref: str | None = None,
-    ) -> list[OCRBlock]:
-        ...
+    ) -> list[OCRBlock]: ...
 
 
 class RapidOCREngine:
     def __init__(self) -> None:
         try:
-            from rapidocr_onnxruntime import RapidOCR
+            from rapidocr import RapidOCR
+            import rapidocr
         except ImportError as exc:
             raise ProcessingError(
                 ProcessingErrorCode.OCR_FAILED,
@@ -46,9 +53,30 @@ class RapidOCREngine:
             ) from exc
 
         try:
-            self._engine = RapidOCR(intra_op_num_threads=1, inter_op_num_threads=1)
+            models = Path(rapidocr.__file__).parent / "models"
+            # Explicit bundled model paths avoid runtime network downloads.
+            names = (
+                "PP-OCRv6_det_small.onnx",
+                "ch_ppocr_mobile_v2.0_cls_mobile.onnx",
+                "PP-OCRv6_rec_small.onnx",
+            )
+            if not all((models / name).is_file() for name in names):
+                raise ValueError("Required bundled OCR models unavailable")
+            self._engine = RapidOCR(
+                params={
+                    "Det.model_path": str(models / names[0]),
+                    "Cls.model_path": str(models / names[1]),
+                    "Rec.model_path": str(models / names[2]),
+                    "Global.log_level": "error",
+                    "EngineConfig.onnxruntime.intra_op_num_threads": 1,
+                    "EngineConfig.onnxruntime.inter_op_num_threads": 1,
+                }
+            )
+            self._lock = Lock()
         except Exception as exc:
-            raise ProcessingError(ProcessingErrorCode.OCR_FAILED, "OCR models could not be initialized.") from exc
+            raise ProcessingError(
+                ProcessingErrorCode.OCR_FAILED, "OCR models could not be initialized."
+            ) from exc
 
     def recognize_image(
         self,
@@ -68,7 +96,13 @@ class RapidOCREngine:
             ) from exc
 
         try:
-            results, _ = self._engine(str(image_path))
+            with self._lock:
+                result = self._engine(str(image_path))
+            results = (
+                list(zip(result.boxes, result.txts, result.scores, strict=True))
+                if result.txts
+                else []
+            )
         except Exception as exc:
             raise ProcessingError(
                 ProcessingErrorCode.OCR_FAILED,
@@ -85,20 +119,37 @@ class RapidOCREngine:
                     blocks.append(OCRBlock(str(text), float(confidence), bbox))
             return blocks
         except Exception as exc:
-            raise ProcessingError(ProcessingErrorCode.OCR_FAILED, "OCR returned invalid regions.", artifact_id=artifact_id) from exc
+            raise ProcessingError(
+                ProcessingErrorCode.OCR_FAILED,
+                "OCR returned invalid regions.",
+                artifact_id=artifact_id,
+            ) from exc
 
 
-def recognize_image(provider: OCRProvider, path: Path, *, artifact_id: UUID,
-                    source_ref: str) -> list[OCRBlock]:
+def recognize_image(
+    provider: OCRProvider, path: Path, *, artifact_id: UUID, source_ref: str
+) -> list[OCRBlock]:
     """Keep provider failures and malformed results inside the error contract."""
     try:
         inspect_image_dimensions(path, artifact_id=artifact_id)
-        return [OCRBlock(block.text, block.confidence, block.bbox)
-                for block in provider.recognize_image(path, artifact_id=artifact_id, source_ref=source_ref)]
+        return [
+            OCRBlock(block.text, block.confidence, block.bbox)
+            for block in provider.recognize_image(
+                path, artifact_id=artifact_id, source_ref=source_ref
+            )
+        ]
     except ProcessingError as exc:
-        raise ProcessingError(ProcessingErrorCode.OCR_FAILED, "Image content could not be recognized.", artifact_id=artifact_id) from exc
+        raise ProcessingError(
+            ProcessingErrorCode.OCR_FAILED,
+            "Image content could not be recognized.",
+            artifact_id=artifact_id,
+        ) from exc
     except Exception as exc:
-        raise ProcessingError(ProcessingErrorCode.OCR_FAILED, "Image content could not be recognized.", artifact_id=artifact_id) from exc
+        raise ProcessingError(
+            ProcessingErrorCode.OCR_FAILED,
+            "Image content could not be recognized.",
+            artifact_id=artifact_id,
+        ) from exc
 
 
 def inspect_image_dimensions(
@@ -109,7 +160,11 @@ def inspect_image_dimensions(
     try:
         with Image.open(image_path) as image:
             if getattr(image, "n_frames", 1) != 1:
-                raise ProcessingError(ProcessingErrorCode.UNSUPPORTED_FILE, "Multi-frame images are not supported.", artifact_id=artifact_id)
+                raise ProcessingError(
+                    ProcessingErrorCode.UNSUPPORTED_FILE,
+                    "Multi-frame images are not supported.",
+                    artifact_id=artifact_id,
+                )
             image.verify()
         with Image.open(image_path) as image:
             return image.size

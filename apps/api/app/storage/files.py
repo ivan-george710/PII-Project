@@ -202,7 +202,10 @@ def storage_for_request() -> LocalFileStorage:
 
     settings = get_settings()
     if settings.app_env == "production":
-        raise ApiError(503, "STORAGE_UNAVAILABLE", "File storage is unavailable")
+        from app.db.session import session_factory
+        from app.storage.database import DatabaseFileStorage
+        settings.require_auth()
+        return DatabaseFileStorage(session_factory(), settings.session_secret.get_secret_value().encode())
     if not hasattr(storage_for_request, "_storage"):
         storage_for_request._storage = LocalFileStorage()  # type: ignore[attr-defined]
     return storage_for_request._storage  # type: ignore[attr-defined]

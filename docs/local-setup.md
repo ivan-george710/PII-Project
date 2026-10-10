@@ -66,3 +66,13 @@ Sign in as a manager and open Company setup / Workspace settings. Under Add an e
 The API is `POST /api/v1/organization/employees` with `{display_name,email,password,manager_id?}`. The manager's session and CSRF token determine company access; manager_id defaults to the caller and must be an active manager in that same company. Response 201 is `{user:{id,email,display_name,role:"employee"},assignment:{employee_id,manager_id,updated_at}}`, without any password/hash. Duplicate account is 409, employee caller 403, foreign manager 404, invalid extra fields 422. Creation and assignment are one transaction.
 
 Migration `0004_employee_chat` must be applied after `0003_signup` for actual employee chat. It adds chat tables without replacing existing users/sessions/assignments. The UI has saved system/light/dark appearance and reduced-motion support. React Bits Strands is installed from the shadcn registry and rendered only as a small loading status; its upstream license is included in components/Strands.LICENSE.txt.
+
+## Real engine integration (PR 18)
+
+Install from the repository root: `python -m pip install 'packages/engine[test,ocr,runtime]' 'apps/api[test]'`. Or use `uv sync --project apps/api` with the committed uv lockfile. No model downloads occur during request handling. Run `PII_GUARD_REAL_OCR=1 python -m pytest packages/engine/tests -q`, then `PYTHONPATH=apps/api python -m pytest apps/api/tests -q`, separately because the two test directories have separate conftest fixtures.
+
+From `apps/api`, run `alembic upgrade head` and `alembic check` before deploying; head includes company policies/events and private file storage. Back up existing production data before schema changes. Configure `OPENAI_API_KEY`/`OPENAI_MODEL` for a real provider; without a configured provider production blocks submission. `DEMO_ADAPTERS_ENABLED=true` is development-only: real redaction still runs, but the response is a simulated local provider.
+
+Vercel keeps both services together and installs the local engine from `../../packages/engine` through uv. Production upload bytes use the database, not ephemeral `/tmp`. Hosting HTTP body limits still apply (Vercel ~4.5 MB per request/response); large direct API uploads need a future object-store upload path even though the engine supports up to 25 MB files.
+
+Managers: Workspace settings creates employees; Rules & Policy toggles FACE/text rules and adds custom rules; Employee Reports shows grouped findings and safe locations for assigned employees. Original PII and file bytes never appear in manager event payloads.

@@ -12,10 +12,10 @@ export function EventDetails({
       role="dialog"
       aria-labelledby="event-details-title"
       style={{
-        border: "2px solid #000",
+        border: "1px solid var(--line)",
         padding: "1rem",
         marginBottom: "1.5rem",
-        backgroundColor: "#fafafa",
+        backgroundColor: "var(--raised)",
       }}
     >
       <div style={{ display: "flex", justifyContent: "space-between" }}>
@@ -46,10 +46,10 @@ export function EventDetails({
             <li
               key={idx}
               style={{
-                border: "1px solid #ccc",
+                border: "1px solid var(--line)",
                 padding: "0.75rem",
                 marginBottom: "0.5rem",
-                backgroundColor: "#fff",
+                backgroundColor: "var(--surface)",
               }}
             >
               <div>
@@ -62,12 +62,16 @@ export function EventDetails({
                   <small>
                     Locations:{" "}
                     {f.locations
-                      .map((loc, lIdx) => {
+                      .map((loc) => {
                         const parts: string[] = [loc.kind];
                         if (loc.page_number) parts.push(`p.${loc.page_number}`);
                         if (loc.slide_number) parts.push(`s.${loc.slide_number}`);
-                        if (loc.start !== undefined && loc.end !== undefined) {
+                        if (loc.start != null && loc.end != null) {
                           parts.push(`offset ${loc.start}–${loc.end}`);
+                        }
+                        if (loc.bbox) {
+                          const [x, y, width, height] = loc.bbox;
+                          parts.push(`region ${Math.round(x * 100)}%, ${Math.round(y * 100)}% (${Math.round(width * 100)}% × ${Math.round(height * 100)}%)`);
                         }
                         return parts.join(" ");
                       })

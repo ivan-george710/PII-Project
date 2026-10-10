@@ -5,7 +5,8 @@ cadence-pii-guard
 demo
 docs
 experiments
-packages
+packages/engine/tests
+packages/engine/README.md
 tests
 *.pdf
 *.docx

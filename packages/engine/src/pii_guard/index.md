@@ -58,3 +58,7 @@ Use Pydantic v2 BaseModel contracts with forbidden extra fields, strict booleans
 - [Issue 1: Build the complete document and image privacy engine](../../../../docs/issues/01-privacy-engine.md) — [GitHub #1](https://github.com/ivan-george710/PII-Project/issues/1)
 
 Each issue includes its own tests and sample/setup helpers. Implement the listed files; deferred entries are outside the approved scope.
+
+## PR 18 integration
+
+`pipeline.py` implements staged inspect/extract/detect/evaluate/redact/verify/publish with all-or-nothing artifact output. `model_assets/` holds the checksum-pinned YuNet model and license. The pipeline returns internal safe artifact text for the chat adapter; it is excluded from serialization.

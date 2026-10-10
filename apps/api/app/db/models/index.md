@@ -32,3 +32,7 @@ Generated caches, dependencies, runtime uploads, and `.git/` are excluded from d
 Each issue includes its own tests and sample/setup helpers. Implement the listed files; deferred entries are outside the approved scope.
 
 All implemented models are exported by `__init__.py` so Alembic metadata includes chat tables without importing HTTP routes. Chat metadata types, indexes and constraints match migration `0004_employee_chat`.
+
+## PR 18 integration
+
+`file_blob.py`: `private_file_blobs`, private original/sanitized bytes keyed to an owned attachment and removed by cascade when the attachment is deleted.

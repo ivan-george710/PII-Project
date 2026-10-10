@@ -33,7 +33,7 @@ def test_map_child_bbox_to_parent() -> None:
 @pytest.mark.integration
 @pytest.mark.skipif(os.environ.get("PII_GUARD_REAL_OCR") != "1", reason="Set PII_GUARD_REAL_OCR=1 to run real OCR")
 def test_real_ocr_synthetic_scan() -> None:
-    pytest.importorskip("rapidocr_onnxruntime")
+    import rapidocr  # CI installs and exercises the actual required OCR package.
     from pii_guard.ocr import RapidOCREngine
     blocks = RapidOCREngine().recognize_image(Path(__file__).parent / "fixtures" / "scan.png")
     assert "HELLO" == "".join(block.text.strip() for block in blocks)

@@ -24,3 +24,7 @@ Each issue includes its own tests and sample/setup helpers. Implement the listed
 ## Delivered interface update
 
 `ChatLayout.tsx` uses WorkspaceShell for desktop/sidebar and mobile drawer; recent untitled conversations are labeled distinctly from the New chat action.
+
+## PR 18 integration
+
+`ManagerLayout.tsx` now uses the shared monochrome light/dark workspace shell for settings and reports, without a duplicate global header.

@@ -37,3 +37,7 @@ Generated caches, dependencies, runtime uploads, and `.git/` are excluded from d
 - [Issue 1: Build the complete document and image privacy engine](../../../docs/issues/01-privacy-engine.md) — [GitHub #1](https://github.com/ivan-george710/PII-Project/issues/1)
 
 Each issue includes its own tests and sample/setup helpers. Implement the listed files; deferred entries are outside the approved scope.
+
+## PR 18 integration
+
+`test_pipeline.py` exercises real OCR/face/NLP models on PNG/JPEG/PDF/DOCX/PPTX, disabled FACE reporting, group photos and atomic failure. Models are required in CI; no engine-test bypass.

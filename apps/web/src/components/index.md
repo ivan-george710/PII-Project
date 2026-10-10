@@ -34,3 +34,7 @@ Each issue includes its own tests and sample/setup helpers. Implement the listed
 | Strands.LICENSE.txt | Existing | Upstream MIT plus Commons Clause license and attribution. |
 
 `BrandMark.tsx` renders the approved shared SVG mark used in the workspace sidebar and sign-in/sign-up header; its geometry matches `public/favicon.svg`.
+
+## PR 18 integration
+
+WorkspaceShell links managers to workspace setup, rules/policy and employee reports, preserving shared theme/account controls.

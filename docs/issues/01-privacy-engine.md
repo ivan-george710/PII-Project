@@ -161,3 +161,7 @@ Implement the following file plan. Shared directories assign individual files to
 Use the documented interfaces and feature-owned development adapters for integration points. Do not wait for another issue to close. Test this workstream against those interfaces, then connect real implementations without changing the contract. Production must never substitute simulated privacy processing.
 
 - Keep all touched directory indexes accurate and distinguish planned files from implemented files.
+
+## PR #18 implementation update
+
+`pipeline.py` now composes extraction, real OCR/Presidio, company policy, redaction and independent output verification. `detection/faces.py` adapts Spark tiled detection with the pinned CPU YuNet model in `model_assets/`. Supported image-bearing formats are PNG/JPEG, PDF, DOCX and PPTX. Image/face API and manager-report integration lives in `apps/api/app/services/engine_adapter.py`; private uploads use `storage/database.py` and migration `0006_private_file_blobs.py`. Tests include real face/OCR fixtures and full upload → sanitized provider → manager-report APIs. See `docs/spark-reuse.md` for detection limits and source attribution.

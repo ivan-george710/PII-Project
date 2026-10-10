@@ -25,3 +25,7 @@ Generated caches, dependencies, runtime uploads, and `.git/` are excluded from d
 - [Issue 1: Build the complete document and image privacy engine](../../../../../docs/issues/01-privacy-engine.md) — [GitHub #1](https://github.com/ivan-george710/PII-Project/issues/1)
 
 Each issue includes its own tests and sample/setup helpers. Implement the listed files; deferred entries are outside the approved scope.
+
+## PR 18 integration
+
+`faces.py` ports Spark tiled detection, duplicate suppression and 8% horizontal / 12% vertical padding to CPU YuNet. Regions use raw image or rendered-page coordinates; Office locations map to the originating picture. FACE is detected even when disabled, for allowed-disabled reporting.

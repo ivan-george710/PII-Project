@@ -82,6 +82,8 @@ export function WorkspaceShell({
               <NavLink className="sidebar-link" to="/company/setup">
                 Workspace settings
               </NavLink>
+              <NavLink className="sidebar-link" to="/manager/settings">Rules &amp; Policy</NavLink>
+              <NavLink className="sidebar-link" to="/manager/reports">Employee Reports</NavLink>
             </nav>
           ) : (
             navigation

@@ -8,6 +8,7 @@ from uuid import UUID
 from pydantic import ConfigDict, Field
 
 from app.schemas.common import Schema
+from app.schemas.reports import Finding as DetailedFinding
 
 
 class PolicyRule(Schema):
@@ -25,13 +26,15 @@ class PolicySnapshot(Schema):
         extra="forbid", validate_assignment=True, from_attributes=True, frozen=True
     )
     version: str = Field(min_length=1, max_length=100)
-    rules: tuple[PolicyRule, ...] = Field(max_length=100)
+    rules: tuple[PolicyRule, ...] = Field(default=(), max_length=100)
+    engine_policy: dict | None = None
 
 
 class SanitizeRequest(Schema):
     organization_id: UUID
     policy: PolicySnapshot
     text: str = Field(max_length=100_000)
+    artifact_id: UUID | None = None
     filename: str | None = None
     mime_type: str | None = None
     original_bytes: bytes | None = None
@@ -41,6 +44,7 @@ class Finding(Schema):
     rule: str
     action: str
     count: int = Field(strict=True, ge=1)
+    details: list[DetailedFinding] = Field(default_factory=list)
 
 
 class SanitizeResult(Schema):
@@ -58,6 +62,7 @@ class EventRecord(Schema):
     rule: str
     action: str
     count: int = Field(strict=True, ge=1)
+    details: list[DetailedFinding] = Field(default_factory=list)
     policy_version: str
 
 

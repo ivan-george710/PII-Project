@@ -10,6 +10,7 @@ from pydantic import (
     Field,
     StrictBool,
     StrictInt,
+    PrivateAttr,
     StringConstraints,
     field_validator,
     model_validator,
@@ -172,6 +173,7 @@ class SanitizedArtifact(EngineBaseModel):
 
 
 class SanitizeResult(EngineBaseModel):
+    _artifact_texts: dict[UUID, str] = PrivateAttr(default_factory=dict)
     submission_id: UUID
     policy_version: Annotated[StrictInt, Field(gt=0)]
     sanitized_text: str

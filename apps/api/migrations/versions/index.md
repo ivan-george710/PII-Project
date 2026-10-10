@@ -24,3 +24,7 @@ Generated caches, dependencies, runtime uploads, and `.git/` are excluded from d
 - [Issue 4: Deliver manager rule settings, custom rules, and employee PII reporting](../../../../docs/issues/04-manager-settings-reports.md) — [GitHub #4](https://github.com/ivan-george710/PII-Project/issues/4)
 
 Each issue includes its own tests and sample/setup helpers. Implement the listed files; deferred entries are outside the approved scope.
+
+## PR 18 integration
+
+`0006_private_file_blobs.py`: additive durable file-byte table after `0005_company_policy_events`; apply before deploying this PR.

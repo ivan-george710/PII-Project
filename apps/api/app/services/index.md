@@ -31,3 +31,7 @@ Each issue includes its own tests and sample/setup helpers. Implement the listed
 ## Delivered interface update
 
 `organization.py` atomically creates employee/password hash/assignment, validates manager scope, rejects duplicate accounts and prevents client-selected roles/companies.
+
+## PR 18 integration
+
+`engine_adapter.py` adapts the complete company policy to `pii_guard.pipeline.PrivacyEngine`, keeps safe artifact text/bytes, and persists location-only manager events. Services are request-scoped; CPU models are process-cached.

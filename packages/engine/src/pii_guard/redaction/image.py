@@ -29,7 +29,7 @@ class ImageRedactionResult(EngineBaseModel):
 
 def _source_key(location: SourceLocation) -> tuple:
     return (location.artifact_id, location.kind, location.page_number,
-            location.slide_number, location.source_ref)
+            location.slide_number, location.source_ref, location.bbox if location.kind == "face" else None)
 
 
 def _validate_regions(targets: Iterable[RedactionTarget], sources: Iterable[SourceLocation],

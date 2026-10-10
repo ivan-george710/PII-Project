@@ -44,10 +44,10 @@ export default function ManagerSettings() {
         <div
           role="alert"
           style={{
-            border: "2px solid #000",
+            border: "1px solid var(--line)",
             padding: "0.75rem",
             marginBottom: "1rem",
-            backgroundColor: "#eee",
+            backgroundColor: "var(--raised)",
           }}
         >
           <p>

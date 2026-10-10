@@ -1,5 +1,5 @@
 from collections import defaultdict
-from datetime import datetime
+from datetime import UTC, datetime
 from uuid import UUID
 
 from sqlalchemy import desc
@@ -102,7 +102,7 @@ def _to_report_event(event: PiiEvent, employee: User) -> ReportEvent:
             display_name=employee.display_name,
             email=employee.email,
         ),
-        occurred_at=event.occurred_at,
+        occurred_at=event.occurred_at.replace(tzinfo=UTC) if event.occurred_at.tzinfo is None else event.occurred_at,
         policy_version=event.policy_version,
         status=event.status,  # type: ignore
         failure_code=event.failure_code,

@@ -25,3 +25,7 @@ Generated caches, dependencies, runtime uploads, and `.git/` are excluded from d
 - [Issue 1: Build the complete document and image privacy engine](../../../../../docs/issues/01-privacy-engine.md) — [GitHub #1](https://github.com/ivan-george710/PII-Project/issues/1)
 
 Each issue includes its own tests and sample/setup helpers. Implement the listed files; deferred entries are outside the approved scope.
+
+## PR 18 integration
+
+Office renderers now accept validated `region_sources` for faces in embedded PNG/JPEG pictures. Multiple faces in a single source image have separate geometry-bound identities. Faces are opaque pixel replacement, not blur.

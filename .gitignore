@@ -24,3 +24,6 @@ uploads/
 *.onnx
 *.pt
 *.safetensors
+
+# Versioned, checksum-verified face model is a required engine asset.
+!packages/engine/src/pii_guard/model_assets/face_detection_yunet_2023mar.onnx

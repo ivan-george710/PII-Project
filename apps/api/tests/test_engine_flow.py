@@ -244,3 +244,103 @@ def test_engine_failure_records_safe_failed_report_and_never_calls_provider(
     assert report["status"] == "failed"
     assert report["failure_code"] == "PROCESSING_FAILED"
     assert not report["findings"]
+
+
+def test_database_files_survive_new_storage_instances_and_sessions(env):
+    from sqlalchemy.orm import sessionmaker
+    from app.schemas.common import ApiError
+
+    employee = env.users[1]
+    aid = uuid4()
+    key = f"original/{employee.organization_id}/{employee.id}/{aid}"
+    env.db.add(
+        Attachment(
+            id=aid,
+            organization_id=employee.organization_id,
+            employee_id=employee.id,
+            original_key=key,
+            filename="private.png",
+            mime_type="image/png",
+            size_bytes=4,
+        )
+    )
+    env.db.commit()
+    factory = sessionmaker(env.db.get_bind(), expire_on_commit=False)
+    first = DatabaseFileStorage(factory, b"fictional-shared-signing-secret")
+    first.receive_upload(employee.organization_id, employee.id, aid, b"test")
+    second = DatabaseFileStorage(factory, b"fictional-shared-signing-secret")
+    assert second.read_original(key) == b"test"
+    sanitized = second.write_sanitized(
+        employee.organization_id, employee.id, aid, b"safe"
+    )
+    assert (
+        DatabaseFileStorage(factory, b"fictional-shared-signing-secret").read_sanitized(
+            sanitized
+        )
+        == b"safe"
+    )
+    with pytest.raises(ApiError):
+        second.write_sanitized(env.companies[1].id, env.users[3].id, aid, b"leak")
+
+
+def test_document_without_readable_text_can_be_sent_and_retained(env, monkeypatch):
+    spy = SpyLLM()
+    for name, value in [
+        ("policy_store", DatabasePolicyStore(env.db)),
+        ("sanitization_engine", PipelineAdapter()),
+        ("event_sink", BoundSink(env)),
+        ("llm_client", spy),
+    ]:
+        monkeypatch.setattr(env.client.app.state, name, value, raising=False)
+    headers = login_as(env, env.users[1])
+    out = BytesIO()
+    Document().save(out)
+    raw = out.getvalue()
+    init = env.client.post(
+        "/api/v1/uploads/init",
+        headers=headers,
+        json={
+            "filename": "empty.docx",
+            "declared_mime": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+            "size_bytes": len(raw),
+        },
+    )
+    assert init.status_code == 201
+    grant = init.json()["upload"]
+    url = urlsplit(grant["url"])
+    assert (
+        env.client.put(
+            url.path + "?" + url.query, content=raw, headers=grant["headers"]
+        ).status_code
+        == 204
+    )
+    aid = init.json()["attachment"]["id"]
+    assert (
+        env.client.post(
+            f"/api/v1/uploads/{aid}/complete", json={}, headers=headers
+        ).status_code
+        == 200
+    )
+    cid = env.client.post(
+        "/api/v1/conversations", headers=headers, json={"title": "Empty document"}
+    ).json()["id"]
+    for text, attachments in [("Summarize", [aid]), ("Follow up", [])]:
+        response = env.client.post(
+            f"/api/v1/conversations/{cid}/messages",
+            headers=headers,
+            json={
+                "text": text,
+                "attachment_ids": attachments,
+                "client_request_id": str(uuid4()),
+            },
+        )
+        assert "event: done" in response.text, response.text
+    assert len(spy.requests) == 2
+    assert (
+        spy.requests[0].artifacts[0].sanitized_text
+        == "[Sanitized document contains no readable text.]"
+    )
+    assert (
+        spy.requests[1].artifacts[0].sanitized_text
+        == "[Sanitized document contains no readable text.]"
+    )

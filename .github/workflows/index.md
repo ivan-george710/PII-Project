@@ -22,3 +22,5 @@ Each issue includes its own tests and sample/setup helpers. Implement the listed
 ## PR 18 integration
 
 CI installs the engine runtime/model extras and runs the complete engine suite with real OCR enabled, before API checks and deployment.
+
+CI configures `VERCEL_SUPPORT_LARGE_FUNCTIONS=1` on the exact configured project for the bundled privacy models. Production health verifies that these models initialize at runtime.

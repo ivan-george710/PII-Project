@@ -420,14 +420,15 @@ def submit_message(
                                 )
                             )
                         else:
-                            if not retained_result.sanitized_text.strip():
-                                raise ValueError(
-                                    "Historical sanitized text unavailable"
+                            historical_text = retained_result.sanitized_text
+                            if not historical_text.strip():
+                                historical_text = (
+                                    "[Sanitized document contains no readable text.]"
                                 )
                             historical_artifacts.append(
                                 ProviderArtifact.from_text(
                                     f"attachment-{retained_attachment.id}",
-                                    retained_result.sanitized_text,
+                                    historical_text,
                                 )
                             )
                         for index, finding in enumerate(retained_result.findings):

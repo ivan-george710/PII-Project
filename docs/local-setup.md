@@ -76,3 +76,5 @@ From `apps/api`, run `alembic upgrade head` and `alembic check` before deploying
 Vercel keeps both services together and installs the local engine from `../../packages/engine` through uv. Production upload bytes use the database, not ephemeral `/tmp`. Hosting HTTP body limits still apply (Vercel ~4.5 MB per request/response); large direct API uploads need a future object-store upload path even though the engine supports up to 25 MB files.
 
 Managers: Workspace settings creates employees; Rules & Policy toggles FACE/text rules and adds custom rules; Employee Reports shows grouped findings and safe locations for assigned employees. Original PII and file bytes never appear in manager event payloads.
+
+The real OCR/NLP runtime is about 707 MB on Linux. CI enables `VERCEL_SUPPORT_LARGE_FUNCTIONS=1` only on the configured PII Guard project (preview/production); Fluid Compute large-function beta is required. Deployment health initializes packaged models and must pass before promotion. The existing live database was upgraded through 0006 during PR18 integration verification.

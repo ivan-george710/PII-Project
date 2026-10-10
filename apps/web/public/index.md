@@ -9,7 +9,7 @@ This is a file plan. **Existing** files are present; **Planned** files must be i
 | Filename | Status | Responsibility |
 |---|---|---|
 | `index.md` | Existing | Directory file manifest and responsibilities; keep it synchronized with changes. |
-| `favicon.svg` | Deferred | Optional future work; outside the five current issues. Simple application browser icon. |
+| `favicon.svg` | Existing | Approved rounded diamond-loop SVG mark; switches monochrome stroke with browser theme. |
 
 Generated caches, dependencies, runtime uploads, and `.git/` are excluded from directory manifests.
 

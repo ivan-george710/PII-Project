@@ -9,9 +9,9 @@ This is a file plan. **Existing** files are present; **Planned** files must be i
 | Filename | Status | Responsibility |
 |---|---|---|
 | `index.md` | Existing | Directory file manifest and responsibilities; keep it synchronized with changes. |
-| `__init__.py` | Planned | Storage package marker. Owner: [issue 2](../../../../docs/issues/02-employee-chat.md). |
-| `files.py` | Planned | Separate original/sanitized artifact storage and enforce authorized access. Owner: [issue 2](../../../../docs/issues/02-employee-chat.md). |
-| `cleanup.py` | Planned | Apply configured file retention and cleanup. Owner: [issue 2](../../../../docs/issues/02-employee-chat.md). |
+| `__init__.py` | Implemented | Storage package marker. Owner: [issue 2](../../../../docs/issues/02-employee-chat.md). |
+| `files.py` | Implemented | Separate original/sanitized artifact storage and enforce authorized access. Owner: [issue 2](../../../../docs/issues/02-employee-chat.md). |
+| `cleanup.py` | Implemented | Apply configured file retention and cleanup. Owner: [issue 2](../../../../docs/issues/02-employee-chat.md). |
 
 Generated caches, dependencies, runtime uploads, and `.git/` are excluded from directory manifests.
 

@@ -20,3 +20,9 @@ Generated caches, dependencies, runtime uploads, and `.git/` are excluded from d
 - [Issue 3: Deliver local authentication, company setup, and employee-manager assignments](../../../../../docs/issues/03-auth-company-setup.md) — [GitHub #3](https://github.com/ivan-george710/PII-Project/issues/3)
 
 Each issue includes its own tests and sample/setup helpers. Implement the listed files; deferred entries are outside the approved scope.
+
+## Interface and employee creation update
+
+| Filename | Status | Responsibility |
+|---|---|---|
+| AddEmployeeForm.tsx | Existing | Create employee credentials and immediate-manager assignment in the signed-in workspace, with status/error feedback. |

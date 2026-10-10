@@ -208,3 +208,7 @@ Implement the following file plan. Shared directories assign individual files to
 Use the documented interfaces and feature-owned development adapters for integration points. Do not wait for another issue to close. Test this workstream against those interfaces, then connect real implementations without changing the contract. Production must never substitute simulated privacy processing.
 
 - Keep all touched directory indexes accurate and distinguish planned files from implemented files.
+
+## Delivered interface redesign
+
+Use the shared responsive WorkspaceShell, full-height conversation area, bounded composer and above-composer attachment/test-sample popup. Preserve black/white/grayscale and text controls without icons. System/light/dark appearance is stored locally; reduced-motion users receive static loading feedback. Loading uses a small lazy-loaded React Bits Strands canvas with WebGL fallback, never a decorative full-screen background. Empty state and current conversation are distinct from the New chat action. Company setup now creates employee accounts that can sign in to this workspace. Actual document engine/company policy/durable reports remain separate implementation work; local simulated chat responses are explicitly development-only.

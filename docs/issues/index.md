@@ -1,6 +1,6 @@
 # docs/issues
 
-Five approved implementation issues. Each includes its own validation, tests, and demo/setup helpers; there is no separate testing/demo issue or prerequisite completion gate.
+Five original implementation issues and two requested network roadmap issues. Each includes its own validation, tests, and demo/setup helpers; there is no separate testing/demo issue or prerequisite completion gate.
 
 ## Files
 
@@ -28,3 +28,12 @@ Refer to the root index and each touched directory index. Python models use Pyda
 ## Current baseline
 
 Every issue now includes the 2026-10-09 implementation baseline: local auth and signup, monochrome icon-free UI, existing database revisions, passing CI, and required regression checks. Fetch current main and preserve delivered features. Image/face work is paused. Chat, policies/reports and the product engine remain pending.
+
+## Network roadmap — requested, not implemented
+
+| Filename | Status | Responsibility |
+|---|---|---|
+| `06-network-enforcement.md` | Existing specification; implementation planned | Gateway, managed-device identity, HTTPS trust, protected-network egress enforcement and setup. [GitHub #14](https://github.com/ivan-george710/PII-Project/issues/14). |
+| `07-network-uploads-reporting.md` | Existing specification; implementation planned | External LLM/non-LLM submissions, safe rewriting, durable audit and immediate-manager reports. [GitHub #15](https://github.com/ivan-george710/PII-Project/issues/15). |
+
+Each network issue includes exact planned filenames, API/input/output contracts, failure behavior, its own integration checks and demo helpers. Neither requires another issue to close before work starts; unavailable production capabilities block submissions. Both must appear in the project PPT as planned/not implemented. Slide source is [presentation-roadmap.md](../presentation-roadmap.md); the actual presentation file still needs identification. The Cadence reference deck is not the project presentation.

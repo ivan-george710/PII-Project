@@ -20,3 +20,7 @@ Generated caches, dependencies, runtime uploads, and `.git/` are excluded from d
 ## Approved issue scope
 
 See the [five approved issues](../docs/issues/index.md). This directory has no required implementation files in the current scope; deferred entries remain optional.
+
+## Network roadmap
+
+`network/` is planned for a separately hosted Linux privacy gateway, firewall and enrollment configuration. Exact files: `compose.yaml`, `nftables.conf`, `.env.example`, and indexes. See [issue #14](../docs/issues/06-network-enforcement.md). This does not change Vercel app deployment or implement network routing yet.

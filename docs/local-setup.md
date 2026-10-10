@@ -58,3 +58,11 @@ The API registers health, local auth and company setup directly. It also registe
 LLM keys/model, storage and `SHOW_DEMO_SAMPLES` are configured by issue 2 when their implementations exist; the current backend does not consume those settings. Unavailable privacy processing must block real submissions. Simulated adapters are explicit development/test helpers only.
 
 Configuration failures return only setting names in `error.fields`, never their values. `/api/health` and API docs remain available for connectivity checks. Configuration errors are surfaced by the endpoints that need those settings.
+
+## Adding employees from the app
+
+Sign in as a manager and open Company setup / Workspace settings. Under Add an employee, enter the name, employee email and chosen password, select their immediate manager, and press Add employee. The account is created in the manager's existing workspace with employee role; public signup is for a separate workspace, not for joining a company. Share sign-in details directly with the employee; no invitation email is sent. Existing employees appear below with manager-assignment controls. Emails/passwords remain unrestricted strings; no verification/strength checks were added.
+
+The API is `POST /api/v1/organization/employees` with `{display_name,email,password,manager_id?}`. The manager's session and CSRF token determine company access; manager_id defaults to the caller and must be an active manager in that same company. Response 201 is `{user:{id,email,display_name,role:"employee"},assignment:{employee_id,manager_id,updated_at}}`, without any password/hash. Duplicate account is 409, employee caller 403, foreign manager 404, invalid extra fields 422. Creation and assignment are one transaction.
+
+Migration `0004_employee_chat` must be applied after `0003_signup` for actual employee chat. It adds chat tables without replacing existing users/sessions/assignments. The UI has saved system/light/dark appearance and reduced-motion support. React Bits Strands is installed from the shadcn registry and rendered only as a small loading status; its upstream license is included in components/Strands.LICENSE.txt.

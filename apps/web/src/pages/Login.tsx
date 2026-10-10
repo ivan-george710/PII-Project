@@ -1,3 +1,6 @@
+import { BrandMark } from "../components/BrandMark";
+import { ThemeToggle } from "../components/ThemeToggle";
+import { LoadingIndicator } from "../components/LoadingIndicator";
 import { useState, type FormEvent } from "react";
 import { Link, Navigate, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../features/auth/useAuth";
@@ -54,7 +57,11 @@ export default function Login() {
   return (
     <div className="auth-page">
       <div className="auth-brand">
-        <span>PII Guard</span>
+        <span className="brand-lockup">
+          <BrandMark />
+          PII Guard
+        </span>
+        <ThemeToggle />
       </div>
       <section className="auth-stage" aria-labelledby="auth-title">
         <div className="auth-card">
@@ -67,9 +74,7 @@ export default function Login() {
               : "Sign in to your PII Guard workspace."}
           </p>
           {loading ? (
-            <p className="auth-loading" role="status">
-              Getting ready…
-            </p>
+            <LoadingIndicator label="Getting ready…" />
           ) : (
             <form
               className="auth-form"
@@ -146,6 +151,11 @@ export default function Login() {
                     ? "Create account"
                     : "Sign in"}
               </button>
+              {submitting && (
+                <LoadingIndicator
+                  label={signup ? "Creating your workspace…" : "Signing in…"}
+                />
+              )}
             </form>
           )}
           <p className="auth-switch">

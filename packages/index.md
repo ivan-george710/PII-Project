@@ -21,3 +21,7 @@ Generated caches, dependencies, runtime uploads, and `.git/` are excluded from d
 - [Issue 1: Build the complete document and image privacy engine](../docs/issues/01-privacy-engine.md) — [GitHub #1](https://github.com/ivan-george710/PII-Project/issues/1)
 
 Each issue includes its own tests and sample/setup helpers. Implement the listed files; deferred entries are outside the approved scope.
+
+## Network roadmap
+
+`gateway/` is a planned package for the network roadmap, not created/implemented. Exact file ownership is in [issue #14](../docs/issues/06-network-enforcement.md) and [issue #15](../docs/issues/07-network-uploads-reporting.md).

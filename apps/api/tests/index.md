@@ -15,11 +15,11 @@ This is a file plan. **Existing** files are present; **Planned** files must be i
 | `test_organization.py` | Existing | Membership and manager-assignment boundaries. Owner: [issue 3](../../../docs/issues/03-auth-company-setup.md). |
 | `test_rules.py` | Existing | Policy versioning, isolation, preview, and invalid-pattern behavior. Owner: [issue 4](../../../docs/issues/04-manager-settings-reports.md). |
 | `test_reports.py` | Existing | Report authorization and idempotent event ingestion. Owner: [issue 4](../../../docs/issues/04-manager-settings-reports.md). |
-| `test_chat.py` | Planned | Safe history, guarded provider calls, streaming, and retry behavior. Owner: [issue 2](../../../docs/issues/02-employee-chat.md). |
-| `test_uploads.py` | Planned | Upload authorization, supported inputs, and output access. Owner: [issue 2](../../../docs/issues/02-employee-chat.md). |
-| `test_guard.py` | Planned | Sanitized-only payloads, disabled rules, and blocked failures. Owner: [issue 2](../../../docs/issues/02-employee-chat.md). |
-| `test_health.py` | Existing | Health/OpenAPI/commit behavior, safe configuration errors, and implemented-router registration failures. Owner: [issue 5](../../../docs/issues/05-platform-deployment.md). |
-| `test_demo.py` | Planned | Catalog scoping, feature toggle, selection idempotency, and file limits. Owner: [issue 2](../../../docs/issues/02-employee-chat.md). |
+| `test_chat.py` | Existing | Safe history, guarded provider calls, streaming, and retry behavior. Owner: [issue 2](../../../docs/issues/02-employee-chat.md). |
+| `test_uploads.py` | Existing | Upload authorization, supported inputs, and output access. Owner: [issue 2](../../../docs/issues/02-employee-chat.md). |
+| `test_guard.py` | Existing | Sanitized-only payloads, disabled rules, and blocked failures. Owner: [issue 2](../../../docs/issues/02-employee-chat.md). |
+| `test_health.py` | Existing | Health/OpenAPI/commit behavior, safe configuration errors, implemented-router registration failures, and duplicate operation regression checks. Owner: [issue 5](../../../docs/issues/05-platform-deployment.md). |
+| `test_demo.py` | Existing | Catalog scoping, feature toggle, selection idempotency, and file limits. Owner: [issue 2](../../../docs/issues/02-employee-chat.md). |
 | `test_seed.py` | Existing | Trusted fictional seeding, explicit opt-in, and idempotency checks. Owner: [issue 3](../../../docs/issues/03-auth-company-setup.md). |
 
 Generated caches, dependencies, runtime uploads, and `.git/` are excluded from directory manifests.
@@ -32,3 +32,7 @@ Generated caches, dependencies, runtime uploads, and `.git/` are excluded from d
 - [Issue 5: Connect the app and document basic setup](../../../docs/issues/05-platform-deployment.md) — [GitHub #5](https://github.com/ivan-george710/PII-Project/issues/5)
 
 Each issue includes its own tests and sample/setup helpers. Implement the listed files; deferred entries are outside the approved scope.
+
+## Delivered interface update
+
+`test_organization.py` covers employee creation, role/company/CSRF boundaries, duplicates and successful employee login/chat access.

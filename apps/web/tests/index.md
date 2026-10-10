@@ -11,8 +11,8 @@ This is a file plan. **Existing** files are present; **Planned** files must be i
 | `index.md` | Existing | Directory file manifest and responsibilities; keep it synchronized with changes. |
 | `chat.test.tsx` | Implemented | Composer, attachment, streaming, retry, and error behavior. Owner: [issue 2](../../../docs/issues/02-employee-chat.md). |
 | `auth.test.tsx` | Existing | Sign-in/sign-up navigation, unrestricted credentials, password visibility and form feedback. Owner: [issue 3](../../../docs/issues/03-auth-company-setup.md). |
-| `rules.test.tsx` | Planned | Toggle, custom-rule validation, preview, and saving behavior. Owner: [issue 4](../../../docs/issues/04-manager-settings-reports.md). |
-| `reports.test.tsx` | Planned | Authorized reporting states and filters. Owner: [issue 4](../../../docs/issues/04-manager-settings-reports.md). |
+| `rules.test.tsx` | Existing | Toggle, custom-rule validation, preview, and saving behavior. Owner: [issue 4](../../../docs/issues/04-manager-settings-reports.md). |
+| `reports.test.tsx` | Existing | Authorized reporting states and filters. Owner: [issue 4](../../../docs/issues/04-manager-settings-reports.md). |
 | `setup.test.tsx` | Existing | Company setup and assignment interactions. Owner: [issue 3](../../../docs/issues/03-auth-company-setup.md). |
 | `setup.ts` | Existing | Shared frontend test environment. Owner: [issue 2](../../../docs/issues/02-employee-chat.md). |
 | `demo_samples.test.tsx` | Implemented | Menu accessibility, draft insertion, attachment selection/removal, and failures. Owner: [issue 2](../../../docs/issues/02-employee-chat.md). |

@@ -14,12 +14,12 @@ This is a file plan. **Existing** files are present; **Planned** files must be i
 | `organization.py` | Existing | Company identity and administrative settings. Owner: [issue 3](../../../../../docs/issues/03-auth-company-setup.md). |
 | `user.py` | Existing | Unique email text, password hash, company membership, and role. Owner: [issue 3](../../../../../docs/issues/03-auth-company-setup.md). |
 | `manager_assignment.py` | Existing | Employee-to-manager relationship within a company. Owner: [issue 3](../../../../../docs/issues/03-auth-company-setup.md). |
-| `conversation.py` | Implemented | Employee-owned conversations. Owner: [issue 2](../../../../../docs/issues/02-employee-chat.md). |
-| `message.py` | Implemented | Conversation turns and safe provider history. Owner: [issue 2](../../../../../docs/issues/02-employee-chat.md). |
-| `attachment.py` | Implemented | File ownership, storage references, and processing state. Owner: [issue 2](../../../../../docs/issues/02-employee-chat.md). |
-| `rule.py` | Planned | Company built-in overrides, custom rules, and policy versions. Owner: [issue 4](../../../../../docs/issues/04-manager-settings-reports.md). |
-| `pii_event.py` | Planned | Submission findings/actions and idempotency identifiers. Owner: [issue 4](../../../../../docs/issues/04-manager-settings-reports.md). |
-| `submission.py` | Implemented | Persist submission state, idempotency, request hash, and stream result. Owner: [issue 2](../../../../../docs/issues/02-employee-chat.md). |
+| `conversation.py` | Existing | Employee-owned conversations. Owner: [issue 2](../../../../../docs/issues/02-employee-chat.md). |
+| `message.py` | Existing | Conversation turns and safe provider history. Owner: [issue 2](../../../../../docs/issues/02-employee-chat.md). |
+| `attachment.py` | Existing | File ownership, storage references, and processing state. Owner: [issue 2](../../../../../docs/issues/02-employee-chat.md). |
+| `rule.py` | Existing | Company built-in overrides, custom rules, and policy versions. Owner: [issue 4](../../../../../docs/issues/04-manager-settings-reports.md). |
+| `pii_event.py` | Existing | Submission findings/actions and idempotency identifiers. Owner: [issue 4](../../../../../docs/issues/04-manager-settings-reports.md). |
+| `submission.py` | Existing | Persist submission state, idempotency, request hash, and stream result. Owner: [issue 2](../../../../../docs/issues/02-employee-chat.md). |
 
 Generated caches, dependencies, runtime uploads, and `.git/` are excluded from directory manifests.
 

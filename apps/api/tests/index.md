@@ -13,13 +13,13 @@ This is a file plan. **Existing** files are present; **Planned** files must be i
 | `test_migrations.py` | Existing | Upgrade the historical schema with existing company/users/assignments; check data preservation and model parity. Owner: [issue 3](../../../docs/issues/03-auth-company-setup.md). |
 | `test_auth.py` | Existing | Sign-up isolation/duplicate handling, unrestricted credentials, password/session behavior, expiry, revocation, CSRF, lockout, and role enforcement. Owner: [issue 3](../../../docs/issues/03-auth-company-setup.md). |
 | `test_organization.py` | Existing | Membership and manager-assignment boundaries. Owner: [issue 3](../../../docs/issues/03-auth-company-setup.md). |
-| `test_rules.py` | Planned | Policy versioning, isolation, preview, and invalid-pattern behavior. Owner: [issue 4](../../../docs/issues/04-manager-settings-reports.md). |
-| `test_reports.py` | Planned | Report authorization and idempotent event ingestion. Owner: [issue 4](../../../docs/issues/04-manager-settings-reports.md). |
-| `test_chat.py` | Implemented | Safe history, guarded provider calls, streaming, and retry behavior. Owner: [issue 2](../../../docs/issues/02-employee-chat.md). |
-| `test_uploads.py` | Implemented | Upload authorization, supported inputs, and output access. Owner: [issue 2](../../../docs/issues/02-employee-chat.md). |
-| `test_guard.py` | Implemented | Sanitized-only payloads, disabled rules, and blocked failures. Owner: [issue 2](../../../docs/issues/02-employee-chat.md). |
+| `test_rules.py` | Existing | Policy versioning, isolation, preview, and invalid-pattern behavior. Owner: [issue 4](../../../docs/issues/04-manager-settings-reports.md). |
+| `test_reports.py` | Existing | Report authorization and idempotent event ingestion. Owner: [issue 4](../../../docs/issues/04-manager-settings-reports.md). |
+| `test_chat.py` | Existing | Safe history, guarded provider calls, streaming, and retry behavior. Owner: [issue 2](../../../docs/issues/02-employee-chat.md). |
+| `test_uploads.py` | Existing | Upload authorization, supported inputs, and output access. Owner: [issue 2](../../../docs/issues/02-employee-chat.md). |
+| `test_guard.py` | Existing | Sanitized-only payloads, disabled rules, and blocked failures. Owner: [issue 2](../../../docs/issues/02-employee-chat.md). |
 | `test_health.py` | Existing | Health/OpenAPI/commit behavior, safe configuration errors, implemented-router registration failures, and duplicate operation regression checks. Owner: [issue 5](../../../docs/issues/05-platform-deployment.md). |
-| `test_demo.py` | Implemented | Catalog scoping, feature toggle, selection idempotency, and file limits. Owner: [issue 2](../../../docs/issues/02-employee-chat.md). |
+| `test_demo.py` | Existing | Catalog scoping, feature toggle, selection idempotency, and file limits. Owner: [issue 2](../../../docs/issues/02-employee-chat.md). |
 | `test_seed.py` | Existing | Trusted fictional seeding, explicit opt-in, and idempotency checks. Owner: [issue 3](../../../docs/issues/03-auth-company-setup.md). |
 
 Generated caches, dependencies, runtime uploads, and `.git/` are excluded from directory manifests.

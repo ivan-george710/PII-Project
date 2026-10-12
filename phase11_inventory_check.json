@@ -1,0 +1,28 @@
+{
+  "pdf": {
+    "inventory_matches": true,
+    "inspected_visual_units": 35,
+    "unsupported": {},
+    "ocr_runs": 0,
+    "inference_runs": 0
+  },
+  "docx": {
+    "inventory_matches": true,
+    "inspected_visual_units": 35,
+    "unsupported": {
+      "uninspected_visual_constructs": 6,
+      "unsupported_image_format": 6
+    },
+    "ocr_runs": 0,
+    "inference_runs": 0
+  },
+  "pptx": {
+    "inventory_matches": true,
+    "inspected_visual_units": 1,
+    "unsupported": {
+      "uninspected_visual_constructs": 3
+    },
+    "ocr_runs": 0,
+    "inference_runs": 0
+  }
+}

@@ -1,0 +1,51 @@
+{
+  "pdf": {
+    "old_applied": 577,
+    "new_applied": 576,
+    "old_residual_confirmed_instances": {
+      "EMPLOYEE_ID": 13,
+      "PERSON": 72,
+      "EMAIL_ADDRESS": 4
+    },
+    "new_residual_confirmed_instances": {
+      "EMPLOYEE_ID": 13,
+      "PERSON": 72,
+      "EMAIL_ADDRESS": 7
+    },
+    "changed_reason_counts": {
+      "institutional_person_span": 1,
+      "email_partial_span": 1
+    },
+    "old_blocking_issues": 172,
+    "new_blocking_issues": 172,
+    "known_risk": "Not labeled; changed email is unresolved and no longer automatically redacted."
+  },
+  "docx": {
+    "old_applied": 29,
+    "new_applied": 29,
+    "old_residual_confirmed_instances": {
+      "PERSON": 2
+    },
+    "new_residual_confirmed_instances": {
+      "PERSON": 2
+    },
+    "changed_reason_counts": {},
+    "old_blocking_issues": 310,
+    "new_blocking_issues": 310,
+    "known_risk": "Effective text redaction unchanged; unverified coverage remains."
+  },
+  "pptx": {
+    "old_applied": 25,
+    "new_applied": 25,
+    "old_residual_confirmed_instances": {
+      "PERSON": 1
+    },
+    "new_residual_confirmed_instances": {
+      "PERSON": 1
+    },
+    "changed_reason_counts": {},
+    "old_blocking_issues": 15,
+    "new_blocking_issues": 15,
+    "known_risk": "Effective text redaction unchanged; unverified coverage remains."
+  }
+}

@@ -1,0 +1,6807 @@
+{
+  "version": "synthetic-1",
+  "seed": 10010,
+  "matching": "exact offsets and entity, unique predictions",
+  "cases": [
+    {
+      "id": "S0001",
+      "category": "person",
+      "text": "Policy owner: John Smith.",
+      "expected": [
+        {
+          "start": 14,
+          "end": 24,
+          "entity_type": "PERSON"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0002",
+      "category": "header",
+      "text": "John Smith\nQuarterly governance report",
+      "expected": [
+        {
+          "start": 0,
+          "end": 10,
+          "entity_type": "PERSON"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0003",
+      "category": "title_name",
+      "text": "Chief Risk Officer: John Smith.",
+      "expected": [
+        {
+          "start": 20,
+          "end": 30,
+          "entity_type": "PERSON"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0004",
+      "category": "email",
+      "text": "Contact: john.smith@example.com",
+      "expected": [
+        {
+          "start": 9,
+          "end": 31,
+          "entity_type": "EMAIL_ADDRESS"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0005",
+      "category": "phone",
+      "text": "Telephone: +1 (212) 555-0100",
+      "expected": [
+        {
+          "start": 11,
+          "end": 28,
+          "entity_type": "PHONE_NUMBER"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0006",
+      "category": "employee",
+      "text": "Employee identifier: EMP-12000",
+      "expected": [
+        {
+          "start": 21,
+          "end": 30,
+          "entity_type": "EMPLOYEE_ID"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0007",
+      "category": "table",
+      "text": "Owner | Employee | Email\nJohn Smith | EMP-12000 | john.smith@example.com",
+      "expected": [
+        {
+          "start": 25,
+          "end": 35,
+          "entity_type": "PERSON"
+        },
+        {
+          "start": 38,
+          "end": 47,
+          "entity_type": "EMPLOYEE_ID"
+        },
+        {
+          "start": 50,
+          "end": 72,
+          "entity_type": "EMAIL_ADDRESS"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0008",
+      "category": "adjacent_email",
+      "text": "John Smith <john.smith@example.com>",
+      "expected": [
+        {
+          "start": 0,
+          "end": 10,
+          "entity_type": "PERSON"
+        },
+        {
+          "start": 12,
+          "end": 34,
+          "entity_type": "EMAIL_ADDRESS"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0009",
+      "category": "duplicate_context",
+      "text": "Owner: John Smith. Reviewed by: John Smith.",
+      "expected": [
+        {
+          "start": 7,
+          "end": 17,
+          "entity_type": "PERSON"
+        },
+        {
+          "start": 32,
+          "end": 42,
+          "entity_type": "PERSON"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0010",
+      "category": "ocr_name",
+      "text": "JohnSmith is the policy author.",
+      "expected": [
+        {
+          "start": 0,
+          "end": 9,
+          "entity_type": "PERSON"
+        }
+      ],
+      "non_pii": [],
+      "notes": "Synthetic OCR concatenation; exact source span required, no invented spaces.",
+      "split": "development"
+    },
+    {
+      "id": "S0011",
+      "category": "malformed_employee",
+      "text": "Release code EMP-12000X; employee field unavailable.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 13,
+          "end": 23,
+          "entity_type": "EMPLOYEE_ID"
+        }
+      ],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0012",
+      "category": "malformed_email",
+      "text": "Contact field: john..smith@example.com",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 15,
+          "end": 38,
+          "entity_type": "EMAIL_ADDRESS"
+        }
+      ],
+      "notes": "Consecutive dots invalidate the unquoted local part; substring is not a gold match.",
+      "split": "development"
+    },
+    {
+      "id": "S0013",
+      "category": "numeric_business",
+      "text": "Revenue amount: 2125550100 dollars; growth 1%.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 16,
+          "end": 26,
+          "entity_type": "PHONE_NUMBER"
+        }
+      ],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0014",
+      "category": "account",
+      "text": "Bank account number: 73000000",
+      "expected": [
+        {
+          "start": 21,
+          "end": 29,
+          "entity_type": "US_BANK_NUMBER"
+        }
+      ],
+      "non_pii": [],
+      "notes": "Explicit bank account context supports policy PII; may need review.",
+      "split": "heldout"
+    },
+    {
+      "id": "S0015",
+      "category": "code",
+      "text": "Internal project code ZX-2125550100; Account 12345.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 25,
+          "end": 35,
+          "entity_type": "PHONE_NUMBER"
+        },
+        {
+          "start": 45,
+          "end": 50,
+          "entity_type": "US_BANK_NUMBER"
+        }
+      ],
+      "notes": "",
+      "split": "heldout"
+    },
+    {
+      "id": "S0016",
+      "category": "person",
+      "text": "Policy owner: Amelia Alder.",
+      "expected": [
+        {
+          "start": 14,
+          "end": 26,
+          "entity_type": "PERSON"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0017",
+      "category": "header",
+      "text": "Amelia Alder\nQuarterly governance report",
+      "expected": [
+        {
+          "start": 0,
+          "end": 12,
+          "entity_type": "PERSON"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "heldout"
+    },
+    {
+      "id": "S0018",
+      "category": "title_name",
+      "text": "Chief Risk Officer: Amelia Alder.",
+      "expected": [
+        {
+          "start": 20,
+          "end": 32,
+          "entity_type": "PERSON"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0019",
+      "category": "email",
+      "text": "Contact: amelia.alder@example.com",
+      "expected": [
+        {
+          "start": 9,
+          "end": 33,
+          "entity_type": "EMAIL_ADDRESS"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0020",
+      "category": "phone",
+      "text": "Telephone: +1 (212) 555-0101",
+      "expected": [
+        {
+          "start": 11,
+          "end": 28,
+          "entity_type": "PHONE_NUMBER"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0021",
+      "category": "employee",
+      "text": "Employee identifier: EMP-12001",
+      "expected": [
+        {
+          "start": 21,
+          "end": 30,
+          "entity_type": "EMPLOYEE_ID"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "heldout"
+    },
+    {
+      "id": "S0022",
+      "category": "table",
+      "text": "Owner | Employee | Email\nAmelia Alder | EMP-12001 | amelia.alder@example.com",
+      "expected": [
+        {
+          "start": 25,
+          "end": 37,
+          "entity_type": "PERSON"
+        },
+        {
+          "start": 40,
+          "end": 49,
+          "entity_type": "EMPLOYEE_ID"
+        },
+        {
+          "start": 52,
+          "end": 76,
+          "entity_type": "EMAIL_ADDRESS"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0023",
+      "category": "adjacent_email",
+      "text": "Amelia Alder <amelia.alder@example.com>",
+      "expected": [
+        {
+          "start": 0,
+          "end": 12,
+          "entity_type": "PERSON"
+        },
+        {
+          "start": 14,
+          "end": 38,
+          "entity_type": "EMAIL_ADDRESS"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "heldout"
+    },
+    {
+      "id": "S0024",
+      "category": "duplicate_context",
+      "text": "Owner: Amelia Alder. Reviewed by: Amelia Alder.",
+      "expected": [
+        {
+          "start": 7,
+          "end": 19,
+          "entity_type": "PERSON"
+        },
+        {
+          "start": 34,
+          "end": 46,
+          "entity_type": "PERSON"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0025",
+      "category": "ocr_name",
+      "text": "AmeliaAlder is the policy author.",
+      "expected": [
+        {
+          "start": 0,
+          "end": 11,
+          "entity_type": "PERSON"
+        }
+      ],
+      "non_pii": [],
+      "notes": "Synthetic OCR concatenation; exact source span required, no invented spaces.",
+      "split": "development"
+    },
+    {
+      "id": "S0026",
+      "category": "malformed_employee",
+      "text": "Release code EMP-12001X; employee field unavailable.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 13,
+          "end": 23,
+          "entity_type": "EMPLOYEE_ID"
+        }
+      ],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0027",
+      "category": "malformed_email",
+      "text": "Contact field: amelia..alder@example.com",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 15,
+          "end": 40,
+          "entity_type": "EMAIL_ADDRESS"
+        }
+      ],
+      "notes": "Consecutive dots invalidate the unquoted local part; substring is not a gold match.",
+      "split": "development"
+    },
+    {
+      "id": "S0028",
+      "category": "numeric_business",
+      "text": "Revenue amount: 2125550101 dollars; growth 2%.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 16,
+          "end": 26,
+          "entity_type": "PHONE_NUMBER"
+        }
+      ],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0029",
+      "category": "account",
+      "text": "Bank account number: 73000001",
+      "expected": [
+        {
+          "start": 21,
+          "end": 29,
+          "entity_type": "US_BANK_NUMBER"
+        }
+      ],
+      "non_pii": [],
+      "notes": "Explicit bank account context supports policy PII; may need review.",
+      "split": "heldout"
+    },
+    {
+      "id": "S0030",
+      "category": "code",
+      "text": "Internal project code ZX-2125550101; Account 12346.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 25,
+          "end": 35,
+          "entity_type": "PHONE_NUMBER"
+        },
+        {
+          "start": 45,
+          "end": 50,
+          "entity_type": "US_BANK_NUMBER"
+        }
+      ],
+      "notes": "",
+      "split": "heldout"
+    },
+    {
+      "id": "S0031",
+      "category": "person",
+      "text": "Policy owner: Oliver Brook.",
+      "expected": [
+        {
+          "start": 14,
+          "end": 26,
+          "entity_type": "PERSON"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0032",
+      "category": "header",
+      "text": "Oliver Brook\nQuarterly governance report",
+      "expected": [
+        {
+          "start": 0,
+          "end": 12,
+          "entity_type": "PERSON"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0033",
+      "category": "title_name",
+      "text": "Chief Risk Officer: Oliver Brook.",
+      "expected": [
+        {
+          "start": 20,
+          "end": 32,
+          "entity_type": "PERSON"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0034",
+      "category": "email",
+      "text": "Contact: oliver.brook@example.com",
+      "expected": [
+        {
+          "start": 9,
+          "end": 33,
+          "entity_type": "EMAIL_ADDRESS"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "heldout"
+    },
+    {
+      "id": "S0035",
+      "category": "phone",
+      "text": "Telephone: +1 (212) 555-0102",
+      "expected": [
+        {
+          "start": 11,
+          "end": 28,
+          "entity_type": "PHONE_NUMBER"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0036",
+      "category": "employee",
+      "text": "Employee identifier: EMP-12002",
+      "expected": [
+        {
+          "start": 21,
+          "end": 30,
+          "entity_type": "EMPLOYEE_ID"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0037",
+      "category": "table",
+      "text": "Owner | Employee | Email\nOliver Brook | EMP-12002 | oliver.brook@example.com",
+      "expected": [
+        {
+          "start": 25,
+          "end": 37,
+          "entity_type": "PERSON"
+        },
+        {
+          "start": 40,
+          "end": 49,
+          "entity_type": "EMPLOYEE_ID"
+        },
+        {
+          "start": 52,
+          "end": 76,
+          "entity_type": "EMAIL_ADDRESS"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0038",
+      "category": "adjacent_email",
+      "text": "Oliver Brook <oliver.brook@example.com>",
+      "expected": [
+        {
+          "start": 0,
+          "end": 12,
+          "entity_type": "PERSON"
+        },
+        {
+          "start": 14,
+          "end": 38,
+          "entity_type": "EMAIL_ADDRESS"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0039",
+      "category": "duplicate_context",
+      "text": "Owner: Oliver Brook. Reviewed by: Oliver Brook.",
+      "expected": [
+        {
+          "start": 7,
+          "end": 19,
+          "entity_type": "PERSON"
+        },
+        {
+          "start": 34,
+          "end": 46,
+          "entity_type": "PERSON"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "heldout"
+    },
+    {
+      "id": "S0040",
+      "category": "ocr_name",
+      "text": "OliverBrook is the policy author.",
+      "expected": [
+        {
+          "start": 0,
+          "end": 11,
+          "entity_type": "PERSON"
+        }
+      ],
+      "non_pii": [],
+      "notes": "Synthetic OCR concatenation; exact source span required, no invented spaces.",
+      "split": "development"
+    },
+    {
+      "id": "S0041",
+      "category": "malformed_employee",
+      "text": "Release code EMP-12002X; employee field unavailable.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 13,
+          "end": 23,
+          "entity_type": "EMPLOYEE_ID"
+        }
+      ],
+      "notes": "",
+      "split": "heldout"
+    },
+    {
+      "id": "S0042",
+      "category": "malformed_email",
+      "text": "Contact field: oliver..brook@example.com",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 15,
+          "end": 40,
+          "entity_type": "EMAIL_ADDRESS"
+        }
+      ],
+      "notes": "Consecutive dots invalidate the unquoted local part; substring is not a gold match.",
+      "split": "heldout"
+    },
+    {
+      "id": "S0043",
+      "category": "numeric_business",
+      "text": "Revenue amount: 2125550102 dollars; growth 3%.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 16,
+          "end": 26,
+          "entity_type": "PHONE_NUMBER"
+        }
+      ],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0044",
+      "category": "account",
+      "text": "Bank account number: 73000002",
+      "expected": [
+        {
+          "start": 21,
+          "end": 29,
+          "entity_type": "US_BANK_NUMBER"
+        }
+      ],
+      "non_pii": [],
+      "notes": "Explicit bank account context supports policy PII; may need review.",
+      "split": "heldout"
+    },
+    {
+      "id": "S0045",
+      "category": "code",
+      "text": "Internal project code ZX-2125550102; Account 12347.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 25,
+          "end": 35,
+          "entity_type": "PHONE_NUMBER"
+        },
+        {
+          "start": 45,
+          "end": 50,
+          "entity_type": "US_BANK_NUMBER"
+        }
+      ],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0046",
+      "category": "person",
+      "text": "Policy owner: Nora Vale.",
+      "expected": [
+        {
+          "start": 14,
+          "end": 23,
+          "entity_type": "PERSON"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0047",
+      "category": "header",
+      "text": "Nora Vale\nQuarterly governance report",
+      "expected": [
+        {
+          "start": 0,
+          "end": 9,
+          "entity_type": "PERSON"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0048",
+      "category": "title_name",
+      "text": "Chief Risk Officer: Nora Vale.",
+      "expected": [
+        {
+          "start": 20,
+          "end": 29,
+          "entity_type": "PERSON"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "heldout"
+    },
+    {
+      "id": "S0049",
+      "category": "email",
+      "text": "Contact: nora.vale@example.com",
+      "expected": [
+        {
+          "start": 9,
+          "end": 30,
+          "entity_type": "EMAIL_ADDRESS"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "heldout"
+    },
+    {
+      "id": "S0050",
+      "category": "phone",
+      "text": "Telephone: +1 (212) 555-0103",
+      "expected": [
+        {
+          "start": 11,
+          "end": 28,
+          "entity_type": "PHONE_NUMBER"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0051",
+      "category": "employee",
+      "text": "Employee identifier: EMP-12003",
+      "expected": [
+        {
+          "start": 21,
+          "end": 30,
+          "entity_type": "EMPLOYEE_ID"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0052",
+      "category": "table",
+      "text": "Owner | Employee | Email\nNora Vale | EMP-12003 | nora.vale@example.com",
+      "expected": [
+        {
+          "start": 25,
+          "end": 34,
+          "entity_type": "PERSON"
+        },
+        {
+          "start": 37,
+          "end": 46,
+          "entity_type": "EMPLOYEE_ID"
+        },
+        {
+          "start": 49,
+          "end": 70,
+          "entity_type": "EMAIL_ADDRESS"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "heldout"
+    },
+    {
+      "id": "S0053",
+      "category": "adjacent_email",
+      "text": "Nora Vale <nora.vale@example.com>",
+      "expected": [
+        {
+          "start": 0,
+          "end": 9,
+          "entity_type": "PERSON"
+        },
+        {
+          "start": 11,
+          "end": 32,
+          "entity_type": "EMAIL_ADDRESS"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0054",
+      "category": "duplicate_context",
+      "text": "Owner: Nora Vale. Reviewed by: Nora Vale.",
+      "expected": [
+        {
+          "start": 7,
+          "end": 16,
+          "entity_type": "PERSON"
+        },
+        {
+          "start": 31,
+          "end": 40,
+          "entity_type": "PERSON"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "heldout"
+    },
+    {
+      "id": "S0055",
+      "category": "ocr_name",
+      "text": "NoraVale is the policy author.",
+      "expected": [
+        {
+          "start": 0,
+          "end": 8,
+          "entity_type": "PERSON"
+        }
+      ],
+      "non_pii": [],
+      "notes": "Synthetic OCR concatenation; exact source span required, no invented spaces.",
+      "split": "heldout"
+    },
+    {
+      "id": "S0056",
+      "category": "malformed_employee",
+      "text": "Release code EMP-12003X; employee field unavailable.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 13,
+          "end": 23,
+          "entity_type": "EMPLOYEE_ID"
+        }
+      ],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0057",
+      "category": "malformed_email",
+      "text": "Contact field: nora..vale@example.com",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 15,
+          "end": 37,
+          "entity_type": "EMAIL_ADDRESS"
+        }
+      ],
+      "notes": "Consecutive dots invalidate the unquoted local part; substring is not a gold match.",
+      "split": "heldout"
+    },
+    {
+      "id": "S0058",
+      "category": "numeric_business",
+      "text": "Revenue amount: 2125550103 dollars; growth 4%.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 16,
+          "end": 26,
+          "entity_type": "PHONE_NUMBER"
+        }
+      ],
+      "notes": "",
+      "split": "heldout"
+    },
+    {
+      "id": "S0059",
+      "category": "account",
+      "text": "Bank account number: 73000003",
+      "expected": [
+        {
+          "start": 21,
+          "end": 29,
+          "entity_type": "US_BANK_NUMBER"
+        }
+      ],
+      "non_pii": [],
+      "notes": "Explicit bank account context supports policy PII; may need review.",
+      "split": "development"
+    },
+    {
+      "id": "S0060",
+      "category": "code",
+      "text": "Internal project code ZX-2125550103; Account 12348.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 25,
+          "end": 35,
+          "entity_type": "PHONE_NUMBER"
+        },
+        {
+          "start": 45,
+          "end": 50,
+          "entity_type": "US_BANK_NUMBER"
+        }
+      ],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0061",
+      "category": "person",
+      "text": "Policy owner: Ethan Reed.",
+      "expected": [
+        {
+          "start": 14,
+          "end": 24,
+          "entity_type": "PERSON"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0062",
+      "category": "header",
+      "text": "Ethan Reed\nQuarterly governance report",
+      "expected": [
+        {
+          "start": 0,
+          "end": 10,
+          "entity_type": "PERSON"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "heldout"
+    },
+    {
+      "id": "S0063",
+      "category": "title_name",
+      "text": "Chief Risk Officer: Ethan Reed.",
+      "expected": [
+        {
+          "start": 20,
+          "end": 30,
+          "entity_type": "PERSON"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "heldout"
+    },
+    {
+      "id": "S0064",
+      "category": "email",
+      "text": "Contact: ethan.reed@example.com",
+      "expected": [
+        {
+          "start": 9,
+          "end": 31,
+          "entity_type": "EMAIL_ADDRESS"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0065",
+      "category": "phone",
+      "text": "Telephone: +1 (212) 555-0104",
+      "expected": [
+        {
+          "start": 11,
+          "end": 28,
+          "entity_type": "PHONE_NUMBER"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0066",
+      "category": "employee",
+      "text": "Employee identifier: EMP-12004",
+      "expected": [
+        {
+          "start": 21,
+          "end": 30,
+          "entity_type": "EMPLOYEE_ID"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0067",
+      "category": "table",
+      "text": "Owner | Employee | Email\nEthan Reed | EMP-12004 | ethan.reed@example.com",
+      "expected": [
+        {
+          "start": 25,
+          "end": 35,
+          "entity_type": "PERSON"
+        },
+        {
+          "start": 38,
+          "end": 47,
+          "entity_type": "EMPLOYEE_ID"
+        },
+        {
+          "start": 50,
+          "end": 72,
+          "entity_type": "EMAIL_ADDRESS"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0068",
+      "category": "adjacent_email",
+      "text": "Ethan Reed <ethan.reed@example.com>",
+      "expected": [
+        {
+          "start": 0,
+          "end": 10,
+          "entity_type": "PERSON"
+        },
+        {
+          "start": 12,
+          "end": 34,
+          "entity_type": "EMAIL_ADDRESS"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "heldout"
+    },
+    {
+      "id": "S0069",
+      "category": "duplicate_context",
+      "text": "Owner: Ethan Reed. Reviewed by: Ethan Reed.",
+      "expected": [
+        {
+          "start": 7,
+          "end": 17,
+          "entity_type": "PERSON"
+        },
+        {
+          "start": 32,
+          "end": 42,
+          "entity_type": "PERSON"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0070",
+      "category": "ocr_name",
+      "text": "EthanReed is the policy author.",
+      "expected": [
+        {
+          "start": 0,
+          "end": 9,
+          "entity_type": "PERSON"
+        }
+      ],
+      "non_pii": [],
+      "notes": "Synthetic OCR concatenation; exact source span required, no invented spaces.",
+      "split": "development"
+    },
+    {
+      "id": "S0071",
+      "category": "malformed_employee",
+      "text": "Release code EMP-12004X; employee field unavailable.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 13,
+          "end": 23,
+          "entity_type": "EMPLOYEE_ID"
+        }
+      ],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0072",
+      "category": "malformed_email",
+      "text": "Contact field: ethan..reed@example.com",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 15,
+          "end": 38,
+          "entity_type": "EMAIL_ADDRESS"
+        }
+      ],
+      "notes": "Consecutive dots invalidate the unquoted local part; substring is not a gold match.",
+      "split": "development"
+    },
+    {
+      "id": "S0073",
+      "category": "numeric_business",
+      "text": "Revenue amount: 2125550104 dollars; growth 5%.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 16,
+          "end": 26,
+          "entity_type": "PHONE_NUMBER"
+        }
+      ],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0074",
+      "category": "account",
+      "text": "Bank account number: 73000004",
+      "expected": [
+        {
+          "start": 21,
+          "end": 29,
+          "entity_type": "US_BANK_NUMBER"
+        }
+      ],
+      "non_pii": [],
+      "notes": "Explicit bank account context supports policy PII; may need review.",
+      "split": "development"
+    },
+    {
+      "id": "S0075",
+      "category": "code",
+      "text": "Internal project code ZX-2125550104; Account 12349.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 25,
+          "end": 35,
+          "entity_type": "PHONE_NUMBER"
+        },
+        {
+          "start": 45,
+          "end": 50,
+          "entity_type": "US_BANK_NUMBER"
+        }
+      ],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0076",
+      "category": "person",
+      "text": "Policy owner: Clara Finch.",
+      "expected": [
+        {
+          "start": 14,
+          "end": 25,
+          "entity_type": "PERSON"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0077",
+      "category": "header",
+      "text": "Clara Finch\nQuarterly governance report",
+      "expected": [
+        {
+          "start": 0,
+          "end": 11,
+          "entity_type": "PERSON"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0078",
+      "category": "title_name",
+      "text": "Chief Risk Officer: Clara Finch.",
+      "expected": [
+        {
+          "start": 20,
+          "end": 31,
+          "entity_type": "PERSON"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0079",
+      "category": "email",
+      "text": "Contact: clara.finch@example.com",
+      "expected": [
+        {
+          "start": 9,
+          "end": 32,
+          "entity_type": "EMAIL_ADDRESS"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0080",
+      "category": "phone",
+      "text": "Telephone: +1 (212) 555-0105",
+      "expected": [
+        {
+          "start": 11,
+          "end": 28,
+          "entity_type": "PHONE_NUMBER"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0081",
+      "category": "employee",
+      "text": "Employee identifier: EMP-12005",
+      "expected": [
+        {
+          "start": 21,
+          "end": 30,
+          "entity_type": "EMPLOYEE_ID"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "heldout"
+    },
+    {
+      "id": "S0082",
+      "category": "table",
+      "text": "Owner | Employee | Email\nClara Finch | EMP-12005 | clara.finch@example.com",
+      "expected": [
+        {
+          "start": 25,
+          "end": 36,
+          "entity_type": "PERSON"
+        },
+        {
+          "start": 39,
+          "end": 48,
+          "entity_type": "EMPLOYEE_ID"
+        },
+        {
+          "start": 51,
+          "end": 74,
+          "entity_type": "EMAIL_ADDRESS"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0083",
+      "category": "adjacent_email",
+      "text": "Clara Finch <clara.finch@example.com>",
+      "expected": [
+        {
+          "start": 0,
+          "end": 11,
+          "entity_type": "PERSON"
+        },
+        {
+          "start": 13,
+          "end": 36,
+          "entity_type": "EMAIL_ADDRESS"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0084",
+      "category": "duplicate_context",
+      "text": "Owner: Clara Finch. Reviewed by: Clara Finch.",
+      "expected": [
+        {
+          "start": 7,
+          "end": 18,
+          "entity_type": "PERSON"
+        },
+        {
+          "start": 33,
+          "end": 44,
+          "entity_type": "PERSON"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "heldout"
+    },
+    {
+      "id": "S0085",
+      "category": "ocr_name",
+      "text": "ClaraFinch is the policy author.",
+      "expected": [
+        {
+          "start": 0,
+          "end": 10,
+          "entity_type": "PERSON"
+        }
+      ],
+      "non_pii": [],
+      "notes": "Synthetic OCR concatenation; exact source span required, no invented spaces.",
+      "split": "development"
+    },
+    {
+      "id": "S0086",
+      "category": "malformed_employee",
+      "text": "Release code EMP-12005X; employee field unavailable.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 13,
+          "end": 23,
+          "entity_type": "EMPLOYEE_ID"
+        }
+      ],
+      "notes": "",
+      "split": "heldout"
+    },
+    {
+      "id": "S0087",
+      "category": "malformed_email",
+      "text": "Contact field: clara..finch@example.com",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 15,
+          "end": 39,
+          "entity_type": "EMAIL_ADDRESS"
+        }
+      ],
+      "notes": "Consecutive dots invalidate the unquoted local part; substring is not a gold match.",
+      "split": "development"
+    },
+    {
+      "id": "S0088",
+      "category": "numeric_business",
+      "text": "Revenue amount: 2125550105 dollars; growth 6%.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 16,
+          "end": 26,
+          "entity_type": "PHONE_NUMBER"
+        }
+      ],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0089",
+      "category": "account",
+      "text": "Bank account number: 73000005",
+      "expected": [
+        {
+          "start": 21,
+          "end": 29,
+          "entity_type": "US_BANK_NUMBER"
+        }
+      ],
+      "non_pii": [],
+      "notes": "Explicit bank account context supports policy PII; may need review.",
+      "split": "development"
+    },
+    {
+      "id": "S0090",
+      "category": "code",
+      "text": "Internal project code ZX-2125550105; Account 12350.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 25,
+          "end": 35,
+          "entity_type": "PHONE_NUMBER"
+        },
+        {
+          "start": 45,
+          "end": 50,
+          "entity_type": "US_BANK_NUMBER"
+        }
+      ],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0091",
+      "category": "person",
+      "text": "Policy owner: Felix Marsh.",
+      "expected": [
+        {
+          "start": 14,
+          "end": 25,
+          "entity_type": "PERSON"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0092",
+      "category": "header",
+      "text": "Felix Marsh\nQuarterly governance report",
+      "expected": [
+        {
+          "start": 0,
+          "end": 11,
+          "entity_type": "PERSON"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0093",
+      "category": "title_name",
+      "text": "Chief Risk Officer: Felix Marsh.",
+      "expected": [
+        {
+          "start": 20,
+          "end": 31,
+          "entity_type": "PERSON"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "heldout"
+    },
+    {
+      "id": "S0094",
+      "category": "email",
+      "text": "Contact: felix.marsh@example.com",
+      "expected": [
+        {
+          "start": 9,
+          "end": 32,
+          "entity_type": "EMAIL_ADDRESS"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0095",
+      "category": "phone",
+      "text": "Telephone: +1 (212) 555-0106",
+      "expected": [
+        {
+          "start": 11,
+          "end": 28,
+          "entity_type": "PHONE_NUMBER"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0096",
+      "category": "employee",
+      "text": "Employee identifier: EMP-12006",
+      "expected": [
+        {
+          "start": 21,
+          "end": 30,
+          "entity_type": "EMPLOYEE_ID"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "heldout"
+    },
+    {
+      "id": "S0097",
+      "category": "table",
+      "text": "Owner | Employee | Email\nFelix Marsh | EMP-12006 | felix.marsh@example.com",
+      "expected": [
+        {
+          "start": 25,
+          "end": 36,
+          "entity_type": "PERSON"
+        },
+        {
+          "start": 39,
+          "end": 48,
+          "entity_type": "EMPLOYEE_ID"
+        },
+        {
+          "start": 51,
+          "end": 74,
+          "entity_type": "EMAIL_ADDRESS"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0098",
+      "category": "adjacent_email",
+      "text": "Felix Marsh <felix.marsh@example.com>",
+      "expected": [
+        {
+          "start": 0,
+          "end": 11,
+          "entity_type": "PERSON"
+        },
+        {
+          "start": 13,
+          "end": 36,
+          "entity_type": "EMAIL_ADDRESS"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "heldout"
+    },
+    {
+      "id": "S0099",
+      "category": "duplicate_context",
+      "text": "Owner: Felix Marsh. Reviewed by: Felix Marsh.",
+      "expected": [
+        {
+          "start": 7,
+          "end": 18,
+          "entity_type": "PERSON"
+        },
+        {
+          "start": 33,
+          "end": 44,
+          "entity_type": "PERSON"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0100",
+      "category": "ocr_name",
+      "text": "FelixMarsh is the policy author.",
+      "expected": [
+        {
+          "start": 0,
+          "end": 10,
+          "entity_type": "PERSON"
+        }
+      ],
+      "non_pii": [],
+      "notes": "Synthetic OCR concatenation; exact source span required, no invented spaces.",
+      "split": "heldout"
+    },
+    {
+      "id": "S0101",
+      "category": "malformed_employee",
+      "text": "Release code EMP-12006X; employee field unavailable.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 13,
+          "end": 23,
+          "entity_type": "EMPLOYEE_ID"
+        }
+      ],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0102",
+      "category": "malformed_email",
+      "text": "Contact field: felix..marsh@example.com",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 15,
+          "end": 39,
+          "entity_type": "EMAIL_ADDRESS"
+        }
+      ],
+      "notes": "Consecutive dots invalidate the unquoted local part; substring is not a gold match.",
+      "split": "development"
+    },
+    {
+      "id": "S0103",
+      "category": "numeric_business",
+      "text": "Revenue amount: 2125550106 dollars; growth 7%.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 16,
+          "end": 26,
+          "entity_type": "PHONE_NUMBER"
+        }
+      ],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0104",
+      "category": "account",
+      "text": "Bank account number: 73000006",
+      "expected": [
+        {
+          "start": 21,
+          "end": 29,
+          "entity_type": "US_BANK_NUMBER"
+        }
+      ],
+      "non_pii": [],
+      "notes": "Explicit bank account context supports policy PII; may need review.",
+      "split": "development"
+    },
+    {
+      "id": "S0105",
+      "category": "code",
+      "text": "Internal project code ZX-2125550106; Account 12351.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 25,
+          "end": 35,
+          "entity_type": "PHONE_NUMBER"
+        },
+        {
+          "start": 45,
+          "end": 50,
+          "entity_type": "US_BANK_NUMBER"
+        }
+      ],
+      "notes": "",
+      "split": "heldout"
+    },
+    {
+      "id": "S0106",
+      "category": "person",
+      "text": "Policy owner: Iris Rowan.",
+      "expected": [
+        {
+          "start": 14,
+          "end": 24,
+          "entity_type": "PERSON"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0107",
+      "category": "header",
+      "text": "Iris Rowan\nQuarterly governance report",
+      "expected": [
+        {
+          "start": 0,
+          "end": 10,
+          "entity_type": "PERSON"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "heldout"
+    },
+    {
+      "id": "S0108",
+      "category": "title_name",
+      "text": "Chief Risk Officer: Iris Rowan.",
+      "expected": [
+        {
+          "start": 20,
+          "end": 30,
+          "entity_type": "PERSON"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0109",
+      "category": "email",
+      "text": "Contact: iris.rowan@example.com",
+      "expected": [
+        {
+          "start": 9,
+          "end": 31,
+          "entity_type": "EMAIL_ADDRESS"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0110",
+      "category": "phone",
+      "text": "Telephone: +1 (212) 555-0107",
+      "expected": [
+        {
+          "start": 11,
+          "end": 28,
+          "entity_type": "PHONE_NUMBER"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0111",
+      "category": "employee",
+      "text": "Employee identifier: EMP-12007",
+      "expected": [
+        {
+          "start": 21,
+          "end": 30,
+          "entity_type": "EMPLOYEE_ID"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0112",
+      "category": "table",
+      "text": "Owner | Employee | Email\nIris Rowan | EMP-12007 | iris.rowan@example.com",
+      "expected": [
+        {
+          "start": 25,
+          "end": 35,
+          "entity_type": "PERSON"
+        },
+        {
+          "start": 38,
+          "end": 47,
+          "entity_type": "EMPLOYEE_ID"
+        },
+        {
+          "start": 50,
+          "end": 72,
+          "entity_type": "EMAIL_ADDRESS"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0113",
+      "category": "adjacent_email",
+      "text": "Iris Rowan <iris.rowan@example.com>",
+      "expected": [
+        {
+          "start": 0,
+          "end": 10,
+          "entity_type": "PERSON"
+        },
+        {
+          "start": 12,
+          "end": 34,
+          "entity_type": "EMAIL_ADDRESS"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0114",
+      "category": "duplicate_context",
+      "text": "Owner: Iris Rowan. Reviewed by: Iris Rowan.",
+      "expected": [
+        {
+          "start": 7,
+          "end": 17,
+          "entity_type": "PERSON"
+        },
+        {
+          "start": 32,
+          "end": 42,
+          "entity_type": "PERSON"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0115",
+      "category": "ocr_name",
+      "text": "IrisRowan is the policy author.",
+      "expected": [
+        {
+          "start": 0,
+          "end": 9,
+          "entity_type": "PERSON"
+        }
+      ],
+      "non_pii": [],
+      "notes": "Synthetic OCR concatenation; exact source span required, no invented spaces.",
+      "split": "heldout"
+    },
+    {
+      "id": "S0116",
+      "category": "malformed_employee",
+      "text": "Release code EMP-12007X; employee field unavailable.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 13,
+          "end": 23,
+          "entity_type": "EMPLOYEE_ID"
+        }
+      ],
+      "notes": "",
+      "split": "heldout"
+    },
+    {
+      "id": "S0117",
+      "category": "malformed_email",
+      "text": "Contact field: iris..rowan@example.com",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 15,
+          "end": 38,
+          "entity_type": "EMAIL_ADDRESS"
+        }
+      ],
+      "notes": "Consecutive dots invalidate the unquoted local part; substring is not a gold match.",
+      "split": "heldout"
+    },
+    {
+      "id": "S0118",
+      "category": "numeric_business",
+      "text": "Revenue amount: 2125550107 dollars; growth 8%.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 16,
+          "end": 26,
+          "entity_type": "PHONE_NUMBER"
+        }
+      ],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0119",
+      "category": "account",
+      "text": "Bank account number: 73000007",
+      "expected": [
+        {
+          "start": 21,
+          "end": 29,
+          "entity_type": "US_BANK_NUMBER"
+        }
+      ],
+      "non_pii": [],
+      "notes": "Explicit bank account context supports policy PII; may need review.",
+      "split": "development"
+    },
+    {
+      "id": "S0120",
+      "category": "code",
+      "text": "Internal project code ZX-2125550107; Account 12352.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 25,
+          "end": 35,
+          "entity_type": "PHONE_NUMBER"
+        },
+        {
+          "start": 45,
+          "end": 50,
+          "entity_type": "US_BANK_NUMBER"
+        }
+      ],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0121",
+      "category": "person",
+      "text": "Policy owner: Leo Cedar.",
+      "expected": [
+        {
+          "start": 14,
+          "end": 23,
+          "entity_type": "PERSON"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "heldout"
+    },
+    {
+      "id": "S0122",
+      "category": "header",
+      "text": "Leo Cedar\nQuarterly governance report",
+      "expected": [
+        {
+          "start": 0,
+          "end": 9,
+          "entity_type": "PERSON"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0123",
+      "category": "title_name",
+      "text": "Chief Risk Officer: Leo Cedar.",
+      "expected": [
+        {
+          "start": 20,
+          "end": 29,
+          "entity_type": "PERSON"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "heldout"
+    },
+    {
+      "id": "S0124",
+      "category": "email",
+      "text": "Contact: leo.cedar@example.com",
+      "expected": [
+        {
+          "start": 9,
+          "end": 30,
+          "entity_type": "EMAIL_ADDRESS"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "heldout"
+    },
+    {
+      "id": "S0125",
+      "category": "phone",
+      "text": "Telephone: +1 (212) 555-0108",
+      "expected": [
+        {
+          "start": 11,
+          "end": 28,
+          "entity_type": "PHONE_NUMBER"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0126",
+      "category": "employee",
+      "text": "Employee identifier: EMP-12008",
+      "expected": [
+        {
+          "start": 21,
+          "end": 30,
+          "entity_type": "EMPLOYEE_ID"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0127",
+      "category": "table",
+      "text": "Owner | Employee | Email\nLeo Cedar | EMP-12008 | leo.cedar@example.com",
+      "expected": [
+        {
+          "start": 25,
+          "end": 34,
+          "entity_type": "PERSON"
+        },
+        {
+          "start": 37,
+          "end": 46,
+          "entity_type": "EMPLOYEE_ID"
+        },
+        {
+          "start": 49,
+          "end": 70,
+          "entity_type": "EMAIL_ADDRESS"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0128",
+      "category": "adjacent_email",
+      "text": "Leo Cedar <leo.cedar@example.com>",
+      "expected": [
+        {
+          "start": 0,
+          "end": 9,
+          "entity_type": "PERSON"
+        },
+        {
+          "start": 11,
+          "end": 32,
+          "entity_type": "EMAIL_ADDRESS"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "heldout"
+    },
+    {
+      "id": "S0129",
+      "category": "duplicate_context",
+      "text": "Owner: Leo Cedar. Reviewed by: Leo Cedar.",
+      "expected": [
+        {
+          "start": 7,
+          "end": 16,
+          "entity_type": "PERSON"
+        },
+        {
+          "start": 31,
+          "end": 40,
+          "entity_type": "PERSON"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "heldout"
+    },
+    {
+      "id": "S0130",
+      "category": "ocr_name",
+      "text": "LeoCedar is the policy author.",
+      "expected": [
+        {
+          "start": 0,
+          "end": 8,
+          "entity_type": "PERSON"
+        }
+      ],
+      "non_pii": [],
+      "notes": "Synthetic OCR concatenation; exact source span required, no invented spaces.",
+      "split": "development"
+    },
+    {
+      "id": "S0131",
+      "category": "malformed_employee",
+      "text": "Release code EMP-12008X; employee field unavailable.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 13,
+          "end": 23,
+          "entity_type": "EMPLOYEE_ID"
+        }
+      ],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0132",
+      "category": "malformed_email",
+      "text": "Contact field: leo..cedar@example.com",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 15,
+          "end": 37,
+          "entity_type": "EMAIL_ADDRESS"
+        }
+      ],
+      "notes": "Consecutive dots invalidate the unquoted local part; substring is not a gold match.",
+      "split": "heldout"
+    },
+    {
+      "id": "S0133",
+      "category": "numeric_business",
+      "text": "Revenue amount: 2125550108 dollars; growth 9%.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 16,
+          "end": 26,
+          "entity_type": "PHONE_NUMBER"
+        }
+      ],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0134",
+      "category": "account",
+      "text": "Bank account number: 73000008",
+      "expected": [
+        {
+          "start": 21,
+          "end": 29,
+          "entity_type": "US_BANK_NUMBER"
+        }
+      ],
+      "non_pii": [],
+      "notes": "Explicit bank account context supports policy PII; may need review.",
+      "split": "development"
+    },
+    {
+      "id": "S0135",
+      "category": "code",
+      "text": "Internal project code ZX-2125550108; Account 12353.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 25,
+          "end": 35,
+          "entity_type": "PHONE_NUMBER"
+        },
+        {
+          "start": 45,
+          "end": 50,
+          "entity_type": "US_BANK_NUMBER"
+        }
+      ],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0136",
+      "category": "person",
+      "text": "Policy owner: Maya Stone.",
+      "expected": [
+        {
+          "start": 14,
+          "end": 24,
+          "entity_type": "PERSON"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0137",
+      "category": "header",
+      "text": "Maya Stone\nQuarterly governance report",
+      "expected": [
+        {
+          "start": 0,
+          "end": 10,
+          "entity_type": "PERSON"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0138",
+      "category": "title_name",
+      "text": "Chief Risk Officer: Maya Stone.",
+      "expected": [
+        {
+          "start": 20,
+          "end": 30,
+          "entity_type": "PERSON"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0139",
+      "category": "email",
+      "text": "Contact: maya.stone@example.com",
+      "expected": [
+        {
+          "start": 9,
+          "end": 31,
+          "entity_type": "EMAIL_ADDRESS"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0140",
+      "category": "phone",
+      "text": "Telephone: +1 (212) 555-0109",
+      "expected": [
+        {
+          "start": 11,
+          "end": 28,
+          "entity_type": "PHONE_NUMBER"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "heldout"
+    },
+    {
+      "id": "S0141",
+      "category": "employee",
+      "text": "Employee identifier: EMP-12009",
+      "expected": [
+        {
+          "start": 21,
+          "end": 30,
+          "entity_type": "EMPLOYEE_ID"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0142",
+      "category": "table",
+      "text": "Owner | Employee | Email\nMaya Stone | EMP-12009 | maya.stone@example.com",
+      "expected": [
+        {
+          "start": 25,
+          "end": 35,
+          "entity_type": "PERSON"
+        },
+        {
+          "start": 38,
+          "end": 47,
+          "entity_type": "EMPLOYEE_ID"
+        },
+        {
+          "start": 50,
+          "end": 72,
+          "entity_type": "EMAIL_ADDRESS"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "heldout"
+    },
+    {
+      "id": "S0143",
+      "category": "adjacent_email",
+      "text": "Maya Stone <maya.stone@example.com>",
+      "expected": [
+        {
+          "start": 0,
+          "end": 10,
+          "entity_type": "PERSON"
+        },
+        {
+          "start": 12,
+          "end": 34,
+          "entity_type": "EMAIL_ADDRESS"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0144",
+      "category": "duplicate_context",
+      "text": "Owner: Maya Stone. Reviewed by: Maya Stone.",
+      "expected": [
+        {
+          "start": 7,
+          "end": 17,
+          "entity_type": "PERSON"
+        },
+        {
+          "start": 32,
+          "end": 42,
+          "entity_type": "PERSON"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0145",
+      "category": "ocr_name",
+      "text": "MayaStone is the policy author.",
+      "expected": [
+        {
+          "start": 0,
+          "end": 9,
+          "entity_type": "PERSON"
+        }
+      ],
+      "non_pii": [],
+      "notes": "Synthetic OCR concatenation; exact source span required, no invented spaces.",
+      "split": "development"
+    },
+    {
+      "id": "S0146",
+      "category": "malformed_employee",
+      "text": "Release code EMP-12009X; employee field unavailable.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 13,
+          "end": 23,
+          "entity_type": "EMPLOYEE_ID"
+        }
+      ],
+      "notes": "",
+      "split": "heldout"
+    },
+    {
+      "id": "S0147",
+      "category": "malformed_email",
+      "text": "Contact field: maya..stone@example.com",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 15,
+          "end": 38,
+          "entity_type": "EMAIL_ADDRESS"
+        }
+      ],
+      "notes": "Consecutive dots invalidate the unquoted local part; substring is not a gold match.",
+      "split": "development"
+    },
+    {
+      "id": "S0148",
+      "category": "numeric_business",
+      "text": "Revenue amount: 2125550109 dollars; growth 10%.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 16,
+          "end": 26,
+          "entity_type": "PHONE_NUMBER"
+        }
+      ],
+      "notes": "",
+      "split": "heldout"
+    },
+    {
+      "id": "S0149",
+      "category": "account",
+      "text": "Bank account number: 73000009",
+      "expected": [
+        {
+          "start": 21,
+          "end": 29,
+          "entity_type": "US_BANK_NUMBER"
+        }
+      ],
+      "non_pii": [],
+      "notes": "Explicit bank account context supports policy PII; may need review.",
+      "split": "development"
+    },
+    {
+      "id": "S0150",
+      "category": "code",
+      "text": "Internal project code ZX-2125550109; Account 12354.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 25,
+          "end": 35,
+          "entity_type": "PHONE_NUMBER"
+        },
+        {
+          "start": 45,
+          "end": 50,
+          "entity_type": "US_BANK_NUMBER"
+        }
+      ],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0151",
+      "category": "person",
+      "text": "Policy owner: Ada Briar.",
+      "expected": [
+        {
+          "start": 14,
+          "end": 23,
+          "entity_type": "PERSON"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0152",
+      "category": "header",
+      "text": "Ada Briar\nQuarterly governance report",
+      "expected": [
+        {
+          "start": 0,
+          "end": 9,
+          "entity_type": "PERSON"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "heldout"
+    },
+    {
+      "id": "S0153",
+      "category": "title_name",
+      "text": "Chief Risk Officer: Ada Briar.",
+      "expected": [
+        {
+          "start": 20,
+          "end": 29,
+          "entity_type": "PERSON"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0154",
+      "category": "email",
+      "text": "Contact: ada.briar@example.com",
+      "expected": [
+        {
+          "start": 9,
+          "end": 30,
+          "entity_type": "EMAIL_ADDRESS"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0155",
+      "category": "phone",
+      "text": "Telephone: +1 (212) 555-0110",
+      "expected": [
+        {
+          "start": 11,
+          "end": 28,
+          "entity_type": "PHONE_NUMBER"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "heldout"
+    },
+    {
+      "id": "S0156",
+      "category": "employee",
+      "text": "Employee identifier: EMP-12010",
+      "expected": [
+        {
+          "start": 21,
+          "end": 30,
+          "entity_type": "EMPLOYEE_ID"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0157",
+      "category": "table",
+      "text": "Owner | Employee | Email\nAda Briar | EMP-12010 | ada.briar@example.com",
+      "expected": [
+        {
+          "start": 25,
+          "end": 34,
+          "entity_type": "PERSON"
+        },
+        {
+          "start": 37,
+          "end": 46,
+          "entity_type": "EMPLOYEE_ID"
+        },
+        {
+          "start": 49,
+          "end": 70,
+          "entity_type": "EMAIL_ADDRESS"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "heldout"
+    },
+    {
+      "id": "S0158",
+      "category": "adjacent_email",
+      "text": "Ada Briar <ada.briar@example.com>",
+      "expected": [
+        {
+          "start": 0,
+          "end": 9,
+          "entity_type": "PERSON"
+        },
+        {
+          "start": 11,
+          "end": 32,
+          "entity_type": "EMAIL_ADDRESS"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0159",
+      "category": "duplicate_context",
+      "text": "Owner: Ada Briar. Reviewed by: Ada Briar.",
+      "expected": [
+        {
+          "start": 7,
+          "end": 16,
+          "entity_type": "PERSON"
+        },
+        {
+          "start": 31,
+          "end": 40,
+          "entity_type": "PERSON"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0160",
+      "category": "ocr_name",
+      "text": "AdaBriar is the policy author.",
+      "expected": [
+        {
+          "start": 0,
+          "end": 8,
+          "entity_type": "PERSON"
+        }
+      ],
+      "non_pii": [],
+      "notes": "Synthetic OCR concatenation; exact source span required, no invented spaces.",
+      "split": "heldout"
+    },
+    {
+      "id": "S0161",
+      "category": "malformed_employee",
+      "text": "Release code EMP-12010X; employee field unavailable.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 13,
+          "end": 23,
+          "entity_type": "EMPLOYEE_ID"
+        }
+      ],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0162",
+      "category": "malformed_email",
+      "text": "Contact field: ada..briar@example.com",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 15,
+          "end": 37,
+          "entity_type": "EMAIL_ADDRESS"
+        }
+      ],
+      "notes": "Consecutive dots invalidate the unquoted local part; substring is not a gold match.",
+      "split": "development"
+    },
+    {
+      "id": "S0163",
+      "category": "numeric_business",
+      "text": "Revenue amount: 2125550110 dollars; growth 11%.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 16,
+          "end": 26,
+          "entity_type": "PHONE_NUMBER"
+        }
+      ],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0164",
+      "category": "account",
+      "text": "Bank account number: 73000010",
+      "expected": [
+        {
+          "start": 21,
+          "end": 29,
+          "entity_type": "US_BANK_NUMBER"
+        }
+      ],
+      "non_pii": [],
+      "notes": "Explicit bank account context supports policy PII; may need review.",
+      "split": "development"
+    },
+    {
+      "id": "S0165",
+      "category": "code",
+      "text": "Internal project code ZX-2125550110; Account 12355.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 25,
+          "end": 35,
+          "entity_type": "PHONE_NUMBER"
+        },
+        {
+          "start": 45,
+          "end": 50,
+          "entity_type": "US_BANK_NUMBER"
+        }
+      ],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0166",
+      "category": "person",
+      "text": "Policy owner: Theo West.",
+      "expected": [
+        {
+          "start": 14,
+          "end": 23,
+          "entity_type": "PERSON"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "heldout"
+    },
+    {
+      "id": "S0167",
+      "category": "header",
+      "text": "Theo West\nQuarterly governance report",
+      "expected": [
+        {
+          "start": 0,
+          "end": 9,
+          "entity_type": "PERSON"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "heldout"
+    },
+    {
+      "id": "S0168",
+      "category": "title_name",
+      "text": "Chief Risk Officer: Theo West.",
+      "expected": [
+        {
+          "start": 20,
+          "end": 29,
+          "entity_type": "PERSON"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0169",
+      "category": "email",
+      "text": "Contact: theo.west@example.com",
+      "expected": [
+        {
+          "start": 9,
+          "end": 30,
+          "entity_type": "EMAIL_ADDRESS"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0170",
+      "category": "phone",
+      "text": "Telephone: +1 (212) 555-0111",
+      "expected": [
+        {
+          "start": 11,
+          "end": 28,
+          "entity_type": "PHONE_NUMBER"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0171",
+      "category": "employee",
+      "text": "Employee identifier: EMP-12011",
+      "expected": [
+        {
+          "start": 21,
+          "end": 30,
+          "entity_type": "EMPLOYEE_ID"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0172",
+      "category": "table",
+      "text": "Owner | Employee | Email\nTheo West | EMP-12011 | theo.west@example.com",
+      "expected": [
+        {
+          "start": 25,
+          "end": 34,
+          "entity_type": "PERSON"
+        },
+        {
+          "start": 37,
+          "end": 46,
+          "entity_type": "EMPLOYEE_ID"
+        },
+        {
+          "start": 49,
+          "end": 70,
+          "entity_type": "EMAIL_ADDRESS"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0173",
+      "category": "adjacent_email",
+      "text": "Theo West <theo.west@example.com>",
+      "expected": [
+        {
+          "start": 0,
+          "end": 9,
+          "entity_type": "PERSON"
+        },
+        {
+          "start": 11,
+          "end": 32,
+          "entity_type": "EMAIL_ADDRESS"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "heldout"
+    },
+    {
+      "id": "S0174",
+      "category": "duplicate_context",
+      "text": "Owner: Theo West. Reviewed by: Theo West.",
+      "expected": [
+        {
+          "start": 7,
+          "end": 16,
+          "entity_type": "PERSON"
+        },
+        {
+          "start": 31,
+          "end": 40,
+          "entity_type": "PERSON"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "heldout"
+    },
+    {
+      "id": "S0175",
+      "category": "ocr_name",
+      "text": "TheoWest is the policy author.",
+      "expected": [
+        {
+          "start": 0,
+          "end": 8,
+          "entity_type": "PERSON"
+        }
+      ],
+      "non_pii": [],
+      "notes": "Synthetic OCR concatenation; exact source span required, no invented spaces.",
+      "split": "development"
+    },
+    {
+      "id": "S0176",
+      "category": "malformed_employee",
+      "text": "Release code EMP-12011X; employee field unavailable.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 13,
+          "end": 23,
+          "entity_type": "EMPLOYEE_ID"
+        }
+      ],
+      "notes": "",
+      "split": "heldout"
+    },
+    {
+      "id": "S0177",
+      "category": "malformed_email",
+      "text": "Contact field: theo..west@example.com",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 15,
+          "end": 37,
+          "entity_type": "EMAIL_ADDRESS"
+        }
+      ],
+      "notes": "Consecutive dots invalidate the unquoted local part; substring is not a gold match.",
+      "split": "development"
+    },
+    {
+      "id": "S0178",
+      "category": "numeric_business",
+      "text": "Revenue amount: 2125550111 dollars; growth 12%.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 16,
+          "end": 26,
+          "entity_type": "PHONE_NUMBER"
+        }
+      ],
+      "notes": "",
+      "split": "heldout"
+    },
+    {
+      "id": "S0179",
+      "category": "account",
+      "text": "Bank account number: 73000011",
+      "expected": [
+        {
+          "start": 21,
+          "end": 29,
+          "entity_type": "US_BANK_NUMBER"
+        }
+      ],
+      "non_pii": [],
+      "notes": "Explicit bank account context supports policy PII; may need review.",
+      "split": "development"
+    },
+    {
+      "id": "S0180",
+      "category": "code",
+      "text": "Internal project code ZX-2125550111; Account 12356.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 25,
+          "end": 35,
+          "entity_type": "PHONE_NUMBER"
+        },
+        {
+          "start": 45,
+          "end": 50,
+          "entity_type": "US_BANK_NUMBER"
+        }
+      ],
+      "notes": "",
+      "split": "heldout"
+    },
+    {
+      "id": "S0181",
+      "category": "person",
+      "text": "Policy owner: Elena Field.",
+      "expected": [
+        {
+          "start": 14,
+          "end": 25,
+          "entity_type": "PERSON"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "heldout"
+    },
+    {
+      "id": "S0182",
+      "category": "header",
+      "text": "Elena Field\nQuarterly governance report",
+      "expected": [
+        {
+          "start": 0,
+          "end": 11,
+          "entity_type": "PERSON"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0183",
+      "category": "title_name",
+      "text": "Chief Risk Officer: Elena Field.",
+      "expected": [
+        {
+          "start": 20,
+          "end": 31,
+          "entity_type": "PERSON"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0184",
+      "category": "email",
+      "text": "Contact: elena.field@example.com",
+      "expected": [
+        {
+          "start": 9,
+          "end": 32,
+          "entity_type": "EMAIL_ADDRESS"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "heldout"
+    },
+    {
+      "id": "S0185",
+      "category": "phone",
+      "text": "Telephone: +1 (212) 555-0112",
+      "expected": [
+        {
+          "start": 11,
+          "end": 28,
+          "entity_type": "PHONE_NUMBER"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "heldout"
+    },
+    {
+      "id": "S0186",
+      "category": "employee",
+      "text": "Employee identifier: EMP-12012",
+      "expected": [
+        {
+          "start": 21,
+          "end": 30,
+          "entity_type": "EMPLOYEE_ID"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0187",
+      "category": "table",
+      "text": "Owner | Employee | Email\nElena Field | EMP-12012 | elena.field@example.com",
+      "expected": [
+        {
+          "start": 25,
+          "end": 36,
+          "entity_type": "PERSON"
+        },
+        {
+          "start": 39,
+          "end": 48,
+          "entity_type": "EMPLOYEE_ID"
+        },
+        {
+          "start": 51,
+          "end": 74,
+          "entity_type": "EMAIL_ADDRESS"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0188",
+      "category": "adjacent_email",
+      "text": "Elena Field <elena.field@example.com>",
+      "expected": [
+        {
+          "start": 0,
+          "end": 11,
+          "entity_type": "PERSON"
+        },
+        {
+          "start": 13,
+          "end": 36,
+          "entity_type": "EMAIL_ADDRESS"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0189",
+      "category": "duplicate_context",
+      "text": "Owner: Elena Field. Reviewed by: Elena Field.",
+      "expected": [
+        {
+          "start": 7,
+          "end": 18,
+          "entity_type": "PERSON"
+        },
+        {
+          "start": 33,
+          "end": 44,
+          "entity_type": "PERSON"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0190",
+      "category": "ocr_name",
+      "text": "ElenaField is the policy author.",
+      "expected": [
+        {
+          "start": 0,
+          "end": 10,
+          "entity_type": "PERSON"
+        }
+      ],
+      "non_pii": [],
+      "notes": "Synthetic OCR concatenation; exact source span required, no invented spaces.",
+      "split": "development"
+    },
+    {
+      "id": "S0191",
+      "category": "malformed_employee",
+      "text": "Release code EMP-12012X; employee field unavailable.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 13,
+          "end": 23,
+          "entity_type": "EMPLOYEE_ID"
+        }
+      ],
+      "notes": "",
+      "split": "heldout"
+    },
+    {
+      "id": "S0192",
+      "category": "malformed_email",
+      "text": "Contact field: elena..field@example.com",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 15,
+          "end": 39,
+          "entity_type": "EMAIL_ADDRESS"
+        }
+      ],
+      "notes": "Consecutive dots invalidate the unquoted local part; substring is not a gold match.",
+      "split": "heldout"
+    },
+    {
+      "id": "S0193",
+      "category": "numeric_business",
+      "text": "Revenue amount: 2125550112 dollars; growth 13%.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 16,
+          "end": 26,
+          "entity_type": "PHONE_NUMBER"
+        }
+      ],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0194",
+      "category": "account",
+      "text": "Bank account number: 73000012",
+      "expected": [
+        {
+          "start": 21,
+          "end": 29,
+          "entity_type": "US_BANK_NUMBER"
+        }
+      ],
+      "non_pii": [],
+      "notes": "Explicit bank account context supports policy PII; may need review.",
+      "split": "heldout"
+    },
+    {
+      "id": "S0195",
+      "category": "code",
+      "text": "Internal project code ZX-2125550112; Account 12357.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 25,
+          "end": 35,
+          "entity_type": "PHONE_NUMBER"
+        },
+        {
+          "start": 45,
+          "end": 50,
+          "entity_type": "US_BANK_NUMBER"
+        }
+      ],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0196",
+      "category": "person",
+      "text": "Policy owner: Hugo Lake.",
+      "expected": [
+        {
+          "start": 14,
+          "end": 23,
+          "entity_type": "PERSON"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "heldout"
+    },
+    {
+      "id": "S0197",
+      "category": "header",
+      "text": "Hugo Lake\nQuarterly governance report",
+      "expected": [
+        {
+          "start": 0,
+          "end": 9,
+          "entity_type": "PERSON"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0198",
+      "category": "title_name",
+      "text": "Chief Risk Officer: Hugo Lake.",
+      "expected": [
+        {
+          "start": 20,
+          "end": 29,
+          "entity_type": "PERSON"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0199",
+      "category": "email",
+      "text": "Contact: hugo.lake@example.com",
+      "expected": [
+        {
+          "start": 9,
+          "end": 30,
+          "entity_type": "EMAIL_ADDRESS"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0200",
+      "category": "phone",
+      "text": "Telephone: +1 (212) 555-0113",
+      "expected": [
+        {
+          "start": 11,
+          "end": 28,
+          "entity_type": "PHONE_NUMBER"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "heldout"
+    },
+    {
+      "id": "S0201",
+      "category": "employee",
+      "text": "Employee identifier: EMP-12013",
+      "expected": [
+        {
+          "start": 21,
+          "end": 30,
+          "entity_type": "EMPLOYEE_ID"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0202",
+      "category": "table",
+      "text": "Owner | Employee | Email\nHugo Lake | EMP-12013 | hugo.lake@example.com",
+      "expected": [
+        {
+          "start": 25,
+          "end": 34,
+          "entity_type": "PERSON"
+        },
+        {
+          "start": 37,
+          "end": 46,
+          "entity_type": "EMPLOYEE_ID"
+        },
+        {
+          "start": 49,
+          "end": 70,
+          "entity_type": "EMAIL_ADDRESS"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0203",
+      "category": "adjacent_email",
+      "text": "Hugo Lake <hugo.lake@example.com>",
+      "expected": [
+        {
+          "start": 0,
+          "end": 9,
+          "entity_type": "PERSON"
+        },
+        {
+          "start": 11,
+          "end": 32,
+          "entity_type": "EMAIL_ADDRESS"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0204",
+      "category": "duplicate_context",
+      "text": "Owner: Hugo Lake. Reviewed by: Hugo Lake.",
+      "expected": [
+        {
+          "start": 7,
+          "end": 16,
+          "entity_type": "PERSON"
+        },
+        {
+          "start": 31,
+          "end": 40,
+          "entity_type": "PERSON"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "heldout"
+    },
+    {
+      "id": "S0205",
+      "category": "ocr_name",
+      "text": "HugoLake is the policy author.",
+      "expected": [
+        {
+          "start": 0,
+          "end": 8,
+          "entity_type": "PERSON"
+        }
+      ],
+      "non_pii": [],
+      "notes": "Synthetic OCR concatenation; exact source span required, no invented spaces.",
+      "split": "heldout"
+    },
+    {
+      "id": "S0206",
+      "category": "malformed_employee",
+      "text": "Release code EMP-12013X; employee field unavailable.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 13,
+          "end": 23,
+          "entity_type": "EMPLOYEE_ID"
+        }
+      ],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0207",
+      "category": "malformed_email",
+      "text": "Contact field: hugo..lake@example.com",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 15,
+          "end": 37,
+          "entity_type": "EMAIL_ADDRESS"
+        }
+      ],
+      "notes": "Consecutive dots invalidate the unquoted local part; substring is not a gold match.",
+      "split": "development"
+    },
+    {
+      "id": "S0208",
+      "category": "numeric_business",
+      "text": "Revenue amount: 2125550113 dollars; growth 14%.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 16,
+          "end": 26,
+          "entity_type": "PHONE_NUMBER"
+        }
+      ],
+      "notes": "",
+      "split": "heldout"
+    },
+    {
+      "id": "S0209",
+      "category": "account",
+      "text": "Bank account number: 73000013",
+      "expected": [
+        {
+          "start": 21,
+          "end": 29,
+          "entity_type": "US_BANK_NUMBER"
+        }
+      ],
+      "non_pii": [],
+      "notes": "Explicit bank account context supports policy PII; may need review.",
+      "split": "heldout"
+    },
+    {
+      "id": "S0210",
+      "category": "code",
+      "text": "Internal project code ZX-2125550113; Account 12358.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 25,
+          "end": 35,
+          "entity_type": "PHONE_NUMBER"
+        },
+        {
+          "start": 45,
+          "end": 50,
+          "entity_type": "US_BANK_NUMBER"
+        }
+      ],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0211",
+      "category": "person",
+      "text": "Policy owner: Lena Grove.",
+      "expected": [
+        {
+          "start": 14,
+          "end": 24,
+          "entity_type": "PERSON"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0212",
+      "category": "header",
+      "text": "Lena Grove\nQuarterly governance report",
+      "expected": [
+        {
+          "start": 0,
+          "end": 10,
+          "entity_type": "PERSON"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0213",
+      "category": "title_name",
+      "text": "Chief Risk Officer: Lena Grove.",
+      "expected": [
+        {
+          "start": 20,
+          "end": 30,
+          "entity_type": "PERSON"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0214",
+      "category": "email",
+      "text": "Contact: lena.grove@example.com",
+      "expected": [
+        {
+          "start": 9,
+          "end": 31,
+          "entity_type": "EMAIL_ADDRESS"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0215",
+      "category": "phone",
+      "text": "Telephone: +1 (212) 555-0114",
+      "expected": [
+        {
+          "start": 11,
+          "end": 28,
+          "entity_type": "PHONE_NUMBER"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0216",
+      "category": "employee",
+      "text": "Employee identifier: EMP-12014",
+      "expected": [
+        {
+          "start": 21,
+          "end": 30,
+          "entity_type": "EMPLOYEE_ID"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "heldout"
+    },
+    {
+      "id": "S0217",
+      "category": "table",
+      "text": "Owner | Employee | Email\nLena Grove | EMP-12014 | lena.grove@example.com",
+      "expected": [
+        {
+          "start": 25,
+          "end": 35,
+          "entity_type": "PERSON"
+        },
+        {
+          "start": 38,
+          "end": 47,
+          "entity_type": "EMPLOYEE_ID"
+        },
+        {
+          "start": 50,
+          "end": 72,
+          "entity_type": "EMAIL_ADDRESS"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "heldout"
+    },
+    {
+      "id": "S0218",
+      "category": "adjacent_email",
+      "text": "Lena Grove <lena.grove@example.com>",
+      "expected": [
+        {
+          "start": 0,
+          "end": 10,
+          "entity_type": "PERSON"
+        },
+        {
+          "start": 12,
+          "end": 34,
+          "entity_type": "EMAIL_ADDRESS"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0219",
+      "category": "duplicate_context",
+      "text": "Owner: Lena Grove. Reviewed by: Lena Grove.",
+      "expected": [
+        {
+          "start": 7,
+          "end": 17,
+          "entity_type": "PERSON"
+        },
+        {
+          "start": 32,
+          "end": 42,
+          "entity_type": "PERSON"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0220",
+      "category": "ocr_name",
+      "text": "LenaGrove is the policy author.",
+      "expected": [
+        {
+          "start": 0,
+          "end": 9,
+          "entity_type": "PERSON"
+        }
+      ],
+      "non_pii": [],
+      "notes": "Synthetic OCR concatenation; exact source span required, no invented spaces.",
+      "split": "development"
+    },
+    {
+      "id": "S0221",
+      "category": "malformed_employee",
+      "text": "Release code EMP-12014X; employee field unavailable.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 13,
+          "end": 23,
+          "entity_type": "EMPLOYEE_ID"
+        }
+      ],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0222",
+      "category": "malformed_email",
+      "text": "Contact field: lena..grove@example.com",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 15,
+          "end": 38,
+          "entity_type": "EMAIL_ADDRESS"
+        }
+      ],
+      "notes": "Consecutive dots invalidate the unquoted local part; substring is not a gold match.",
+      "split": "development"
+    },
+    {
+      "id": "S0223",
+      "category": "numeric_business",
+      "text": "Revenue amount: 2125550114 dollars; growth 15%.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 16,
+          "end": 26,
+          "entity_type": "PHONE_NUMBER"
+        }
+      ],
+      "notes": "",
+      "split": "heldout"
+    },
+    {
+      "id": "S0224",
+      "category": "account",
+      "text": "Bank account number: 73000014",
+      "expected": [
+        {
+          "start": 21,
+          "end": 29,
+          "entity_type": "US_BANK_NUMBER"
+        }
+      ],
+      "non_pii": [],
+      "notes": "Explicit bank account context supports policy PII; may need review.",
+      "split": "development"
+    },
+    {
+      "id": "S0225",
+      "category": "code",
+      "text": "Internal project code ZX-2125550114; Account 12359.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 25,
+          "end": 35,
+          "entity_type": "PHONE_NUMBER"
+        },
+        {
+          "start": 45,
+          "end": 50,
+          "entity_type": "US_BANK_NUMBER"
+        }
+      ],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0226",
+      "category": "person",
+      "text": "Policy owner: Oscar Ash.",
+      "expected": [
+        {
+          "start": 14,
+          "end": 23,
+          "entity_type": "PERSON"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0227",
+      "category": "header",
+      "text": "Oscar Ash\nQuarterly governance report",
+      "expected": [
+        {
+          "start": 0,
+          "end": 9,
+          "entity_type": "PERSON"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0228",
+      "category": "title_name",
+      "text": "Chief Risk Officer: Oscar Ash.",
+      "expected": [
+        {
+          "start": 20,
+          "end": 29,
+          "entity_type": "PERSON"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0229",
+      "category": "email",
+      "text": "Contact: oscar.ash@example.com",
+      "expected": [
+        {
+          "start": 9,
+          "end": 30,
+          "entity_type": "EMAIL_ADDRESS"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "heldout"
+    },
+    {
+      "id": "S0230",
+      "category": "phone",
+      "text": "Telephone: +1 (212) 555-0115",
+      "expected": [
+        {
+          "start": 11,
+          "end": 28,
+          "entity_type": "PHONE_NUMBER"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "heldout"
+    },
+    {
+      "id": "S0231",
+      "category": "employee",
+      "text": "Employee identifier: EMP-12015",
+      "expected": [
+        {
+          "start": 21,
+          "end": 30,
+          "entity_type": "EMPLOYEE_ID"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "heldout"
+    },
+    {
+      "id": "S0232",
+      "category": "table",
+      "text": "Owner | Employee | Email\nOscar Ash | EMP-12015 | oscar.ash@example.com",
+      "expected": [
+        {
+          "start": 25,
+          "end": 34,
+          "entity_type": "PERSON"
+        },
+        {
+          "start": 37,
+          "end": 46,
+          "entity_type": "EMPLOYEE_ID"
+        },
+        {
+          "start": 49,
+          "end": 70,
+          "entity_type": "EMAIL_ADDRESS"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0233",
+      "category": "adjacent_email",
+      "text": "Oscar Ash <oscar.ash@example.com>",
+      "expected": [
+        {
+          "start": 0,
+          "end": 9,
+          "entity_type": "PERSON"
+        },
+        {
+          "start": 11,
+          "end": 32,
+          "entity_type": "EMAIL_ADDRESS"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0234",
+      "category": "duplicate_context",
+      "text": "Owner: Oscar Ash. Reviewed by: Oscar Ash.",
+      "expected": [
+        {
+          "start": 7,
+          "end": 16,
+          "entity_type": "PERSON"
+        },
+        {
+          "start": 31,
+          "end": 40,
+          "entity_type": "PERSON"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0235",
+      "category": "ocr_name",
+      "text": "OscarAsh is the policy author.",
+      "expected": [
+        {
+          "start": 0,
+          "end": 8,
+          "entity_type": "PERSON"
+        }
+      ],
+      "non_pii": [],
+      "notes": "Synthetic OCR concatenation; exact source span required, no invented spaces.",
+      "split": "heldout"
+    },
+    {
+      "id": "S0236",
+      "category": "malformed_employee",
+      "text": "Release code EMP-12015X; employee field unavailable.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 13,
+          "end": 23,
+          "entity_type": "EMPLOYEE_ID"
+        }
+      ],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0237",
+      "category": "malformed_email",
+      "text": "Contact field: oscar..ash@example.com",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 15,
+          "end": 37,
+          "entity_type": "EMAIL_ADDRESS"
+        }
+      ],
+      "notes": "Consecutive dots invalidate the unquoted local part; substring is not a gold match.",
+      "split": "heldout"
+    },
+    {
+      "id": "S0238",
+      "category": "numeric_business",
+      "text": "Revenue amount: 2125550115 dollars; growth 16%.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 16,
+          "end": 26,
+          "entity_type": "PHONE_NUMBER"
+        }
+      ],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0239",
+      "category": "account",
+      "text": "Bank account number: 73000015",
+      "expected": [
+        {
+          "start": 21,
+          "end": 29,
+          "entity_type": "US_BANK_NUMBER"
+        }
+      ],
+      "non_pii": [],
+      "notes": "Explicit bank account context supports policy PII; may need review.",
+      "split": "development"
+    },
+    {
+      "id": "S0240",
+      "category": "code",
+      "text": "Internal project code ZX-2125550115; Account 12360.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 25,
+          "end": 35,
+          "entity_type": "PHONE_NUMBER"
+        },
+        {
+          "start": 45,
+          "end": 50,
+          "entity_type": "US_BANK_NUMBER"
+        }
+      ],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0241",
+      "category": "person",
+      "text": "Policy owner: Vera Dale.",
+      "expected": [
+        {
+          "start": 14,
+          "end": 23,
+          "entity_type": "PERSON"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0242",
+      "category": "header",
+      "text": "Vera Dale\nQuarterly governance report",
+      "expected": [
+        {
+          "start": 0,
+          "end": 9,
+          "entity_type": "PERSON"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0243",
+      "category": "title_name",
+      "text": "Chief Risk Officer: Vera Dale.",
+      "expected": [
+        {
+          "start": 20,
+          "end": 29,
+          "entity_type": "PERSON"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "heldout"
+    },
+    {
+      "id": "S0244",
+      "category": "email",
+      "text": "Contact: vera.dale@example.com",
+      "expected": [
+        {
+          "start": 9,
+          "end": 30,
+          "entity_type": "EMAIL_ADDRESS"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0245",
+      "category": "phone",
+      "text": "Telephone: +1 (212) 555-0116",
+      "expected": [
+        {
+          "start": 11,
+          "end": 28,
+          "entity_type": "PHONE_NUMBER"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0246",
+      "category": "employee",
+      "text": "Employee identifier: EMP-12016",
+      "expected": [
+        {
+          "start": 21,
+          "end": 30,
+          "entity_type": "EMPLOYEE_ID"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0247",
+      "category": "table",
+      "text": "Owner | Employee | Email\nVera Dale | EMP-12016 | vera.dale@example.com",
+      "expected": [
+        {
+          "start": 25,
+          "end": 34,
+          "entity_type": "PERSON"
+        },
+        {
+          "start": 37,
+          "end": 46,
+          "entity_type": "EMPLOYEE_ID"
+        },
+        {
+          "start": 49,
+          "end": 70,
+          "entity_type": "EMAIL_ADDRESS"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0248",
+      "category": "adjacent_email",
+      "text": "Vera Dale <vera.dale@example.com>",
+      "expected": [
+        {
+          "start": 0,
+          "end": 9,
+          "entity_type": "PERSON"
+        },
+        {
+          "start": 11,
+          "end": 32,
+          "entity_type": "EMAIL_ADDRESS"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0249",
+      "category": "duplicate_context",
+      "text": "Owner: Vera Dale. Reviewed by: Vera Dale.",
+      "expected": [
+        {
+          "start": 7,
+          "end": 16,
+          "entity_type": "PERSON"
+        },
+        {
+          "start": 31,
+          "end": 40,
+          "entity_type": "PERSON"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0250",
+      "category": "ocr_name",
+      "text": "VeraDale is the policy author.",
+      "expected": [
+        {
+          "start": 0,
+          "end": 8,
+          "entity_type": "PERSON"
+        }
+      ],
+      "non_pii": [],
+      "notes": "Synthetic OCR concatenation; exact source span required, no invented spaces.",
+      "split": "development"
+    },
+    {
+      "id": "S0251",
+      "category": "malformed_employee",
+      "text": "Release code EMP-12016X; employee field unavailable.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 13,
+          "end": 23,
+          "entity_type": "EMPLOYEE_ID"
+        }
+      ],
+      "notes": "",
+      "split": "heldout"
+    },
+    {
+      "id": "S0252",
+      "category": "malformed_email",
+      "text": "Contact field: vera..dale@example.com",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 15,
+          "end": 37,
+          "entity_type": "EMAIL_ADDRESS"
+        }
+      ],
+      "notes": "Consecutive dots invalidate the unquoted local part; substring is not a gold match.",
+      "split": "development"
+    },
+    {
+      "id": "S0253",
+      "category": "numeric_business",
+      "text": "Revenue amount: 2125550116 dollars; growth 17%.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 16,
+          "end": 26,
+          "entity_type": "PHONE_NUMBER"
+        }
+      ],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0254",
+      "category": "account",
+      "text": "Bank account number: 73000016",
+      "expected": [
+        {
+          "start": 21,
+          "end": 29,
+          "entity_type": "US_BANK_NUMBER"
+        }
+      ],
+      "non_pii": [],
+      "notes": "Explicit bank account context supports policy PII; may need review.",
+      "split": "development"
+    },
+    {
+      "id": "S0255",
+      "category": "code",
+      "text": "Internal project code ZX-2125550116; Account 12361.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 25,
+          "end": 35,
+          "entity_type": "PHONE_NUMBER"
+        },
+        {
+          "start": 45,
+          "end": 50,
+          "entity_type": "US_BANK_NUMBER"
+        }
+      ],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0256",
+      "category": "person",
+      "text": "Policy owner: Miles Elm.",
+      "expected": [
+        {
+          "start": 14,
+          "end": 23,
+          "entity_type": "PERSON"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "heldout"
+    },
+    {
+      "id": "S0257",
+      "category": "header",
+      "text": "Miles Elm\nQuarterly governance report",
+      "expected": [
+        {
+          "start": 0,
+          "end": 9,
+          "entity_type": "PERSON"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "heldout"
+    },
+    {
+      "id": "S0258",
+      "category": "title_name",
+      "text": "Chief Risk Officer: Miles Elm.",
+      "expected": [
+        {
+          "start": 20,
+          "end": 29,
+          "entity_type": "PERSON"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0259",
+      "category": "email",
+      "text": "Contact: miles.elm@example.com",
+      "expected": [
+        {
+          "start": 9,
+          "end": 30,
+          "entity_type": "EMAIL_ADDRESS"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0260",
+      "category": "phone",
+      "text": "Telephone: +1 (212) 555-0117",
+      "expected": [
+        {
+          "start": 11,
+          "end": 28,
+          "entity_type": "PHONE_NUMBER"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0261",
+      "category": "employee",
+      "text": "Employee identifier: EMP-12017",
+      "expected": [
+        {
+          "start": 21,
+          "end": 30,
+          "entity_type": "EMPLOYEE_ID"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0262",
+      "category": "table",
+      "text": "Owner | Employee | Email\nMiles Elm | EMP-12017 | miles.elm@example.com",
+      "expected": [
+        {
+          "start": 25,
+          "end": 34,
+          "entity_type": "PERSON"
+        },
+        {
+          "start": 37,
+          "end": 46,
+          "entity_type": "EMPLOYEE_ID"
+        },
+        {
+          "start": 49,
+          "end": 70,
+          "entity_type": "EMAIL_ADDRESS"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "heldout"
+    },
+    {
+      "id": "S0263",
+      "category": "adjacent_email",
+      "text": "Miles Elm <miles.elm@example.com>",
+      "expected": [
+        {
+          "start": 0,
+          "end": 9,
+          "entity_type": "PERSON"
+        },
+        {
+          "start": 11,
+          "end": 32,
+          "entity_type": "EMAIL_ADDRESS"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "heldout"
+    },
+    {
+      "id": "S0264",
+      "category": "duplicate_context",
+      "text": "Owner: Miles Elm. Reviewed by: Miles Elm.",
+      "expected": [
+        {
+          "start": 7,
+          "end": 16,
+          "entity_type": "PERSON"
+        },
+        {
+          "start": 31,
+          "end": 40,
+          "entity_type": "PERSON"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0265",
+      "category": "ocr_name",
+      "text": "MilesElm is the policy author.",
+      "expected": [
+        {
+          "start": 0,
+          "end": 8,
+          "entity_type": "PERSON"
+        }
+      ],
+      "non_pii": [],
+      "notes": "Synthetic OCR concatenation; exact source span required, no invented spaces.",
+      "split": "development"
+    },
+    {
+      "id": "S0266",
+      "category": "malformed_employee",
+      "text": "Release code EMP-12017X; employee field unavailable.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 13,
+          "end": 23,
+          "entity_type": "EMPLOYEE_ID"
+        }
+      ],
+      "notes": "",
+      "split": "heldout"
+    },
+    {
+      "id": "S0267",
+      "category": "malformed_email",
+      "text": "Contact field: miles..elm@example.com",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 15,
+          "end": 37,
+          "entity_type": "EMAIL_ADDRESS"
+        }
+      ],
+      "notes": "Consecutive dots invalidate the unquoted local part; substring is not a gold match.",
+      "split": "development"
+    },
+    {
+      "id": "S0268",
+      "category": "numeric_business",
+      "text": "Revenue amount: 2125550117 dollars; growth 18%.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 16,
+          "end": 26,
+          "entity_type": "PHONE_NUMBER"
+        }
+      ],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0269",
+      "category": "account",
+      "text": "Bank account number: 73000017",
+      "expected": [
+        {
+          "start": 21,
+          "end": 29,
+          "entity_type": "US_BANK_NUMBER"
+        }
+      ],
+      "non_pii": [],
+      "notes": "Explicit bank account context supports policy PII; may need review.",
+      "split": "heldout"
+    },
+    {
+      "id": "S0270",
+      "category": "code",
+      "text": "Internal project code ZX-2125550117; Account 12362.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 25,
+          "end": 35,
+          "entity_type": "PHONE_NUMBER"
+        },
+        {
+          "start": 45,
+          "end": 50,
+          "entity_type": "US_BANK_NUMBER"
+        }
+      ],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0271",
+      "category": "person",
+      "text": "Policy owner: Ruby Hart.",
+      "expected": [
+        {
+          "start": 14,
+          "end": 23,
+          "entity_type": "PERSON"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "heldout"
+    },
+    {
+      "id": "S0272",
+      "category": "header",
+      "text": "Ruby Hart\nQuarterly governance report",
+      "expected": [
+        {
+          "start": 0,
+          "end": 9,
+          "entity_type": "PERSON"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0273",
+      "category": "title_name",
+      "text": "Chief Risk Officer: Ruby Hart.",
+      "expected": [
+        {
+          "start": 20,
+          "end": 29,
+          "entity_type": "PERSON"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "heldout"
+    },
+    {
+      "id": "S0274",
+      "category": "email",
+      "text": "Contact: ruby.hart@example.com",
+      "expected": [
+        {
+          "start": 9,
+          "end": 30,
+          "entity_type": "EMAIL_ADDRESS"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0275",
+      "category": "phone",
+      "text": "Telephone: +1 (212) 555-0118",
+      "expected": [
+        {
+          "start": 11,
+          "end": 28,
+          "entity_type": "PHONE_NUMBER"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0276",
+      "category": "employee",
+      "text": "Employee identifier: EMP-12018",
+      "expected": [
+        {
+          "start": 21,
+          "end": 30,
+          "entity_type": "EMPLOYEE_ID"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "heldout"
+    },
+    {
+      "id": "S0277",
+      "category": "table",
+      "text": "Owner | Employee | Email\nRuby Hart | EMP-12018 | ruby.hart@example.com",
+      "expected": [
+        {
+          "start": 25,
+          "end": 34,
+          "entity_type": "PERSON"
+        },
+        {
+          "start": 37,
+          "end": 46,
+          "entity_type": "EMPLOYEE_ID"
+        },
+        {
+          "start": 49,
+          "end": 70,
+          "entity_type": "EMAIL_ADDRESS"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0278",
+      "category": "adjacent_email",
+      "text": "Ruby Hart <ruby.hart@example.com>",
+      "expected": [
+        {
+          "start": 0,
+          "end": 9,
+          "entity_type": "PERSON"
+        },
+        {
+          "start": 11,
+          "end": 32,
+          "entity_type": "EMAIL_ADDRESS"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0279",
+      "category": "duplicate_context",
+      "text": "Owner: Ruby Hart. Reviewed by: Ruby Hart.",
+      "expected": [
+        {
+          "start": 7,
+          "end": 16,
+          "entity_type": "PERSON"
+        },
+        {
+          "start": 31,
+          "end": 40,
+          "entity_type": "PERSON"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0280",
+      "category": "ocr_name",
+      "text": "RubyHart is the policy author.",
+      "expected": [
+        {
+          "start": 0,
+          "end": 8,
+          "entity_type": "PERSON"
+        }
+      ],
+      "non_pii": [],
+      "notes": "Synthetic OCR concatenation; exact source span required, no invented spaces.",
+      "split": "development"
+    },
+    {
+      "id": "S0281",
+      "category": "malformed_employee",
+      "text": "Release code EMP-12018X; employee field unavailable.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 13,
+          "end": 23,
+          "entity_type": "EMPLOYEE_ID"
+        }
+      ],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0282",
+      "category": "malformed_email",
+      "text": "Contact field: ruby..hart@example.com",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 15,
+          "end": 37,
+          "entity_type": "EMAIL_ADDRESS"
+        }
+      ],
+      "notes": "Consecutive dots invalidate the unquoted local part; substring is not a gold match.",
+      "split": "heldout"
+    },
+    {
+      "id": "S0283",
+      "category": "numeric_business",
+      "text": "Revenue amount: 2125550118 dollars; growth 19%.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 16,
+          "end": 26,
+          "entity_type": "PHONE_NUMBER"
+        }
+      ],
+      "notes": "",
+      "split": "heldout"
+    },
+    {
+      "id": "S0284",
+      "category": "account",
+      "text": "Bank account number: 73000018",
+      "expected": [
+        {
+          "start": 21,
+          "end": 29,
+          "entity_type": "US_BANK_NUMBER"
+        }
+      ],
+      "non_pii": [],
+      "notes": "Explicit bank account context supports policy PII; may need review.",
+      "split": "development"
+    },
+    {
+      "id": "S0285",
+      "category": "code",
+      "text": "Internal project code ZX-2125550118; Account 12363.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 25,
+          "end": 35,
+          "entity_type": "PHONE_NUMBER"
+        },
+        {
+          "start": 45,
+          "end": 50,
+          "entity_type": "US_BANK_NUMBER"
+        }
+      ],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0286",
+      "category": "person",
+      "text": "Policy owner: Simon Wren.",
+      "expected": [
+        {
+          "start": 14,
+          "end": 24,
+          "entity_type": "PERSON"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0287",
+      "category": "header",
+      "text": "Simon Wren\nQuarterly governance report",
+      "expected": [
+        {
+          "start": 0,
+          "end": 10,
+          "entity_type": "PERSON"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0288",
+      "category": "title_name",
+      "text": "Chief Risk Officer: Simon Wren.",
+      "expected": [
+        {
+          "start": 20,
+          "end": 30,
+          "entity_type": "PERSON"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0289",
+      "category": "email",
+      "text": "Contact: simon.wren@example.com",
+      "expected": [
+        {
+          "start": 9,
+          "end": 31,
+          "entity_type": "EMAIL_ADDRESS"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "heldout"
+    },
+    {
+      "id": "S0290",
+      "category": "phone",
+      "text": "Telephone: +1 (212) 555-0119",
+      "expected": [
+        {
+          "start": 11,
+          "end": 28,
+          "entity_type": "PHONE_NUMBER"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "heldout"
+    },
+    {
+      "id": "S0291",
+      "category": "employee",
+      "text": "Employee identifier: EMP-12019",
+      "expected": [
+        {
+          "start": 21,
+          "end": 30,
+          "entity_type": "EMPLOYEE_ID"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0292",
+      "category": "table",
+      "text": "Owner | Employee | Email\nSimon Wren | EMP-12019 | simon.wren@example.com",
+      "expected": [
+        {
+          "start": 25,
+          "end": 35,
+          "entity_type": "PERSON"
+        },
+        {
+          "start": 38,
+          "end": 47,
+          "entity_type": "EMPLOYEE_ID"
+        },
+        {
+          "start": 50,
+          "end": 72,
+          "entity_type": "EMAIL_ADDRESS"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "heldout"
+    },
+    {
+      "id": "S0293",
+      "category": "adjacent_email",
+      "text": "Simon Wren <simon.wren@example.com>",
+      "expected": [
+        {
+          "start": 0,
+          "end": 10,
+          "entity_type": "PERSON"
+        },
+        {
+          "start": 12,
+          "end": 34,
+          "entity_type": "EMAIL_ADDRESS"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0294",
+      "category": "duplicate_context",
+      "text": "Owner: Simon Wren. Reviewed by: Simon Wren.",
+      "expected": [
+        {
+          "start": 7,
+          "end": 17,
+          "entity_type": "PERSON"
+        },
+        {
+          "start": 32,
+          "end": 42,
+          "entity_type": "PERSON"
+        }
+      ],
+      "non_pii": [],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0295",
+      "category": "ocr_name",
+      "text": "SimonWren is the policy author.",
+      "expected": [
+        {
+          "start": 0,
+          "end": 9,
+          "entity_type": "PERSON"
+        }
+      ],
+      "non_pii": [],
+      "notes": "Synthetic OCR concatenation; exact source span required, no invented spaces.",
+      "split": "development"
+    },
+    {
+      "id": "S0296",
+      "category": "malformed_employee",
+      "text": "Release code EMP-12019X; employee field unavailable.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 13,
+          "end": 23,
+          "entity_type": "EMPLOYEE_ID"
+        }
+      ],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0297",
+      "category": "malformed_email",
+      "text": "Contact field: simon..wren@example.com",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 15,
+          "end": 38,
+          "entity_type": "EMAIL_ADDRESS"
+        }
+      ],
+      "notes": "Consecutive dots invalidate the unquoted local part; substring is not a gold match.",
+      "split": "development"
+    },
+    {
+      "id": "S0298",
+      "category": "numeric_business",
+      "text": "Revenue amount: 2125550119 dollars; growth 20%.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 16,
+          "end": 26,
+          "entity_type": "PHONE_NUMBER"
+        }
+      ],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0299",
+      "category": "account",
+      "text": "Bank account number: 73000019",
+      "expected": [
+        {
+          "start": 21,
+          "end": 29,
+          "entity_type": "US_BANK_NUMBER"
+        }
+      ],
+      "non_pii": [],
+      "notes": "Explicit bank account context supports policy PII; may need review.",
+      "split": "development"
+    },
+    {
+      "id": "S0300",
+      "category": "code",
+      "text": "Internal project code ZX-2125550119; Account 12364.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 25,
+          "end": 35,
+          "entity_type": "PHONE_NUMBER"
+        },
+        {
+          "start": 45,
+          "end": 50,
+          "entity_type": "US_BANK_NUMBER"
+        }
+      ],
+      "notes": "",
+      "split": "development"
+    },
+    {
+      "id": "S0301",
+      "category": "department",
+      "text": "Internal governance record 1: Risk Management.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 30,
+          "end": 45,
+          "entity_type": "PERSON"
+        }
+      ],
+      "notes": "Addresses/dates are outside current redaction policy. Blue Horizon denotes a project here.",
+      "split": "development"
+    },
+    {
+      "id": "S0302",
+      "category": "department",
+      "text": "Internal governance record 1: Operations Team.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 30,
+          "end": 45,
+          "entity_type": "PERSON"
+        }
+      ],
+      "notes": "Addresses/dates are outside current redaction policy. Blue Horizon denotes a project here.",
+      "split": "development"
+    },
+    {
+      "id": "S0303",
+      "category": "committee",
+      "text": "Internal governance record 1: Smith Risk Committee.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 30,
+          "end": 50,
+          "entity_type": "PERSON"
+        }
+      ],
+      "notes": "Addresses/dates are outside current redaction policy. Blue Horizon denotes a project here.",
+      "split": "development"
+    },
+    {
+      "id": "S0304",
+      "category": "organization",
+      "text": "Internal governance record 1: Alder Financial Group.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 30,
+          "end": 51,
+          "entity_type": "PERSON"
+        }
+      ],
+      "notes": "Addresses/dates are outside current redaction policy. Blue Horizon denotes a project here.",
+      "split": "development"
+    },
+    {
+      "id": "S0305",
+      "category": "organization",
+      "text": "Internal governance record 1: Brook Holdings Limited.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 30,
+          "end": 52,
+          "entity_type": "PERSON"
+        }
+      ],
+      "notes": "Addresses/dates are outside current redaction policy. Blue Horizon denotes a project here.",
+      "split": "development"
+    },
+    {
+      "id": "S0306",
+      "category": "role",
+      "text": "Internal governance record 1: Chief Compliance Officer.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 30,
+          "end": 54,
+          "entity_type": "PERSON"
+        }
+      ],
+      "notes": "Addresses/dates are outside current redaction policy. Blue Horizon denotes a project here.",
+      "split": "development"
+    },
+    {
+      "id": "S0307",
+      "category": "business",
+      "text": "Internal governance record 1: Capital Allocation.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 30,
+          "end": 48,
+          "entity_type": "PERSON"
+        }
+      ],
+      "notes": "Addresses/dates are outside current redaction policy. Blue Horizon denotes a project here.",
+      "split": "development"
+    },
+    {
+      "id": "S0308",
+      "category": "business",
+      "text": "Internal governance record 1: Credit Exposure.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 30,
+          "end": 45,
+          "entity_type": "PERSON"
+        }
+      ],
+      "notes": "Addresses/dates are outside current redaction policy. Blue Horizon denotes a project here.",
+      "split": "development"
+    },
+    {
+      "id": "S0309",
+      "category": "project",
+      "text": "Internal governance record 1: Project Silver Harbor.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 30,
+          "end": 51,
+          "entity_type": "PERSON"
+        }
+      ],
+      "notes": "Addresses/dates are outside current redaction policy. Blue Horizon denotes a project here.",
+      "split": "heldout"
+    },
+    {
+      "id": "S0310",
+      "category": "abbreviation",
+      "text": "Internal governance record 1: RCSA.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 30,
+          "end": 34,
+          "entity_type": "NON_PII"
+        }
+      ],
+      "notes": "Addresses/dates are outside current redaction policy. Blue Horizon denotes a project here.",
+      "split": "heldout"
+    },
+    {
+      "id": "S0311",
+      "category": "abbreviation",
+      "text": "Internal governance record 1: NED.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 30,
+          "end": 33,
+          "entity_type": "NON_PII"
+        }
+      ],
+      "notes": "Addresses/dates are outside current redaction policy. Blue Horizon denotes a project here.",
+      "split": "development"
+    },
+    {
+      "id": "S0312",
+      "category": "ambiguous_capitals",
+      "text": "Internal governance record 1: Blue Horizon.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 30,
+          "end": 42,
+          "entity_type": "PERSON"
+        }
+      ],
+      "notes": "Addresses/dates are outside current redaction policy. Blue Horizon denotes a project here.",
+      "split": "development"
+    },
+    {
+      "id": "S0313",
+      "category": "footer",
+      "text": "Internal governance record 1: Document Control Department.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 30,
+          "end": 57,
+          "entity_type": "PERSON"
+        }
+      ],
+      "notes": "Addresses/dates are outside current redaction policy. Blue Horizon denotes a project here.",
+      "split": "development"
+    },
+    {
+      "id": "S0314",
+      "category": "address",
+      "text": "Internal governance record 1: 100 Example Avenue.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 30,
+          "end": 48,
+          "entity_type": "NON_PII"
+        }
+      ],
+      "notes": "Addresses/dates are outside current redaction policy. Blue Horizon denotes a project here.",
+      "split": "development"
+    },
+    {
+      "id": "S0315",
+      "category": "date",
+      "text": "Internal governance record 1: 2025-04-12.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 30,
+          "end": 40,
+          "entity_type": "NON_PII"
+        }
+      ],
+      "notes": "Addresses/dates are outside current redaction policy. Blue Horizon denotes a project here.",
+      "split": "development"
+    },
+    {
+      "id": "S0316",
+      "category": "numeric_business",
+      "text": "Internal governance record 1: 123456789.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 30,
+          "end": 39,
+          "entity_type": "NON_PII"
+        }
+      ],
+      "notes": "Addresses/dates are outside current redaction policy. Blue Horizon denotes a project here.",
+      "split": "development"
+    },
+    {
+      "id": "S0317",
+      "category": "malformed_email",
+      "text": "Internal governance record 1: person@.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 30,
+          "end": 37,
+          "entity_type": "NON_PII"
+        }
+      ],
+      "notes": "Addresses/dates are outside current redaction policy. Blue Horizon denotes a project here.",
+      "split": "development"
+    },
+    {
+      "id": "S0318",
+      "category": "malformed_employee",
+      "text": "Internal governance record 1: EMP-1234.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 30,
+          "end": 38,
+          "entity_type": "NON_PII"
+        }
+      ],
+      "notes": "Addresses/dates are outside current redaction policy. Blue Horizon denotes a project here.",
+      "split": "development"
+    },
+    {
+      "id": "S0319",
+      "category": "malformed_employee",
+      "text": "Internal governance record 1: EMP-123456.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 30,
+          "end": 40,
+          "entity_type": "NON_PII"
+        }
+      ],
+      "notes": "Addresses/dates are outside current redaction policy. Blue Horizon denotes a project here.",
+      "split": "development"
+    },
+    {
+      "id": "S0320",
+      "category": "code",
+      "text": "Internal governance record 1: POLICY-12345.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 30,
+          "end": 42,
+          "entity_type": "NON_PII"
+        }
+      ],
+      "notes": "Addresses/dates are outside current redaction policy. Blue Horizon denotes a project here.",
+      "split": "development"
+    },
+    {
+      "id": "S0321",
+      "category": "department",
+      "text": "Internal governance record 2: Risk Management.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 30,
+          "end": 45,
+          "entity_type": "PERSON"
+        }
+      ],
+      "notes": "Addresses/dates are outside current redaction policy. Blue Horizon denotes a project here.",
+      "split": "heldout"
+    },
+    {
+      "id": "S0322",
+      "category": "department",
+      "text": "Internal governance record 2: Operations Team.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 30,
+          "end": 45,
+          "entity_type": "PERSON"
+        }
+      ],
+      "notes": "Addresses/dates are outside current redaction policy. Blue Horizon denotes a project here.",
+      "split": "development"
+    },
+    {
+      "id": "S0323",
+      "category": "committee",
+      "text": "Internal governance record 2: Smith Risk Committee.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 30,
+          "end": 50,
+          "entity_type": "PERSON"
+        }
+      ],
+      "notes": "Addresses/dates are outside current redaction policy. Blue Horizon denotes a project here.",
+      "split": "development"
+    },
+    {
+      "id": "S0324",
+      "category": "organization",
+      "text": "Internal governance record 2: Alder Financial Group.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 30,
+          "end": 51,
+          "entity_type": "PERSON"
+        }
+      ],
+      "notes": "Addresses/dates are outside current redaction policy. Blue Horizon denotes a project here.",
+      "split": "heldout"
+    },
+    {
+      "id": "S0325",
+      "category": "organization",
+      "text": "Internal governance record 2: Brook Holdings Limited.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 30,
+          "end": 52,
+          "entity_type": "PERSON"
+        }
+      ],
+      "notes": "Addresses/dates are outside current redaction policy. Blue Horizon denotes a project here.",
+      "split": "heldout"
+    },
+    {
+      "id": "S0326",
+      "category": "role",
+      "text": "Internal governance record 2: Chief Compliance Officer.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 30,
+          "end": 54,
+          "entity_type": "PERSON"
+        }
+      ],
+      "notes": "Addresses/dates are outside current redaction policy. Blue Horizon denotes a project here.",
+      "split": "development"
+    },
+    {
+      "id": "S0327",
+      "category": "business",
+      "text": "Internal governance record 2: Capital Allocation.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 30,
+          "end": 48,
+          "entity_type": "PERSON"
+        }
+      ],
+      "notes": "Addresses/dates are outside current redaction policy. Blue Horizon denotes a project here.",
+      "split": "development"
+    },
+    {
+      "id": "S0328",
+      "category": "business",
+      "text": "Internal governance record 2: Credit Exposure.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 30,
+          "end": 45,
+          "entity_type": "PERSON"
+        }
+      ],
+      "notes": "Addresses/dates are outside current redaction policy. Blue Horizon denotes a project here.",
+      "split": "development"
+    },
+    {
+      "id": "S0329",
+      "category": "project",
+      "text": "Internal governance record 2: Project Silver Harbor.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 30,
+          "end": 51,
+          "entity_type": "PERSON"
+        }
+      ],
+      "notes": "Addresses/dates are outside current redaction policy. Blue Horizon denotes a project here.",
+      "split": "development"
+    },
+    {
+      "id": "S0330",
+      "category": "abbreviation",
+      "text": "Internal governance record 2: RCSA.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 30,
+          "end": 34,
+          "entity_type": "NON_PII"
+        }
+      ],
+      "notes": "Addresses/dates are outside current redaction policy. Blue Horizon denotes a project here.",
+      "split": "development"
+    },
+    {
+      "id": "S0331",
+      "category": "abbreviation",
+      "text": "Internal governance record 2: NED.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 30,
+          "end": 33,
+          "entity_type": "NON_PII"
+        }
+      ],
+      "notes": "Addresses/dates are outside current redaction policy. Blue Horizon denotes a project here.",
+      "split": "development"
+    },
+    {
+      "id": "S0332",
+      "category": "ambiguous_capitals",
+      "text": "Internal governance record 2: Blue Horizon.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 30,
+          "end": 42,
+          "entity_type": "PERSON"
+        }
+      ],
+      "notes": "Addresses/dates are outside current redaction policy. Blue Horizon denotes a project here.",
+      "split": "development"
+    },
+    {
+      "id": "S0333",
+      "category": "footer",
+      "text": "Internal governance record 2: Document Control Department.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 30,
+          "end": 57,
+          "entity_type": "PERSON"
+        }
+      ],
+      "notes": "Addresses/dates are outside current redaction policy. Blue Horizon denotes a project here.",
+      "split": "development"
+    },
+    {
+      "id": "S0334",
+      "category": "address",
+      "text": "Internal governance record 2: 100 Example Avenue.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 30,
+          "end": 48,
+          "entity_type": "NON_PII"
+        }
+      ],
+      "notes": "Addresses/dates are outside current redaction policy. Blue Horizon denotes a project here.",
+      "split": "heldout"
+    },
+    {
+      "id": "S0335",
+      "category": "date",
+      "text": "Internal governance record 2: 2025-04-12.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 30,
+          "end": 40,
+          "entity_type": "NON_PII"
+        }
+      ],
+      "notes": "Addresses/dates are outside current redaction policy. Blue Horizon denotes a project here.",
+      "split": "development"
+    },
+    {
+      "id": "S0336",
+      "category": "numeric_business",
+      "text": "Internal governance record 2: 123456789.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 30,
+          "end": 39,
+          "entity_type": "NON_PII"
+        }
+      ],
+      "notes": "Addresses/dates are outside current redaction policy. Blue Horizon denotes a project here.",
+      "split": "heldout"
+    },
+    {
+      "id": "S0337",
+      "category": "malformed_email",
+      "text": "Internal governance record 2: person@.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 30,
+          "end": 37,
+          "entity_type": "NON_PII"
+        }
+      ],
+      "notes": "Addresses/dates are outside current redaction policy. Blue Horizon denotes a project here.",
+      "split": "development"
+    },
+    {
+      "id": "S0338",
+      "category": "malformed_employee",
+      "text": "Internal governance record 2: EMP-1234.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 30,
+          "end": 38,
+          "entity_type": "NON_PII"
+        }
+      ],
+      "notes": "Addresses/dates are outside current redaction policy. Blue Horizon denotes a project here.",
+      "split": "heldout"
+    },
+    {
+      "id": "S0339",
+      "category": "malformed_employee",
+      "text": "Internal governance record 2: EMP-123456.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 30,
+          "end": 40,
+          "entity_type": "NON_PII"
+        }
+      ],
+      "notes": "Addresses/dates are outside current redaction policy. Blue Horizon denotes a project here.",
+      "split": "development"
+    },
+    {
+      "id": "S0340",
+      "category": "code",
+      "text": "Internal governance record 2: POLICY-12345.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 30,
+          "end": 42,
+          "entity_type": "NON_PII"
+        }
+      ],
+      "notes": "Addresses/dates are outside current redaction policy. Blue Horizon denotes a project here.",
+      "split": "development"
+    },
+    {
+      "id": "S0341",
+      "category": "department",
+      "text": "Internal governance record 3: Risk Management.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 30,
+          "end": 45,
+          "entity_type": "PERSON"
+        }
+      ],
+      "notes": "Addresses/dates are outside current redaction policy. Blue Horizon denotes a project here.",
+      "split": "heldout"
+    },
+    {
+      "id": "S0342",
+      "category": "department",
+      "text": "Internal governance record 3: Operations Team.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 30,
+          "end": 45,
+          "entity_type": "PERSON"
+        }
+      ],
+      "notes": "Addresses/dates are outside current redaction policy. Blue Horizon denotes a project here.",
+      "split": "heldout"
+    },
+    {
+      "id": "S0343",
+      "category": "committee",
+      "text": "Internal governance record 3: Smith Risk Committee.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 30,
+          "end": 50,
+          "entity_type": "PERSON"
+        }
+      ],
+      "notes": "Addresses/dates are outside current redaction policy. Blue Horizon denotes a project here.",
+      "split": "development"
+    },
+    {
+      "id": "S0344",
+      "category": "organization",
+      "text": "Internal governance record 3: Alder Financial Group.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 30,
+          "end": 51,
+          "entity_type": "PERSON"
+        }
+      ],
+      "notes": "Addresses/dates are outside current redaction policy. Blue Horizon denotes a project here.",
+      "split": "development"
+    },
+    {
+      "id": "S0345",
+      "category": "organization",
+      "text": "Internal governance record 3: Brook Holdings Limited.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 30,
+          "end": 52,
+          "entity_type": "PERSON"
+        }
+      ],
+      "notes": "Addresses/dates are outside current redaction policy. Blue Horizon denotes a project here.",
+      "split": "development"
+    },
+    {
+      "id": "S0346",
+      "category": "role",
+      "text": "Internal governance record 3: Chief Compliance Officer.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 30,
+          "end": 54,
+          "entity_type": "PERSON"
+        }
+      ],
+      "notes": "Addresses/dates are outside current redaction policy. Blue Horizon denotes a project here.",
+      "split": "development"
+    },
+    {
+      "id": "S0347",
+      "category": "business",
+      "text": "Internal governance record 3: Capital Allocation.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 30,
+          "end": 48,
+          "entity_type": "PERSON"
+        }
+      ],
+      "notes": "Addresses/dates are outside current redaction policy. Blue Horizon denotes a project here.",
+      "split": "heldout"
+    },
+    {
+      "id": "S0348",
+      "category": "business",
+      "text": "Internal governance record 3: Credit Exposure.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 30,
+          "end": 45,
+          "entity_type": "PERSON"
+        }
+      ],
+      "notes": "Addresses/dates are outside current redaction policy. Blue Horizon denotes a project here.",
+      "split": "heldout"
+    },
+    {
+      "id": "S0349",
+      "category": "project",
+      "text": "Internal governance record 3: Project Silver Harbor.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 30,
+          "end": 51,
+          "entity_type": "PERSON"
+        }
+      ],
+      "notes": "Addresses/dates are outside current redaction policy. Blue Horizon denotes a project here.",
+      "split": "development"
+    },
+    {
+      "id": "S0350",
+      "category": "abbreviation",
+      "text": "Internal governance record 3: RCSA.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 30,
+          "end": 34,
+          "entity_type": "NON_PII"
+        }
+      ],
+      "notes": "Addresses/dates are outside current redaction policy. Blue Horizon denotes a project here.",
+      "split": "heldout"
+    },
+    {
+      "id": "S0351",
+      "category": "abbreviation",
+      "text": "Internal governance record 3: NED.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 30,
+          "end": 33,
+          "entity_type": "NON_PII"
+        }
+      ],
+      "notes": "Addresses/dates are outside current redaction policy. Blue Horizon denotes a project here.",
+      "split": "development"
+    },
+    {
+      "id": "S0352",
+      "category": "ambiguous_capitals",
+      "text": "Internal governance record 3: Blue Horizon.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 30,
+          "end": 42,
+          "entity_type": "PERSON"
+        }
+      ],
+      "notes": "Addresses/dates are outside current redaction policy. Blue Horizon denotes a project here.",
+      "split": "development"
+    },
+    {
+      "id": "S0353",
+      "category": "footer",
+      "text": "Internal governance record 3: Document Control Department.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 30,
+          "end": 57,
+          "entity_type": "PERSON"
+        }
+      ],
+      "notes": "Addresses/dates are outside current redaction policy. Blue Horizon denotes a project here.",
+      "split": "development"
+    },
+    {
+      "id": "S0354",
+      "category": "address",
+      "text": "Internal governance record 3: 100 Example Avenue.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 30,
+          "end": 48,
+          "entity_type": "NON_PII"
+        }
+      ],
+      "notes": "Addresses/dates are outside current redaction policy. Blue Horizon denotes a project here.",
+      "split": "development"
+    },
+    {
+      "id": "S0355",
+      "category": "date",
+      "text": "Internal governance record 3: 2025-04-12.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 30,
+          "end": 40,
+          "entity_type": "NON_PII"
+        }
+      ],
+      "notes": "Addresses/dates are outside current redaction policy. Blue Horizon denotes a project here.",
+      "split": "development"
+    },
+    {
+      "id": "S0356",
+      "category": "numeric_business",
+      "text": "Internal governance record 3: 123456789.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 30,
+          "end": 39,
+          "entity_type": "NON_PII"
+        }
+      ],
+      "notes": "Addresses/dates are outside current redaction policy. Blue Horizon denotes a project here.",
+      "split": "development"
+    },
+    {
+      "id": "S0357",
+      "category": "malformed_email",
+      "text": "Internal governance record 3: person@.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 30,
+          "end": 37,
+          "entity_type": "NON_PII"
+        }
+      ],
+      "notes": "Addresses/dates are outside current redaction policy. Blue Horizon denotes a project here.",
+      "split": "development"
+    },
+    {
+      "id": "S0358",
+      "category": "malformed_employee",
+      "text": "Internal governance record 3: EMP-1234.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 30,
+          "end": 38,
+          "entity_type": "NON_PII"
+        }
+      ],
+      "notes": "Addresses/dates are outside current redaction policy. Blue Horizon denotes a project here.",
+      "split": "development"
+    },
+    {
+      "id": "S0359",
+      "category": "malformed_employee",
+      "text": "Internal governance record 3: EMP-123456.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 30,
+          "end": 40,
+          "entity_type": "NON_PII"
+        }
+      ],
+      "notes": "Addresses/dates are outside current redaction policy. Blue Horizon denotes a project here.",
+      "split": "development"
+    },
+    {
+      "id": "S0360",
+      "category": "code",
+      "text": "Internal governance record 3: POLICY-12345.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 30,
+          "end": 42,
+          "entity_type": "NON_PII"
+        }
+      ],
+      "notes": "Addresses/dates are outside current redaction policy. Blue Horizon denotes a project here.",
+      "split": "heldout"
+    },
+    {
+      "id": "S0361",
+      "category": "department",
+      "text": "Internal governance record 4: Risk Management.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 30,
+          "end": 45,
+          "entity_type": "PERSON"
+        }
+      ],
+      "notes": "Addresses/dates are outside current redaction policy. Blue Horizon denotes a project here.",
+      "split": "development"
+    },
+    {
+      "id": "S0362",
+      "category": "department",
+      "text": "Internal governance record 4: Operations Team.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 30,
+          "end": 45,
+          "entity_type": "PERSON"
+        }
+      ],
+      "notes": "Addresses/dates are outside current redaction policy. Blue Horizon denotes a project here.",
+      "split": "development"
+    },
+    {
+      "id": "S0363",
+      "category": "committee",
+      "text": "Internal governance record 4: Smith Risk Committee.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 30,
+          "end": 50,
+          "entity_type": "PERSON"
+        }
+      ],
+      "notes": "Addresses/dates are outside current redaction policy. Blue Horizon denotes a project here.",
+      "split": "heldout"
+    },
+    {
+      "id": "S0364",
+      "category": "organization",
+      "text": "Internal governance record 4: Alder Financial Group.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 30,
+          "end": 51,
+          "entity_type": "PERSON"
+        }
+      ],
+      "notes": "Addresses/dates are outside current redaction policy. Blue Horizon denotes a project here.",
+      "split": "development"
+    },
+    {
+      "id": "S0365",
+      "category": "organization",
+      "text": "Internal governance record 4: Brook Holdings Limited.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 30,
+          "end": 52,
+          "entity_type": "PERSON"
+        }
+      ],
+      "notes": "Addresses/dates are outside current redaction policy. Blue Horizon denotes a project here.",
+      "split": "development"
+    },
+    {
+      "id": "S0366",
+      "category": "role",
+      "text": "Internal governance record 4: Chief Compliance Officer.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 30,
+          "end": 54,
+          "entity_type": "PERSON"
+        }
+      ],
+      "notes": "Addresses/dates are outside current redaction policy. Blue Horizon denotes a project here.",
+      "split": "heldout"
+    },
+    {
+      "id": "S0367",
+      "category": "business",
+      "text": "Internal governance record 4: Capital Allocation.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 30,
+          "end": 48,
+          "entity_type": "PERSON"
+        }
+      ],
+      "notes": "Addresses/dates are outside current redaction policy. Blue Horizon denotes a project here.",
+      "split": "development"
+    },
+    {
+      "id": "S0368",
+      "category": "business",
+      "text": "Internal governance record 4: Credit Exposure.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 30,
+          "end": 45,
+          "entity_type": "PERSON"
+        }
+      ],
+      "notes": "Addresses/dates are outside current redaction policy. Blue Horizon denotes a project here.",
+      "split": "development"
+    },
+    {
+      "id": "S0369",
+      "category": "project",
+      "text": "Internal governance record 4: Project Silver Harbor.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 30,
+          "end": 51,
+          "entity_type": "PERSON"
+        }
+      ],
+      "notes": "Addresses/dates are outside current redaction policy. Blue Horizon denotes a project here.",
+      "split": "development"
+    },
+    {
+      "id": "S0370",
+      "category": "abbreviation",
+      "text": "Internal governance record 4: RCSA.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 30,
+          "end": 34,
+          "entity_type": "NON_PII"
+        }
+      ],
+      "notes": "Addresses/dates are outside current redaction policy. Blue Horizon denotes a project here.",
+      "split": "development"
+    },
+    {
+      "id": "S0371",
+      "category": "abbreviation",
+      "text": "Internal governance record 4: NED.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 30,
+          "end": 33,
+          "entity_type": "NON_PII"
+        }
+      ],
+      "notes": "Addresses/dates are outside current redaction policy. Blue Horizon denotes a project here.",
+      "split": "development"
+    },
+    {
+      "id": "S0372",
+      "category": "ambiguous_capitals",
+      "text": "Internal governance record 4: Blue Horizon.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 30,
+          "end": 42,
+          "entity_type": "PERSON"
+        }
+      ],
+      "notes": "Addresses/dates are outside current redaction policy. Blue Horizon denotes a project here.",
+      "split": "development"
+    },
+    {
+      "id": "S0373",
+      "category": "footer",
+      "text": "Internal governance record 4: Document Control Department.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 30,
+          "end": 57,
+          "entity_type": "PERSON"
+        }
+      ],
+      "notes": "Addresses/dates are outside current redaction policy. Blue Horizon denotes a project here.",
+      "split": "heldout"
+    },
+    {
+      "id": "S0374",
+      "category": "address",
+      "text": "Internal governance record 4: 100 Example Avenue.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 30,
+          "end": 48,
+          "entity_type": "NON_PII"
+        }
+      ],
+      "notes": "Addresses/dates are outside current redaction policy. Blue Horizon denotes a project here.",
+      "split": "development"
+    },
+    {
+      "id": "S0375",
+      "category": "date",
+      "text": "Internal governance record 4: 2025-04-12.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 30,
+          "end": 40,
+          "entity_type": "NON_PII"
+        }
+      ],
+      "notes": "Addresses/dates are outside current redaction policy. Blue Horizon denotes a project here.",
+      "split": "heldout"
+    },
+    {
+      "id": "S0376",
+      "category": "numeric_business",
+      "text": "Internal governance record 4: 123456789.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 30,
+          "end": 39,
+          "entity_type": "NON_PII"
+        }
+      ],
+      "notes": "Addresses/dates are outside current redaction policy. Blue Horizon denotes a project here.",
+      "split": "development"
+    },
+    {
+      "id": "S0377",
+      "category": "malformed_email",
+      "text": "Internal governance record 4: person@.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 30,
+          "end": 37,
+          "entity_type": "NON_PII"
+        }
+      ],
+      "notes": "Addresses/dates are outside current redaction policy. Blue Horizon denotes a project here.",
+      "split": "development"
+    },
+    {
+      "id": "S0378",
+      "category": "malformed_employee",
+      "text": "Internal governance record 4: EMP-1234.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 30,
+          "end": 38,
+          "entity_type": "NON_PII"
+        }
+      ],
+      "notes": "Addresses/dates are outside current redaction policy. Blue Horizon denotes a project here.",
+      "split": "development"
+    },
+    {
+      "id": "S0379",
+      "category": "malformed_employee",
+      "text": "Internal governance record 4: EMP-123456.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 30,
+          "end": 40,
+          "entity_type": "NON_PII"
+        }
+      ],
+      "notes": "Addresses/dates are outside current redaction policy. Blue Horizon denotes a project here.",
+      "split": "development"
+    },
+    {
+      "id": "S0380",
+      "category": "code",
+      "text": "Internal governance record 4: POLICY-12345.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 30,
+          "end": 42,
+          "entity_type": "NON_PII"
+        }
+      ],
+      "notes": "Addresses/dates are outside current redaction policy. Blue Horizon denotes a project here.",
+      "split": "heldout"
+    },
+    {
+      "id": "S0381",
+      "category": "department",
+      "text": "Internal governance record 5: Risk Management.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 30,
+          "end": 45,
+          "entity_type": "PERSON"
+        }
+      ],
+      "notes": "Addresses/dates are outside current redaction policy. Blue Horizon denotes a project here.",
+      "split": "development"
+    },
+    {
+      "id": "S0382",
+      "category": "department",
+      "text": "Internal governance record 5: Operations Team.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 30,
+          "end": 45,
+          "entity_type": "PERSON"
+        }
+      ],
+      "notes": "Addresses/dates are outside current redaction policy. Blue Horizon denotes a project here.",
+      "split": "development"
+    },
+    {
+      "id": "S0383",
+      "category": "committee",
+      "text": "Internal governance record 5: Smith Risk Committee.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 30,
+          "end": 50,
+          "entity_type": "PERSON"
+        }
+      ],
+      "notes": "Addresses/dates are outside current redaction policy. Blue Horizon denotes a project here.",
+      "split": "development"
+    },
+    {
+      "id": "S0384",
+      "category": "organization",
+      "text": "Internal governance record 5: Alder Financial Group.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 30,
+          "end": 51,
+          "entity_type": "PERSON"
+        }
+      ],
+      "notes": "Addresses/dates are outside current redaction policy. Blue Horizon denotes a project here.",
+      "split": "heldout"
+    },
+    {
+      "id": "S0385",
+      "category": "organization",
+      "text": "Internal governance record 5: Brook Holdings Limited.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 30,
+          "end": 52,
+          "entity_type": "PERSON"
+        }
+      ],
+      "notes": "Addresses/dates are outside current redaction policy. Blue Horizon denotes a project here.",
+      "split": "development"
+    },
+    {
+      "id": "S0386",
+      "category": "role",
+      "text": "Internal governance record 5: Chief Compliance Officer.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 30,
+          "end": 54,
+          "entity_type": "PERSON"
+        }
+      ],
+      "notes": "Addresses/dates are outside current redaction policy. Blue Horizon denotes a project here.",
+      "split": "development"
+    },
+    {
+      "id": "S0387",
+      "category": "business",
+      "text": "Internal governance record 5: Capital Allocation.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 30,
+          "end": 48,
+          "entity_type": "PERSON"
+        }
+      ],
+      "notes": "Addresses/dates are outside current redaction policy. Blue Horizon denotes a project here.",
+      "split": "heldout"
+    },
+    {
+      "id": "S0388",
+      "category": "business",
+      "text": "Internal governance record 5: Credit Exposure.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 30,
+          "end": 45,
+          "entity_type": "PERSON"
+        }
+      ],
+      "notes": "Addresses/dates are outside current redaction policy. Blue Horizon denotes a project here.",
+      "split": "development"
+    },
+    {
+      "id": "S0389",
+      "category": "project",
+      "text": "Internal governance record 5: Project Silver Harbor.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 30,
+          "end": 51,
+          "entity_type": "PERSON"
+        }
+      ],
+      "notes": "Addresses/dates are outside current redaction policy. Blue Horizon denotes a project here.",
+      "split": "development"
+    },
+    {
+      "id": "S0390",
+      "category": "abbreviation",
+      "text": "Internal governance record 5: RCSA.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 30,
+          "end": 34,
+          "entity_type": "NON_PII"
+        }
+      ],
+      "notes": "Addresses/dates are outside current redaction policy. Blue Horizon denotes a project here.",
+      "split": "heldout"
+    },
+    {
+      "id": "S0391",
+      "category": "abbreviation",
+      "text": "Internal governance record 5: NED.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 30,
+          "end": 33,
+          "entity_type": "NON_PII"
+        }
+      ],
+      "notes": "Addresses/dates are outside current redaction policy. Blue Horizon denotes a project here.",
+      "split": "development"
+    },
+    {
+      "id": "S0392",
+      "category": "ambiguous_capitals",
+      "text": "Internal governance record 5: Blue Horizon.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 30,
+          "end": 42,
+          "entity_type": "PERSON"
+        }
+      ],
+      "notes": "Addresses/dates are outside current redaction policy. Blue Horizon denotes a project here.",
+      "split": "heldout"
+    },
+    {
+      "id": "S0393",
+      "category": "footer",
+      "text": "Internal governance record 5: Document Control Department.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 30,
+          "end": 57,
+          "entity_type": "PERSON"
+        }
+      ],
+      "notes": "Addresses/dates are outside current redaction policy. Blue Horizon denotes a project here.",
+      "split": "development"
+    },
+    {
+      "id": "S0394",
+      "category": "address",
+      "text": "Internal governance record 5: 100 Example Avenue.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 30,
+          "end": 48,
+          "entity_type": "NON_PII"
+        }
+      ],
+      "notes": "Addresses/dates are outside current redaction policy. Blue Horizon denotes a project here.",
+      "split": "development"
+    },
+    {
+      "id": "S0395",
+      "category": "date",
+      "text": "Internal governance record 5: 2025-04-12.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 30,
+          "end": 40,
+          "entity_type": "NON_PII"
+        }
+      ],
+      "notes": "Addresses/dates are outside current redaction policy. Blue Horizon denotes a project here.",
+      "split": "development"
+    },
+    {
+      "id": "S0396",
+      "category": "numeric_business",
+      "text": "Internal governance record 5: 123456789.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 30,
+          "end": 39,
+          "entity_type": "NON_PII"
+        }
+      ],
+      "notes": "Addresses/dates are outside current redaction policy. Blue Horizon denotes a project here.",
+      "split": "development"
+    },
+    {
+      "id": "S0397",
+      "category": "malformed_email",
+      "text": "Internal governance record 5: person@.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 30,
+          "end": 37,
+          "entity_type": "NON_PII"
+        }
+      ],
+      "notes": "Addresses/dates are outside current redaction policy. Blue Horizon denotes a project here.",
+      "split": "development"
+    },
+    {
+      "id": "S0398",
+      "category": "malformed_employee",
+      "text": "Internal governance record 5: EMP-1234.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 30,
+          "end": 38,
+          "entity_type": "NON_PII"
+        }
+      ],
+      "notes": "Addresses/dates are outside current redaction policy. Blue Horizon denotes a project here.",
+      "split": "development"
+    },
+    {
+      "id": "S0399",
+      "category": "malformed_employee",
+      "text": "Internal governance record 5: EMP-123456.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 30,
+          "end": 40,
+          "entity_type": "NON_PII"
+        }
+      ],
+      "notes": "Addresses/dates are outside current redaction policy. Blue Horizon denotes a project here.",
+      "split": "development"
+    },
+    {
+      "id": "S0400",
+      "category": "code",
+      "text": "Internal governance record 5: POLICY-12345.",
+      "expected": [],
+      "non_pii": [
+        {
+          "start": 30,
+          "end": 42,
+          "entity_type": "NON_PII"
+        }
+      ],
+      "notes": "Addresses/dates are outside current redaction policy. Blue Horizon denotes a project here.",
+      "split": "heldout"
+    },
+    {
+      "id": "S0401",
+      "category": "ssn",
+      "text": "Synthetic payroll SSN: 219-30-1000",
+      "expected": [
+        {
+          "start": 23,
+          "end": 34,
+          "entity_type": "US_SSN"
+        }
+      ],
+      "non_pii": [],
+      "notes": "Invented test-only digits, not sourced from a person or real document.",
+      "split": "development"
+    },
+    {
+      "id": "S0402",
+      "category": "ssn",
+      "text": "Synthetic payroll SSN: 219-31-1001",
+      "expected": [
+        {
+          "start": 23,
+          "end": 34,
+          "entity_type": "US_SSN"
+        }
+      ],
+      "non_pii": [],
+      "notes": "Invented test-only digits, not sourced from a person or real document.",
+      "split": "development"
+    },
+    {
+      "id": "S0403",
+      "category": "ssn",
+      "text": "Synthetic payroll SSN: 219-32-1002",
+      "expected": [
+        {
+          "start": 23,
+          "end": 34,
+          "entity_type": "US_SSN"
+        }
+      ],
+      "non_pii": [],
+      "notes": "Invented test-only digits, not sourced from a person or real document.",
+      "split": "development"
+    },
+    {
+      "id": "S0404",
+      "category": "ssn",
+      "text": "Synthetic payroll SSN: 219-33-1003",
+      "expected": [
+        {
+          "start": 23,
+          "end": 34,
+          "entity_type": "US_SSN"
+        }
+      ],
+      "non_pii": [],
+      "notes": "Invented test-only digits, not sourced from a person or real document.",
+      "split": "development"
+    },
+    {
+      "id": "S0405",
+      "category": "ssn",
+      "text": "Synthetic payroll SSN: 219-34-1004",
+      "expected": [
+        {
+          "start": 23,
+          "end": 34,
+          "entity_type": "US_SSN"
+        }
+      ],
+      "non_pii": [],
+      "notes": "Invented test-only digits, not sourced from a person or real document.",
+      "split": "development"
+    },
+    {
+      "id": "S0406",
+      "category": "ssn",
+      "text": "Synthetic payroll SSN: 219-35-1005",
+      "expected": [
+        {
+          "start": 23,
+          "end": 34,
+          "entity_type": "US_SSN"
+        }
+      ],
+      "non_pii": [],
+      "notes": "Invented test-only digits, not sourced from a person or real document.",
+      "split": "development"
+    },
+    {
+      "id": "S0407",
+      "category": "ssn",
+      "text": "Synthetic payroll SSN: 219-36-1006",
+      "expected": [
+        {
+          "start": 23,
+          "end": 34,
+          "entity_type": "US_SSN"
+        }
+      ],
+      "non_pii": [],
+      "notes": "Invented test-only digits, not sourced from a person or real document.",
+      "split": "development"
+    },
+    {
+      "id": "S0408",
+      "category": "ssn",
+      "text": "Synthetic payroll SSN: 219-37-1007",
+      "expected": [
+        {
+          "start": 23,
+          "end": 34,
+          "entity_type": "US_SSN"
+        }
+      ],
+      "non_pii": [],
+      "notes": "Invented test-only digits, not sourced from a person or real document.",
+      "split": "heldout"
+    },
+    {
+      "id": "S0409",
+      "category": "ssn",
+      "text": "Synthetic payroll SSN: 219-38-1008",
+      "expected": [
+        {
+          "start": 23,
+          "end": 34,
+          "entity_type": "US_SSN"
+        }
+      ],
+      "non_pii": [],
+      "notes": "Invented test-only digits, not sourced from a person or real document.",
+      "split": "heldout"
+    },
+    {
+      "id": "S0410",
+      "category": "ssn",
+      "text": "Synthetic payroll SSN: 219-39-1009",
+      "expected": [
+        {
+          "start": 23,
+          "end": 34,
+          "entity_type": "US_SSN"
+        }
+      ],
+      "non_pii": [],
+      "notes": "Invented test-only digits, not sourced from a person or real document.",
+      "split": "heldout"
+    },
+    {
+      "id": "S0411",
+      "category": "ssn",
+      "text": "Synthetic payroll SSN: 219-40-1010",
+      "expected": [
+        {
+          "start": 23,
+          "end": 34,
+          "entity_type": "US_SSN"
+        }
+      ],
+      "non_pii": [],
+      "notes": "Invented test-only digits, not sourced from a person or real document.",
+      "split": "development"
+    },
+    {
+      "id": "S0412",
+      "category": "ssn",
+      "text": "Synthetic payroll SSN: 219-41-1011",
+      "expected": [
+        {
+          "start": 23,
+          "end": 34,
+          "entity_type": "US_SSN"
+        }
+      ],
+      "non_pii": [],
+      "notes": "Invented test-only digits, not sourced from a person or real document.",
+      "split": "development"
+    },
+    {
+      "id": "S0413",
+      "category": "ssn",
+      "text": "Synthetic payroll SSN: 219-42-1012",
+      "expected": [
+        {
+          "start": 23,
+          "end": 34,
+          "entity_type": "US_SSN"
+        }
+      ],
+      "non_pii": [],
+      "notes": "Invented test-only digits, not sourced from a person or real document.",
+      "split": "heldout"
+    },
+    {
+      "id": "S0414",
+      "category": "ssn",
+      "text": "Synthetic payroll SSN: 219-43-1013",
+      "expected": [
+        {
+          "start": 23,
+          "end": 34,
+          "entity_type": "US_SSN"
+        }
+      ],
+      "non_pii": [],
+      "notes": "Invented test-only digits, not sourced from a person or real document.",
+      "split": "heldout"
+    },
+    {
+      "id": "S0415",
+      "category": "ssn",
+      "text": "Synthetic payroll SSN: 219-44-1014",
+      "expected": [
+        {
+          "start": 23,
+          "end": 34,
+          "entity_type": "US_SSN"
+        }
+      ],
+      "non_pii": [],
+      "notes": "Invented test-only digits, not sourced from a person or real document.",
+      "split": "development"
+    },
+    {
+      "id": "S0416",
+      "category": "ssn",
+      "text": "Synthetic payroll SSN: 219-45-1015",
+      "expected": [
+        {
+          "start": 23,
+          "end": 34,
+          "entity_type": "US_SSN"
+        }
+      ],
+      "non_pii": [],
+      "notes": "Invented test-only digits, not sourced from a person or real document.",
+      "split": "heldout"
+    },
+    {
+      "id": "S0417",
+      "category": "ssn",
+      "text": "Synthetic payroll SSN: 219-46-1016",
+      "expected": [
+        {
+          "start": 23,
+          "end": 34,
+          "entity_type": "US_SSN"
+        }
+      ],
+      "non_pii": [],
+      "notes": "Invented test-only digits, not sourced from a person or real document.",
+      "split": "development"
+    },
+    {
+      "id": "S0418",
+      "category": "ssn",
+      "text": "Synthetic payroll SSN: 219-47-1017",
+      "expected": [
+        {
+          "start": 23,
+          "end": 34,
+          "entity_type": "US_SSN"
+        }
+      ],
+      "non_pii": [],
+      "notes": "Invented test-only digits, not sourced from a person or real document.",
+      "split": "development"
+    },
+    {
+      "id": "S0419",
+      "category": "ssn",
+      "text": "Synthetic payroll SSN: 219-48-1018",
+      "expected": [
+        {
+          "start": 23,
+          "end": 34,
+          "entity_type": "US_SSN"
+        }
+      ],
+      "non_pii": [],
+      "notes": "Invented test-only digits, not sourced from a person or real document.",
+      "split": "development"
+    },
+    {
+      "id": "S0420",
+      "category": "ssn",
+      "text": "Synthetic payroll SSN: 219-49-1019",
+      "expected": [
+        {
+          "start": 23,
+          "end": 34,
+          "entity_type": "US_SSN"
+        }
+      ],
+      "non_pii": [],
+      "notes": "Invented test-only digits, not sourced from a person or real document.",
+      "split": "development"
+    }
+  ]
+}

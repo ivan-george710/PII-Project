@@ -1,0 +1,136 @@
+{
+  "pdf": {
+    "summary": {
+      "raw": 1418,
+      "confirmed": 578,
+      "rejected": 668,
+      "review": 172,
+      "accounting_consistent": true,
+      "entities": {
+        "DATE_TIME": {
+          "REJECT": 235
+        },
+        "EMAIL_ADDRESS": {
+          "CONFIRM": 140
+        },
+        "EMPLOYEE_ID": {
+          "CONFIRM": 168
+        },
+        "LOCATION": {
+          "REJECT": 54
+        },
+        "MEDICAL_LICENSE": {
+          "CONFIRM": 1
+        },
+        "NRP": {
+          "REJECT": 9
+        },
+        "PERSON": {
+          "CONFIRM": 157,
+          "REJECT": 14,
+          "REVIEW": 87
+        },
+        "PHONE_NUMBER": {
+          "CONFIRM": 109
+        },
+        "URL": {
+          "REJECT": 356
+        },
+        "US_BANK_NUMBER": {
+          "REVIEW": 28
+        },
+        "US_DRIVER_LICENSE": {
+          "REVIEW": 57
+        },
+        "US_ITIN": {
+          "CONFIRM": 1
+        },
+        "US_SSN": {
+          "CONFIRM": 2
+        }
+      },
+      "review_reasons": {
+        "identifier_without_supporting_context": 83,
+        "person_requires_contextual_review": 87,
+        "identifier_requires_contextual_review": 2
+      }
+    },
+    "seconds": 0,
+    "historical_detection_reused": true
+  },
+  "docx": {
+    "summary": {
+      "raw": 424,
+      "confirmed": 29,
+      "rejected": 85,
+      "review": 310,
+      "accounting_consistent": true,
+      "entities": {
+        "DATE_TIME": {
+          "REJECT": 43
+        },
+        "LOCATION": {
+          "REJECT": 25
+        },
+        "NRP": {
+          "REJECT": 4
+        },
+        "PERSON": {
+          "CONFIRM": 29,
+          "REVIEW": 23
+        },
+        "URL": {
+          "REJECT": 13
+        },
+        "US_DRIVER_LICENSE": {
+          "REVIEW": 287
+        }
+      },
+      "review_reasons": {
+        "identifier_without_supporting_context": 287,
+        "person_requires_contextual_review": 23
+      }
+    },
+    "seconds": 11.674419300004956,
+    "historical_detection_reused": false
+  },
+  "pptx": {
+    "summary": {
+      "raw": 59,
+      "confirmed": 25,
+      "rejected": 19,
+      "review": 15,
+      "accounting_consistent": true,
+      "entities": {
+        "DATE_TIME": {
+          "REJECT": 3
+        },
+        "LOCATION": {
+          "REJECT": 3
+        },
+        "PERSON": {
+          "CONFIRM": 25,
+          "REVIEW": 15
+        },
+        "URL": {
+          "REJECT": 13
+        }
+      },
+      "review_reasons": {
+        "person_requires_contextual_review": 15
+      }
+    },
+    "seconds": 0.41332799999509007,
+    "historical_detection_reused": false
+  },
+  "detector_policy_version": "1.0",
+  "policy_fingerprint": {
+    "__init__.py": "551c5c5ec3e1722f2e279dfbaca25644ca9775db688333c01edb7c32b73974cd",
+    "engine.py": "8291b6c97bc759fdd7a090b8ae0636929d400376024e47995e9c1106093f9bcc",
+    "models.py": "5734214c17cdb03e42338cde3c2996ebff9fa27dd401d713ae9a87a493b4aa5f",
+    "presidio.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "recognizers.py": "38dcc155ce02e414a0395ec41b38ee2b8b71568b067f571875a2d1b5da8d7c2f",
+    "validation.py": "c2f426e62d70c9b638c7626cbdc21dee8043a65a7779b95e2e44a9bf1d77aa31"
+  },
+  "elapsed_seconds": 13.914214699994773
+}

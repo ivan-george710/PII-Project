@@ -18,6 +18,8 @@ PII_ENTITY_TYPES = frozenset({
     "US_PASSPORT", "US_DRIVER_LICENSE", "US_ITIN", "US_BANK_NUMBER",
     "IBAN_CODE", "CREDIT_CARD", "MEDICAL_LICENSE",
 })
+CUSTOM_ENTITY_TYPES = frozenset({"CUSTOM_BLOCKED", "CUSTOM_RULE"})
+
 
 # General business/role vocabulary, also used for concatenated OCR labels.
 # This is not a list of names or document-specific span exceptions.
@@ -92,6 +94,8 @@ def _explicit_business_number(left, right):
 
 
 def validate_detection(detection: DetectedPII, context: str = "", *, context_start=None) -> tuple[ValidationDecision, str]:
+    if getattr(detection, 'detection_method', None) == "custom_rule" or detection.entity_type in {"CUSTOM_BLOCKED", "CUSTOM_RULE"}:
+        return ValidationDecision.CONFIRM, "custom_manager_blocking_rule"
     if detection.entity_type not in PII_ENTITY_TYPES:
         return ValidationDecision.REJECT, "entity_type_not_in_pii_policy"
     left, right = _adjacent(detection, context, context_start)

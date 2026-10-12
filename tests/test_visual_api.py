@@ -6,12 +6,15 @@ import pytest
 from fastapi.testclient import TestClient
 from PIL import Image
 from app.web.server import create_app
+from app.web.manager_client import ManagerClient
+from manager.server import create_app as create_manager_app
 from tools.create_phase11_fixtures import create
 
 
 def test_actual_face_api_review_crop_and_saved_replay(tmp_path):
     path=create(tmp_path/'fixture')/'synthetic-face.pptx'
-    app=create_app(work_dir=tmp_path/'private-app',allow_test_host=True);client=TestClient(app)
+    mgr_client=ManagerClient(client=TestClient(create_manager_app(path=tmp_path/'manager.sqlite')))
+    app=create_app(work_dir=tmp_path/'private-app',allow_test_host=True,manager_client=mgr_client);client=TestClient(app)
     response=client.post('/api/documents',files={'file':(path.name,path.read_bytes())},headers={'X-Cadence-Local':'1'})
     assert response.status_code==200
     state=response.json();sid=state['document_session_id'];base=f'/api/documents/{sid}'

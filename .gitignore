@@ -11,3 +11,22 @@
 /.phase10b/
 /frontend/.vite/
 /.private_phase11/
+
+# Private local configuration, inputs and development artifacts
+.env*
+!.env.example
+.venv/
+.vercel/
+node_modules/
+__pycache__/
+*.pyc
+.private*/
+*.db
+*.sqlite
+*.egg-info/
+output/
+
+frontend/dist/
+apps/
+manager-mobile-preview.png
+/demo/samples/

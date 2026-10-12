@@ -1,0 +1,15 @@
+# Only frontend and the manager service deploy. Employee processing stays local.
+.env*
+.venv/
+.private*/
+app/
+apps/
+tests/
+output/
+*.pdf
+*.docx
+*.pptx
+*.sqlite
+**/__pycache__/
+frontend/node_modules/
+frontend/dist/

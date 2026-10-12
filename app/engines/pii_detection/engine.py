@@ -12,7 +12,7 @@ from .validation import ValidationDecision, validate_detection
 
 
 class PIIDetectionEngine:
-    def __init__(self, *, analyzer=None) -> None:
+    def __init__(self, *, analyzer=None, custom_rules=None) -> None:
         """Injected analyzers are already configured; default analyzer registers IDs once."""
         if analyzer is None:
             try:
@@ -23,6 +23,7 @@ class PIIDetectionEngine:
                     f"Presidio initialization failed ({type(exc).__name__}); check local NLP dependencies"
                 ) from None
         self.analyzer = analyzer
+        self.custom_rules = list(custom_rules or [])
 
     def detect(self, extraction_result: ExtractionResult) -> PIIDetectionResult:
         if extraction_result is None:
@@ -44,8 +45,6 @@ class PIIDetectionEngine:
                 raise DetectionProcessingError(
                     f"Presidio analysis failed on page {page.page_number} ({type(exc).__name__})"
                 ) from None
-            output.pages_analyzed.append(page.page_number)
-            output.raw_candidate_count += len(raw)
             block_spans = self._block_spans(page)
             try:
                 candidates = [self._candidate(item, page, block_spans) for item in raw]
@@ -55,6 +54,27 @@ class PIIDetectionEngine:
                 raise DetectionProcessingError(
                     f"Invalid analyzer candidate on page {page.page_number} ({type(exc).__name__})"
                 ) from None
+            for rule in (self.custom_rules or []):
+                pattern = rule.get('pattern', '')
+                if not pattern: continue
+                is_regex = rule.get('is_regex', False)
+                try:
+                    regex = re.compile(pattern if is_regex else re.escape(pattern), re.IGNORECASE)
+                    for m in regex.finditer(page.text):
+                        st, en = m.start(), m.end()
+                        if st >= en: continue
+                        block = next((idx for idx, b_st, b_en in block_spans if b_st <= st and en <= b_en), None)
+                        ent = rule.get('entity_type', 'CUSTOM_BLOCKED')
+                        if not re.fullmatch(r"[A-Z][A-Z0-9_]*", ent): ent = 'CUSTOM_BLOCKED'
+                        cand = DetectedPII(
+                            ent, page.text[st:en], st, en, 1.0, "custom_rule",
+                            f"CustomRuleRecognizer:{rule.get('name', 'Rule')}", page.page_number, block
+                        )
+                        candidates.append(cand)
+                except Exception:
+                    pass
+            output.pages_analyzed.append(page.page_number)
+            output.raw_candidate_count += len(candidates)
             # Keep duplicate raw candidates; no overlap removal in Engine 3.
             candidates.sort(key=lambda d: (d.start, d.end, d.entity_type))
             for detection in candidates:

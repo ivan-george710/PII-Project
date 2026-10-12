@@ -1,0 +1,111 @@
+name: CI
+
+on:
+  push:
+    branches: [pseudofix]
+  pull_request:
+    branches: [pseudofix]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  backend:
+    name: Backend Tests (Pytest)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libmagic-dev poppler-utils
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+          cache-dependency-path: requirements-local.txt
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-local.txt
+
+      - name: Cache spaCy model
+        id: cache-spacy
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/spacy
+          key: spacy-en-core-web-lg-3.8.0
+
+      - name: Download spaCy en_core_web_lg model
+        run: |
+          python -m spacy download en_core_web_lg
+
+      - name: Run backend pytest suite
+        env:
+          PYTHONPATH: .
+        run: |
+          pytest tests/ -v
+
+  frontend:
+    name: Frontend Tests and Builds
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Set up Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install frontend dependencies
+        run: npm --prefix frontend ci
+
+      - name: Run frontend tests
+        run: npm --prefix frontend run test -- --run
+
+      - name: Build local employee frontend
+        run: npm --prefix frontend run build
+
+      - name: Build manager-only frontend
+        run: npm --prefix frontend run build -- --mode manager
+
+  manager-isolation:
+    name: Validate Manager Service Isolation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install minimal manager requirements
+        run: |
+          python -m pip install fastapi uvicorn pydantic
+
+      - name: Verify manager runs independently without engine dependencies
+        run: |
+          PYTHONPATH=. python3 -c "from manager.server import create_app; app = create_app(); print('Manager standalone app initialized successfully')"
+
+      - name: Verify vercel deployment exclusion
+        run: |
+          grep -q "^app/" .vercelignore
+          grep -q "^\.env" .vercelignore
+          grep -q "manager" vercel.json

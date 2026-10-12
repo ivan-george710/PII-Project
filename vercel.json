@@ -1,0 +1,17 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "services": {
+    "frontend": {
+      "root": "frontend",
+      "framework": "vite",
+      "buildCommand": "npm run build -- --mode manager",
+      "outputDirectory": "dist",
+      "rewrites": [{"source": "/(.*)", "destination": "/index.html"}]
+    },
+    "manager": {"root": "manager", "framework": "fastapi", "entrypoint": "server:app"}
+  },
+  "rewrites": [
+    {"source": "/api/(.*)", "destination": {"service": "manager"}},
+    {"source": "/(.*)", "destination": {"service": "frontend"}}
+  ]
+}

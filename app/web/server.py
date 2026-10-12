@@ -20,7 +20,7 @@ from app.engines.extraction.office import source_hash
 from app.pipeline import DocumentPipeline
 from .models import (DocumentState, StageState, Finding, FindingList, FindingDetail, SourceWindow,
                      PreviewHighlight, FeedbackRequest, MissedRequest, SaveRequest, LoadRequest,
-                     ReviewIdentity, AuditView, AuditEvent, FindingComparison)
+                     ReviewIdentity, AuditView, AuditEvent, FindingComparison, TextRequest)
 
 MAX_UPLOAD = 30 * 1024 * 1024
 STATIC = Path(__file__).parent / "static"
@@ -53,7 +53,7 @@ class LocalBoundary:
             return await reject(403, "Use the local review application to submit changes.")
         # Multipart data stays in memory until explicitly written to our private area.
         # No framework spool file containing PII is allowed in the public OS temp area.
-        maximum = self.maximum + 65536 if scope["path"] == "/api/documents" else 16384
+        maximum = self.maximum + 65536 if scope["path"] == "/api/documents" else (512000 if scope["path"] == "/api/messages" else 16384)
         messages, size = [], 0
         if mutating:
             try:
@@ -103,9 +103,10 @@ class ReviewSession:
     format: str
     result: object
     saved_revision: int | None = None
+    input_text: str | None = None
 
 
-def create_app(*, work_dir=None, pipeline=None, max_upload_bytes=MAX_UPLOAD, allow_test_host=False):
+def create_app(*, work_dir=None, pipeline=None, max_upload_bytes=MAX_UPLOAD, allow_test_host=False, manager_client=None):
     if not 0 < max_upload_bytes <= MAX_UPLOAD:
         raise ValueError("Choose a bounded local upload size")
     store = AuditStore(work_dir or PROJECT_ROOT / ".private_review_app")
@@ -115,6 +116,8 @@ def create_app(*, work_dir=None, pipeline=None, max_upload_bytes=MAX_UPLOAD, all
         AuditStore(root / name)._prepare()
     MultiPartParser.spool_max_size = MAX_UPLOAD + 65537
     engine = pipeline or DocumentPipeline(audit=AuditEngine(root / "audits"), artifact_output_dir=root / "artifacts")
+    from .manager_client import ManagerClient
+    manager = manager_client or ManagerClient()
     lock, sessions, saved_refs = RLock(), {}, {}
     app = FastAPI(title="Cadence PII Guard", debug=False, docs_url=None, redoc_url=None, openapi_url=None)
     app.add_middleware(LocalBoundary, max_upload_bytes=max_upload_bytes, allow_test_host=allow_test_host)
@@ -180,7 +183,31 @@ def create_app(*, work_dir=None, pipeline=None, max_upload_bytes=MAX_UPLOAD, all
                                      seconds=result.stage_timings.get(name)))
         return DocumentState(document_session_id=s.session_id, format=s.format,
             revision=result.audit_result.revision if result.audit_result else None, saved_revision=s.saved_revision,
-            artifact_available=available, summary=result.sanitized_summary(), stages=stages, issue_message=issue_message)
+            artifact_available=available, summary=result.sanitized_summary(), stages=stages, issue_message=issue_message, input_text=s.input_text, output_text=(result.redaction_result.full_text if s.input_text and result.redaction_result and not result.failure else s.input_text if s.input_text else None))
+
+    def report(s):
+        current=s.result.audit_result;summary=s.result.sanitized_summary();parts=[]
+        for record in (current.records+current.visual_records if current else []):
+            if record.effective_decision=='REJECT':continue
+            value=detail(s.session_id,record.detection_id)
+            compared=comparison(s.session_id,record.detection_id)
+            part={'finding_id':record.detection_id,'category':value.finding.entity_type,'original':value.candidate,'redacted':compared.replacement,'truncated':value.candidate_truncated}
+            if value.finding.kind=='VISUAL':
+                from PIL import Image
+                def image(after):
+                    response=face_crop(s.session_id,record.detection_id,after,current.revision)
+                    picture=Image.open(__import__('io').BytesIO(response.body)).convert('RGB');picture.thumbnail((160,160));buffer=__import__('io').BytesIO();picture.save(buffer,format='PNG')
+                    return 'data:image/png;base64,'+__import__('base64').b64encode(buffer.getvalue()).decode()
+                part['original_image']=image(False)
+                part['redacted_image']=image(True) if value.finding.protected else None
+            parts.append(part)
+        artifact=summary.get('artifact') or {}
+        ready=bool(not s.result.failure and summary.get('human_review_complete') and artifact.get('verification_completed') and artifact.get('supported_content_verified'))
+        path=file_for(s) if ready else None
+        audit_info = summary.get('audit') or {}
+        counts = {k: v for k, v in (audit_info.get('counts') or {}).items() if isinstance(v, int)}
+        payload={'id':s.session_id,'filename':s.display_name,'revision':current.revision if current else 0,'ready':ready,'artifact_sha256':source_hash(path) if path else None,'parts':parts,'counts':counts}
+        return manager.publish(payload)
 
     def finding(record, s=None):
         d = record.effective_detection
@@ -224,7 +251,18 @@ def create_app(*, work_dir=None, pipeline=None, max_upload_bytes=MAX_UPLOAD, all
 
     @app.get("/api/config")
     def config():
-        return {"max_upload_bytes": max_upload_bytes, "supported_formats": list(FORMATS.values()), "trusted_local_only": True}
+        return {"manager_url": manager.url, "max_upload_bytes": max_upload_bytes, "supported_formats": list(FORMATS.values()), "trusted_local_only": True}
+
+    @app.get('/api/samples')
+    def samples():
+        folder=Path(os.getenv('DEMO_SAMPLE_DIR',str(PROJECT_ROOT/'demo'/'samples')))
+        return {'items':[{'filename':p.name,'label':p.stem.replace('-',' ')} for p in sorted(folder.glob('*')) if p.is_file() and p.suffix in FORMATS]}
+
+    @app.get('/api/samples/{filename}')
+    def sample(filename:str):
+        folder=Path(os.getenv('DEMO_SAMPLE_DIR',str(PROJECT_ROOT/'demo'/'samples'))).resolve();path=(folder/filename).resolve()
+        if path.parent!=folder or path.suffix not in FORMATS or not path.is_file():raise HTTPException(404,'Sample unavailable.')
+        return FileResponse(path,media_type=MIME[FORMATS[path.suffix]],filename=path.name)
 
     @app.get("/api/documents", response_model=list[DocumentState])
     def documents():
@@ -259,15 +297,37 @@ def create_app(*, work_dir=None, pipeline=None, max_upload_bytes=MAX_UPLOAD, all
             except Exception:
                 raise HTTPException(400, "Document content is corrupt, unsupported or does not match its extension.") from None
             with lock:
+                try:
+                    if hasattr(engine, 'set_custom_rules'): engine.set_custom_rules(manager.get_rules())
+                except Exception: pass
                 result = engine.process(path)
                 s = ReviewSession(identifier, name, FORMATS[extension], result)
                 sessions[identifier] = s
+                try:report(s)
+                except Exception:pass
                 return state(s)
         except Exception:
             path.unlink(missing_ok=True)
             raise
         finally:
             file.file.close()
+
+    @app.post('/api/messages', response_model=DocumentState)
+    def text_message(body:TextRequest):
+        if not body.text.strip():raise HTTPException(422,'Write a message first.')
+        from docx import Document
+        identifier=uuid4().hex;directory=root/'uploads'/identifier;AuditStore(directory)._prepare()
+        path=directory/'message.docx';document=Document()
+        for paragraph in body.text.split('\n'):document.add_paragraph(paragraph)
+        document.save(path);os.chmod(path,0o600)
+        with lock:
+            try:
+                if hasattr(engine, 'set_custom_rules'): engine.set_custom_rules(manager.get_rules())
+            except Exception: pass
+            result=engine.process(path);s=ReviewSession(identifier,'Text message','docx',result,input_text=body.text);sessions[identifier]=s
+            try:report(s)
+            except Exception:pass
+            return state(s)
 
     @app.get("/api/documents/{identifier}", response_model=DocumentState)
     def get_document(identifier: str):
@@ -376,12 +436,77 @@ def create_app(*, work_dir=None, pipeline=None, max_upload_bytes=MAX_UPLOAD, all
             return apply(s,ReviewerFeedback("MISSED_PII",body.reviewer_id,page_number=body.location,
                 original_start=body.start,original_end=body.end,entity_type=body.entity_type,reason=body.reason))
 
-    @app.get("/api/documents/{identifier}/artifact")
-    def artifact(identifier: str, inline: bool = False):
+    @app.get('/api/documents/{identifier}/manager')
+    def manager_status(identifier:str):
+        with lock:
+            s=session(identifier)
+            try:
+                decision=manager.status(identifier)
+                if decision['revision']!=(s.result.audit_result.revision if s.result.audit_result else 0):decision=report(s)
+                return decision
+            except HTTPException:
+                return report(s)
+
+    @app.get('/api/documents/{identifier}/original')
+    def original(identifier:str):
+        with lock:
+            s=session(identifier);path=Path(s.result.extraction_result.source_path) if s.result.extraction_result else None
+            if not path or not path.is_file() or not path.resolve().is_relative_to(root/'uploads'):raise HTTPException(404,'Original file unavailable.')
+            return FileResponse(path,media_type=MIME[s.format],filename=s.display_name,content_disposition_type='inline' if s.format=='pdf' else 'attachment')
+
+    @app.get('/api/documents/{identifier}/preview-pages')
+    def preview_pages(identifier: str):
         with lock:
             s = session(identifier)
+            ext_pages = s.result.extraction_result.pages if s.result.extraction_result else []
+            red_pages = s.result.redaction_result.pages if s.result.redaction_result else []
+            kind = {"pdf": "page", "docx": "section", "pptx": "slide"}.get(s.format, "page")
+            items = []
+            for i, ep in enumerate(ext_pages):
+                rp = red_pages[i] if i < len(red_pages) else None
+                items.append({
+                    "page_number": ep.page_number,
+                    "kind": kind,
+                    "original_text": ep.text,
+                    "redacted_text": rp.text if rp else ep.text,
+                    "extraction_method": getattr(ep, 'extraction_method', 'native'),
+                })
+            applied = [
+                {
+                    "tag": r.tag,
+                    "entity_type": r.entity_type,
+                    "original_text": r.original_text,
+                    "page_number": r.page_number,
+                }
+                for r in (s.result.redaction_result.redactions if s.result.redaction_result else [])
+            ]
+            return {
+                "format": s.format,
+                "filename": s.display_name,
+                "location_kind": kind,
+                "total_pages": len(ext_pages),
+                "pages": items,
+                "redactions": applied,
+            }
+
+    @app.get("/api/documents/{identifier}/artifact")
+    def artifact(identifier: str, inline: bool = False, expected: int | None = Query(None, alias="revision")):
+        with lock:
+            s = session(identifier)
+            if expected is not None:revision(s, expected)
             path = file_for(s)
-            return FileResponse(path,media_type=MIME[s.format],filename="private-review-copy."+s.format,
+            try:
+                decision = manager.status(identifier)
+                if isinstance(decision, dict) and decision.get('status') == 'denied':
+                    raise HTTPException(403, 'Artifact download was denied by manager.')
+            except HTTPException as e:
+                if e.status_code == 403: raise
+            except Exception:
+                pass
+            if s.input_text is not None:
+                content = s.result.redaction_result.full_text if s.result.redaction_result else ""
+                return Response(content,media_type="text/plain",headers={"Content-Disposition":"attachment; filename=redacted-message.txt"})
+            return FileResponse(path,media_type=MIME[s.format],filename="redacted-"+s.display_name,
                 content_disposition_type="inline" if inline and s.format=="pdf" else "attachment")
 
     @app.get("/api/documents/{identifier}/audit", response_model=AuditView)

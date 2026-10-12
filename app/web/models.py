@@ -17,6 +17,8 @@ class DocumentState(BaseModel):
     summary: dict
     stages: list[StageState]
     issue_message: str | None = None
+    input_text: str | None = None
+    output_text: str | None = None
 
 
 class Finding(BaseModel):
@@ -125,3 +127,8 @@ class AuditEvent(BaseModel):
 class AuditView(BaseModel):
     summary: dict
     events: list[AuditEvent]
+
+
+class TextRequest(BaseModel):
+    model_config=ConfigDict(extra="forbid")
+    text:str=Field(min_length=1,max_length=100000)

@@ -21,6 +21,9 @@ from app.engines.extraction.pptx import extract_pptx
 from app.engines.pii_detection import PIIDetectionEngine
 from app.web.server import create_app
 
+from manager.server import create_app as create_manager_app
+from app.web.manager_client import ManagerClient
+
 HEADERS={"X-Cadence-Local":"1"}
 LINES=["Owner: John Smith", "Employee: EMP-00001", "Contact: Brightwell", "Missed: SecretToken", "Non-sensitive business policy"]
 
@@ -61,7 +64,11 @@ def setup(tmp_path,maximum=30*1024*1024):
     extraction=Mock(side_effect=extract)
     pipeline=DocumentPipeline(extraction=SimpleNamespace(extract=extraction),detection=PIIDetectionEngine(analyzer=analyzer),
         audit=AuditEngine(root/"audits"),artifact_output_dir=root/"artifacts")
-    app=create_app(work_dir=root,pipeline=pipeline,max_upload_bytes=maximum,allow_test_host=True)
+    manager_app=create_manager_app(path=root/"manager.sqlite")
+    manager_tc=TestClient(manager_app)
+    mgr_client=ManagerClient(client=manager_tc)
+    app=create_app(work_dir=root,pipeline=pipeline,max_upload_bytes=maximum,allow_test_host=True,manager_client=mgr_client)
+    app.state.manager_test_client=manager_tc
     return TestClient(app),app,analyzer,extraction
 
 
@@ -76,6 +83,7 @@ def upload(client,kind="docx",content=None,name=None):
 @pytest.mark.parametrize("kind",["pdf","docx","pptx"])
 def test_upload_get_findings_context_artifact_and_no_path_leaks(api,kind):
     client,app,_,_=api
+    mgr_tc=app.state.manager_test_client
     response=upload(client,kind)
     assert response.status_code==200,response.text
     state=response.json();sid=state["document_session_id"]
@@ -92,9 +100,48 @@ def test_upload_get_findings_context_artifact_and_no_path_leaks(api,kind):
     detail=client.get(f"/api/documents/{sid}/findings/{reviews['items'][0]['finding_id']}").json()
     assert detail["candidate"]=="Brightwell"
     assert sum(len(detail[k]) for k in ["before","candidate","after"])<=480
+
+    # Initial redacted artifact is available immediately without awaiting review/approval
+    assert client.get(f"/api/documents/{sid}/artifact").status_code==200
+
+    # Manager report is pending and unready; manager cannot approve unready engine results
+    rep=mgr_tc.get(f"/api/manager/reports/{sid}").json()
+    assert rep["status"]=="pending" and not rep["ready"]
+    bad_approve=mgr_tc.post(f"/api/manager/reports/{sid}/decision",headers=HEADERS,json={"revision":0,"artifact_sha256":None,"action":"approved"})
+    assert bad_approve.status_code==409
+
+    # Resolve review item -> human review complete
+    f_id=reviews["items"][0]["finding_id"]
+    fb=client.post(f"/api/documents/{sid}/feedback",headers=HEADERS,json={"expected_revision":0,"finding_id":f_id,"action":"CONFIRM_PII"})
+    assert fb.status_code==200
+    rev1=fb.json()["revision"]
+    assert fb.json()["summary"]["human_review_complete"]
+
+    # Sync manager report with revised result
+    m_status=client.get(f"/api/documents/{sid}/manager").json()
+    assert m_status["ready"] is True and m_status["status"]=="pending"
+    sha=m_status["artifact_sha256"]
+    assert sha is not None
+
+    # Redacted artifact is available immediately without awaiting manager approval
     download=client.get(f"/api/documents/{sid}/artifact")
     assert download.status_code==200 and download.content
-    assert "private-review-copy."+kind in download.headers["content-disposition"]
+    assert ("redacted-private-name."+kind) in download.headers["content-disposition"]
+
+    # Manager approves revision 1
+    approve=mgr_tc.post(f"/api/manager/reports/{sid}/decision",headers=HEADERS,json={"revision":rev1,"artifact_sha256":sha,"action":"approved"})
+    assert approve.status_code==200
+    assert client.get(f"/api/documents/{sid}/artifact").status_code==200
+
+    # Manager denies -> download blocked (403)
+    deny=mgr_tc.post(f"/api/manager/reports/{sid}/decision",headers=HEADERS,json={"revision":rev1,"artifact_sha256":sha,"action":"denied"})
+    assert deny.status_code==200
+    assert client.get(f"/api/documents/{sid}/artifact").status_code==403
+
+    # Re-approve -> download unblocked (200)
+    mgr_tc.post(f"/api/manager/reports/{sid}/decision",headers=HEADERS,json={"revision":rev1,"artifact_sha256":sha,"action":"approved"})
+    assert client.get(f"/api/documents/{sid}/artifact").status_code==200
+
     for secret in [str(app.state.work_dir),"private-name", "John Smith", "Brightwell", "EMP-00001"]:
         assert secret not in response.text
         assert secret not in str(findings)
@@ -329,3 +376,74 @@ def test_saved_feedback_timeline_survives_reload_without_detection(api):
     assert timeline.status_code == 200
     assert timeline.json()["events"][0]["action"] == "CONFIRM_PII"
     assert analyzer.calls == calls
+
+
+def test_manager_unavailable_does_not_block_local_download(tmp_path):
+    root = tmp_path / "private-app"
+    analyzer = Analyzer()
+    pipeline = DocumentPipeline(extraction=SimpleNamespace(extract=lambda p: extract_docx(p)), detection=PIIDetectionEngine(analyzer=analyzer),
+        audit=AuditEngine(root / "audits"), artifact_output_dir=root / "artifacts")
+    unreachable_client = ManagerClient(url="http://127.0.0.1:59999")
+    app = create_app(work_dir=root, pipeline=pipeline, allow_test_host=True, manager_client=unreachable_client)
+    client = TestClient(app)
+    res = upload(client, "docx")
+    assert res.status_code == 200
+    sid = res.json()["document_session_id"]
+    finding = client.get(f"/api/documents/{sid}/findings?decision=REVIEW").json()["items"][0]
+    client.post(f"/api/documents/{sid}/feedback", headers=HEADERS, json={"expected_revision": 0, "finding_id": finding["finding_id"], "action": "CONFIRM_PII"})
+    down = client.get(f"/api/documents/{sid}/artifact")
+    assert down.status_code == 200
+
+
+def test_revision_reset_resets_approval_and_blocks_stale_download(api):
+    client, app, _, _ = api
+    mgr_tc = app.state.manager_test_client
+    sid = upload(client, "docx").json()["document_session_id"]
+    finding = client.get(f"/api/documents/{sid}/findings?decision=REVIEW").json()["items"][0]
+    client.post(f"/api/documents/{sid}/feedback", headers=HEADERS, json={"expected_revision": 0, "finding_id": finding["finding_id"], "action": "CONFIRM_PII"})
+    m_status = client.get(f"/api/documents/{sid}/manager").json()
+    assert m_status["ready"] is True
+    sha1 = m_status["artifact_sha256"]
+    approve1 = mgr_tc.post(f"/api/manager/reports/{sid}/decision", headers=HEADERS, json={"revision": 1, "artifact_sha256": sha1, "action": "approved"})
+    assert approve1.status_code == 200
+    assert client.get(f"/api/documents/{sid}/artifact").status_code == 200
+
+    rec = client.get(f"/api/documents/{sid}/findings?decision=CONFIRM").json()["items"][0]
+    client.post(f"/api/documents/{sid}/feedback", headers=HEADERS, json={"expected_revision": 1, "finding_id": rec["finding_id"], "action": "FALSE_POSITIVE"})
+    assert client.get(f"/api/documents/{sid}").json()["revision"] == 2
+
+    # Deny blocks download
+    m_status2 = client.get(f"/api/documents/{sid}/manager").json()
+    deny = mgr_tc.post(f"/api/manager/reports/{sid}/decision", headers=HEADERS, json={"revision": 2, "artifact_sha256": m_status2["artifact_sha256"], "action": "denied"})
+    assert deny.status_code == 200
+    assert client.get(f"/api/documents/{sid}/artifact").status_code == 403
+
+    stale_app = mgr_tc.post(f"/api/manager/reports/{sid}/decision", headers=HEADERS, json={"revision": 1, "artifact_sha256": sha1, "action": "approved"})
+    assert stale_app.status_code == 409
+
+    approve2 = mgr_tc.post(f"/api/manager/reports/{sid}/decision", headers=HEADERS, json={"revision": 2, "artifact_sha256": m_status2["artifact_sha256"], "action": "approved"})
+    assert approve2.status_code == 200
+    assert client.get(f"/api/documents/{sid}/artifact").status_code == 200
+
+
+def test_text_message_manager_approval_and_sanitized_txt_download(api):
+    client, app, _, _ = api
+    mgr_tc = app.state.manager_test_client
+    res = client.post("/api/messages", headers=HEADERS, json={"text": "Contact Brightwell about EMP-00001 please."})
+    assert res.status_code == 200
+    sid = res.json()["document_session_id"]
+    assert res.json()["input_text"] == "Contact Brightwell about EMP-00001 please."
+
+    finding = client.get(f"/api/documents/{sid}/findings?decision=REVIEW").json()["items"][0]
+    client.post(f"/api/documents/{sid}/feedback", headers=HEADERS, json={"expected_revision": 0, "finding_id": finding["finding_id"], "action": "CONFIRM_PII"})
+    m_status = client.get(f"/api/documents/{sid}/manager").json()
+    assert m_status["ready"] is True
+    mgr_tc.post(f"/api/manager/reports/{sid}/decision", headers=HEADERS, json={"revision": 1, "artifact_sha256": m_status["artifact_sha256"], "action": "approved"})
+    down = client.get(f"/api/documents/{sid}/artifact")
+    assert down.status_code == 200
+    assert down.headers["content-type"].startswith("text/plain")
+    assert "redacted-message.txt" in down.headers["content-disposition"]
+    text = down.text
+    assert "Brightwell" not in text
+    assert "EMP-00001" not in text
+    assert "please." in text

@@ -1,12 +1,20 @@
 import type { FindingList, Finding } from './types';
-export class ApiError extends Error { constructor(public status:number){ super(status===409?'This review changed. Refresh before submitting feedback.':status===413?'The document exceeds the local size limit.':status===415?'Supported uploads are PDF, DOCX and PPTX.':status===422?'Check the finding, source range and current decision.':'The local operation could not be completed. Please retry.'); } }
+export class ApiError extends Error {
+  constructor(public status:number, public detail?:string){
+    super(detail || (status===409?'This review changed. Refresh before submitting feedback.':status===413?'The document exceeds the local size limit.':status===415?'Supported uploads are PDF, DOCX and PPTX.':status===422?'Check the finding, source range and current decision.':'The local operation could not be completed. Please retry.'));
+  }
+}
 let pending:Promise<void>=Promise.resolve();
 export function api<T>(path:string, init:RequestInit={}):Promise<T> {
   // The existing local launcher has a four-connection limit and synchronous
   // processing. Serialize JSON requests rather than burst on each React mount.
   const request=pending.then(async()=>{
     const response=await fetch(path,{...init,credentials:'same-origin',headers:{'X-Cadence-Local':'1',...(init.body instanceof FormData?{}:{'Content-Type':'application/json'}),...init.headers}});
-    if(!response.ok)throw new ApiError(response.status);
+    if(!response.ok){
+      let detail:string|undefined;
+      try{const data=await response.json();if(typeof data?.detail==='string')detail=data.detail;}catch{}
+      throw new ApiError(response.status, detail);
+    }
     return response.json() as Promise<T>;
   });
   pending=request.then(()=>undefined,()=>undefined);

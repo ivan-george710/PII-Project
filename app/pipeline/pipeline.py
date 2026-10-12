@@ -52,6 +52,11 @@ class DocumentPipeline:
             setattr(self, name, engine)
         return engine
 
+    def set_custom_rules(self, rules):
+        from app.engines.pii_detection import PIIDetectionEngine
+        det = self._engine("detection", PIIDetectionEngine)
+        det.custom_rules = list(rules or [])
+
     @staticmethod
     def _stage(result, stage, operation, expected_type=None):
         started = perf_counter()

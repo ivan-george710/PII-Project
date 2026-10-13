@@ -9,3 +9,5 @@
 Subdirectories contain their own manifests when touched. Engine implementation and phase evidence remain authoritative.
 
 | `review-2026-10-13.md` | Implemented | Pushed-commit review, local fixes, verified test/video evidence and explicit remaining engine/deployment gaps. |
+
+The automatic visual presentation is in `../presentation/`; its index describes the architecture film, speaker notes, timed choreography and assets.

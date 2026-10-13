@@ -284,3 +284,7 @@ before restarting an existing app process to load the new backend modules.
 See [PHASE11_REPORT.md](PHASE11_REPORT.md) for provenance, thresholds, format support,
 measured real-document diagnostics, test commands, and limitations. Synthetic fixtures
 can be generated locally with `.venv\Scripts\python.exe tools/create_phase11_fixtures.py`.
+
+## Team presentation
+
+The automatic architecture film lives in `presentation/`. Start it with `python3 -m http.server 8767 --bind 127.0.0.1 --directory presentation`, then open http://127.0.0.1:8767. Press Start film once; the timed camera and demonstrations follow the agreed speaker order. Speaking times and notes are available from the header. See `presentation/README.md` for offline use and rehearsal controls.

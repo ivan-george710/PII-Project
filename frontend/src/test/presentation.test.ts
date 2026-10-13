@@ -19,6 +19,12 @@ describe('presentation playback', () => {
       addEventListener: vi.fn(), removeEventListener: vi.fn(), dispatchEvent: () => true,
     }));
     vi.spyOn(console, 'debug').mockImplementation(() => {});
+    const resizeCallbacks: ResizeObserverCallback[] = [];
+    const BrowserResizeObserver = window.ResizeObserver;
+    vi.spyOn(window, 'ResizeObserver').mockImplementation(function (callback: ResizeObserverCallback) {
+      resizeCallbacks.push(callback);
+      return new BrowserResizeObserver(callback);
+    } as unknown as typeof ResizeObserver);
     Object.defineProperty(SVGElement.prototype, 'getTotalLength', { configurable: true, value: () => 100 });
     const script = ['story.js', 'intro.js', 'component-demos.js', 'presentation.js']
       .map(file => readFileSync(resolve(root, file), 'utf8')).join('\n');
@@ -32,6 +38,18 @@ describe('presentation playback', () => {
     const scenes = ['intro', 'overview', 'understand', 'protect', 'rules', 'audit', 'integration', 'manager', 'architecture', 'network', 'shares', 'closing'];
     const speakers = ['Diljot', 'Diljot', 'Ivan', 'Ivan', 'Adarsh', 'Shambavi', 'Anubhav', 'Anubhav', 'Diljot', 'Diljot', 'Diljot', 'Diljot'];
     expect(document.querySelector('.masthead')!.children).toHaveLength(1);
+    button('next').click();
+    const problemScrub = document.getElementById('scrub') as HTMLInputElement;
+    problemScrub.value = '1000'; problemScrub.dispatchEvent(new Event('input', { bubbles: true }));
+    vi.spyOn(Element.prototype, 'getBoundingClientRect').mockReturnValue({
+      width: 390, height: 600, top: 0, left: 0, right: 390, bottom: 600, x: 0, y: 0, toJSON: () => ({}),
+    });
+    resizeCallbacks[0]([], {} as ResizeObserver);
+    expect(document.getElementById('intro-stage')!.style.getPropertyValue('--intro-evidence-x')).toBe('0px');
+    expect(document.getElementById('intro-stage')!.style.getPropertyValue('--intro-copy-x')).toBe('91px');
+    expect(document.body.dataset.cycleProgress).toBe('1.000');
+    expect(window.location.hash).toBe('#1');
+    button('previous').click();
     button('play').click();
     for (const [index, scene] of scenes.entries()) {
       if (index) button('next').click();

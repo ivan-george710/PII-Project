@@ -5,6 +5,7 @@
   let root;
   let refs;
   let observer;
+  let lastOptions = {};
   let bounds = { width: 1200, height: 600 };
   const clamp = (value, min = 0, max = 1) => Math.min(max, Math.max(min, value));
   const ease = value => 1 - Math.pow(1 - clamp(value), 4);
@@ -97,7 +98,12 @@
     };
     const measure = () => {
       const box = root.getBoundingClientRect();
-      if (box.width && box.height) bounds = { width: box.width, height: box.height };
+      if (box.width && box.height) {
+        const changed = box.width !== bounds.width || box.height !== bounds.height;
+        bounds = { width: box.width, height: box.height };
+        // A paused slide still needs its current composition to fit a resized viewport.
+        if (changed && refs) render(lastOptions);
+      }
     };
     measure();
     if (typeof ResizeObserver === 'function') {
@@ -112,6 +118,7 @@
 
   function render(options = {}) {
     if (!root) return;
+    lastOptions = { ...options };
     const scene = options.scene === 1 || options.scene === 'problem' ? 1 : 0;
     const reduced = Boolean(options.reduced);
     const playing = Boolean(options.playing);

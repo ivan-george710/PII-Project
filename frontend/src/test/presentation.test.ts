@@ -35,15 +35,18 @@ describe('presentation playback', () => {
       const match = document.getElementById('clock')!.textContent!.match(/\/ (\d+):(\d+)/)!;
       return Number(match[1]) * 60 + Number(match[2]);
     };
-    const scenes = ['intro', 'overview', 'understand', 'protect', 'rules', 'audit', 'integration', 'manager', 'architecture', 'network', 'shares', 'closing'];
+    const scenes = ['system', 'overview', 'understand', 'protect', 'rules', 'audit', 'integration', 'manager', 'architecture', 'network', 'shares', 'closing'];
     const speakers = ['Diljot', 'Diljot', 'Ivan', 'Ivan', 'Adarsh', 'Shambavi', 'Anubhav', 'Anubhav', 'Diljot', 'Diljot', 'Diljot', 'Diljot'];
     expect(document.querySelector('.masthead')!.children).toHaveLength(1);
+    expect(document.body.dataset.shot).toBe('system');
+    expect(document.getElementById('scene-title')!.textContent).toBe('Our approach to problem #2');
+    expect(document.getElementById('world')!.classList.contains('world-overview')).toBe(true);
+    expect(document.getElementById('viewport')).toHaveAttribute('aria-hidden', 'false');
     button('next').click();
     const problemScrub = document.getElementById('scrub') as HTMLInputElement;
     problemScrub.value = '1000'; problemScrub.dispatchEvent(new Event('input', { bubbles: true }));
-    vi.spyOn(Element.prototype, 'getBoundingClientRect').mockReturnValue({
-      width: 390, height: 600, top: 0, left: 0, right: 390, bottom: 600, x: 0, y: 0, toJSON: () => ({}),
-    });
+    Object.defineProperty(document.getElementById('intro-stage'), 'clientWidth', { configurable: true, value: 390 });
+    Object.defineProperty(document.getElementById('intro-stage'), 'clientHeight', { configurable: true, value: 600 });
     resizeCallbacks[0]([], {} as ResizeObserver);
     expect(document.getElementById('intro-stage')!.style.getPropertyValue('--intro-evidence-x')).toBe('0px');
     expect(document.getElementById('intro-stage')!.style.getPropertyValue('--intro-copy-x')).toBe('91px');
@@ -54,10 +57,13 @@ describe('presentation playback', () => {
     for (const [index, scene] of scenes.entries()) {
       if (index) button('next').click();
       expect(document.body.dataset.shot).toBe(scene);
+      expect(document.getElementById('scene-title')!.textContent!.trim().length).toBeGreaterThan(0);
       expect(document.getElementById('speaker')!.textContent).toBe(speakers[index]);
-      if (index < 8) expect(document.getElementById('world')!.classList.contains('world-overview')).toBe(false);
+      if (index > 0 && index < 8) expect(document.getElementById('world')!.classList.contains('world-overview')).toBe(false);
       if (index === 1) {
-        expect(document.getElementById('viewport')).toHaveAttribute('aria-hidden', 'true');
+        expect(document.getElementById('viewport')).toHaveAttribute('aria-hidden', 'false');
+        expect(document.getElementById('source-engine')).toHaveClass('problem-view');
+        expect(document.getElementById('intro-stage')!.parentElement!.id).toBe('source-engine');
         expect(document.getElementById('intro-stage')).toHaveAttribute('data-intro-scene', '1');
       }
       tick(loopDuration() * 3 + .1);
@@ -65,6 +71,7 @@ describe('presentation playback', () => {
       expect(window.location.hash).toBe(`#${index}`);
       expect(document.body.dataset.loopCount).toBe('3');
     }
+    expect(document.getElementById('scene-title')!.textContent).toBe('So, we conclude');
     expect(button('next')).toBeDisabled();
     button('next').click();
     expect(window.location.hash).toBe('#11');

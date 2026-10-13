@@ -60,8 +60,7 @@
           </ul>
         </div>
       </section>
-      <section class="intro-shot intro-overview-shot" aria-labelledby="intro-overview-title" hidden>
-        <h2 id="intro-overview-title">One upload.</h2>
+      <section class="intro-shot intro-overview-shot" aria-labelledby="scene-title" hidden>
         <div class="intro-document-stage">
           <div class="intro-folio intro-upload">
             <span class="intro-folio-label">Original upload</span>
@@ -97,7 +96,7 @@
       evidence: root.querySelector('.intro-evidence'),
     };
     const measure = () => {
-      const box = root.getBoundingClientRect();
+      const box = { width: root.clientWidth, height: root.clientHeight };
       if (box.width && box.height) {
         const changed = box.width !== bounds.width || box.height !== bounds.height;
         bounds = { width: box.width, height: box.height };
@@ -152,12 +151,13 @@
     const split = reduced ? 1 : phase(time, 3.5, 3.6);
     const copy = reduced ? 1 : phase(time, 3.6, 2.8);
     const evidence = reduced ? 1 : phase(time, 10.5, 3.4);
-    const spread = mobile ? Math.min(91, bounds.width * .235) : Math.min(340, bounds.width * .265);
-    const sourceScale = mobile ? 1 - split * .425 : 1 - split * .13;
-    const copyScale = mobile ? .82 - split * .245 : .86 + split * .01;
+    const boxedWide = root.parentElement.id === 'source-engine' && !mobile;
+    const spread = boxedWide ? Math.min(560, bounds.width * .30) : mobile ? Math.min(91, bounds.width * .235) : Math.min(340, bounds.width * .265);
+    const sourceScale = boxedWide ? 1 : mobile ? 1 - split * .425 : 1 - split * .13;
+    const copyScale = boxedWide ? 1 : mobile ? .82 - split * .245 : .86 + split * .01;
     const sourceY = mobile ? -split * Math.min(103, bounds.height * .16) : -split * 2;
     const copyY = mobile ? sourceY : -split * 2;
-    const evidenceY = mobile ? Math.min(155, bounds.height * .25) : 21;
+    const evidenceY = (mobile ? Math.min(155, bounds.height * .25) : 21) + (root.parentElement.id === 'source-engine' && mobile ? 40 : 0);
     const mask = reduced ? 1 : phase(time, 6.3, 2.3);
     const motionBlur = playing && !reduced ? pulse(time, 3.5, 3.6) * 2.8 : 0;
     set('--intro-source-x', `${-spread * split}px`);
@@ -171,7 +171,7 @@
     set('--intro-copy-opacity', copy);
     set('--intro-evidence-x', `${mobile ? 0 : spread * evidence}px`);
     set('--intro-evidence-y', `${evidenceY + (1 - evidence) * 42}px`);
-    set('--intro-evidence-scale', mobile ? .91 : .97);
+    set('--intro-evidence-scale', root.parentElement.id === 'source-engine' && mobile ? .73 : mobile ? .91 : .97);
     set('--intro-evidence-turn', mobile || reduced ? 0 : 3 * (1 - evidence));
     set('--intro-evidence-opacity', evidence);
     set('--intro-folio-blur', motionBlur);

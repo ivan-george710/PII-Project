@@ -21,7 +21,7 @@
 .cd-mask{clip-path:inset(0 calc((1 - var(--mask,1))*100%) 0 0);transform-box:fill-box;transform-origin:left center}
 .cd-mask rect{fill:var(--cd-ink);stroke:none}
 .cd-mask text{fill:#f4f4f4;font-size:14px;letter-spacing:0}
-.cd-portrait{filter:grayscale(1)}
+.cd-portrait{filter:none}
 .cd-composer>rect{stroke:var(--cd-line);stroke-width:1.2;fill:#202020}
 .cd-composer-placeholder{opacity:calc(1 - var(--attach,1));fill:var(--cd-soft)!important;font-size:16px!important}
 .cd-composer-file{opacity:var(--attach,1)}
@@ -169,5 +169,4 @@
 @media(prefers-reduced-motion:reduce){
   .cd-demo *{filter:none!important;transition:none!important;animation:none!important}
   /* Grayscale belongs to the palette; it is not a motion effect. */
-  .cd-demo .cd-portrait{filter:grayscale(1)!important}
 }

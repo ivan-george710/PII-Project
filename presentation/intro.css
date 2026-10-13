@@ -30,7 +30,6 @@
 .intro-team { display: flex; justify-content: center; flex-wrap: wrap; gap: clamp(24px, 4vw, 64px); list-style: none; padding: 0; margin: 48px 0 0; font-size: clamp(17px, 1.6vw, 23px); line-height: 1.4; color: #bfbfbf; }
 .intro-team li { margin: 0; }
 
-.intro-overview-shot > h2 { position: absolute; top: 8px; left: 0; right: 0; font-size: clamp(34px, 4.3vw, 60px); line-height: 1.05; font-weight: 530; letter-spacing: -.03em; text-align: center; margin: 0; }
 .intro-document-stage { position: absolute; inset: 84px 0 70px; }
 .intro-folio { position: absolute; top: 50%; left: 50%; width: 292px; height: 396px; margin: -198px 0 0 -146px; transform-origin: 50% 50%; }
 .intro-folio-label { position: absolute; left: -30px; right: -30px; top: -39px; text-align: center; font-size: 20px; font-weight: 500; letter-spacing: -.015em; white-space: nowrap; }
@@ -90,7 +89,6 @@
   .intro-brand-composition h2 { font-size: 58px; }
   .intro-team { max-width: 280px; margin: 38px auto 0; gap: 18px 26px; font-size: 17px; }
   .intro-team li { flex: 0 0 auto; }
-  .intro-overview-shot > h2 { top: 9px; font-size: 36px; }
   .intro-document-stage { inset: 73px 0 70px; }
   .intro-folio { width: 252px; height: 343px; margin: -171.5px 0 0 -126px; }
   .intro-document { width: 252px; height: 343px; padding: 20px; }
@@ -118,9 +116,16 @@
   .intro-brand-composition h2 { font-size: 70px; }
   .intro-team { margin-top: 35px; }
   .intro-document-stage { transform: scale(.77); transform-origin: 50% 50%; inset: 70px -10% 62px; }
-  .intro-overview-shot > h2 { font-size: 42px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .intro-root *, .intro-root *::before, .intro-root *::after { transition: none; animation: none; filter: none; }
 }
+
+/* The problem demonstration occupies the same upload box as the pipeline. */
+#source-engine .intro-root { inset: 80px 0 10px; background: transparent; }
+#source-engine.problem-view { width: 1800px; height: 600px; top: 380px; z-index: 8; background: var(--surface); border-color: var(--line); }
+#source-engine.problem-view > .cd-demo { visibility: hidden; }
+#source-engine .intro-document-stage { inset: 34px 0 40px; transform: none; }
+#source-engine .intro-overview-outcome { bottom: 7px; font-size: 17px; }
+#source-engine .intro-folio-label { font-size: 19px; }

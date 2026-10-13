@@ -18,18 +18,18 @@
     $(name === 'network' ? 'gateway' : name === 'shares' ? 'shared-chat' : `${name}-engine`)]));
   // Loop lengths describe demonstrations, never speaking time or slide advancement.
   const shots = [
-    { key: 'intro', intro: 0, seconds: 6 },
-    { key: 'overview', intro: 1, seconds: 8 },
-    { key: 'understand', seconds: 12, rect: [640, 315, 1320, 820], roles: ['extract', 'detect'] },
-    { key: 'protect', seconds: 9, rect: [1970, 315, 700, 1280], roles: ['redact', 'verify'] },
+    { key: 'system', seconds: 12, pipeline: true, rect: whole },
+    { key: 'overview', intro: 1, node: 'source', rect: [100, 370, 1840, 620], seconds: 8 },
+    { key: 'understand', seconds: 12, rect: [675, 345, 1250, 740], roles: ['extract', 'detect'] },
+    { key: 'protect', seconds: 9, rect: [2000, 340, 640, 1230], roles: ['redact', 'verify'] },
     { key: 'rules', seconds: 6, node: 'rules' },
     { key: 'audit', seconds: 7, node: 'audit' },
     { key: 'integration', seconds: 10, pipeline: true, scope: ['redact', 'verify', 'audit', 'manager'], rect: [1310, 315, 2100, 1300] },
     { key: 'manager', seconds: 8, node: 'manager' },
-    { key: 'architecture', seconds: 12, pipeline: true, rect: whole, heading: 'The whole system.' },
-    { key: 'network', seconds: 8, node: 'network', heading: 'Beyond one interface.' },
-    { key: 'shares', seconds: 8, node: 'shares', heading: 'Before sharing.' },
-    { key: 'closing', seconds: 12, pipeline: true, rect: [20, -110, 3430, 2600], heading: 'From upload to oversight.' }
+    { key: 'architecture', seconds: 12, pipeline: true, rect: whole },
+    { key: 'network', seconds: 8, node: 'network' },
+    { key: 'shares', seconds: 8, node: 'shares' },
+    { key: 'closing', seconds: 12, pipeline: true, rect: [20, -110, 3430, 2600] }
   ];
   const speedKey = 'pii-presentation-loop-speed-v1';
   const speeds = [.75, 1, 1.5, 2];
@@ -43,13 +43,13 @@
   let camera = { x: 345, y: 730, z: 0 }, target = { ...camera }, velocity = { x: 0, y: 0, z: 0 };
   let frameCount = 0, frameEpoch = performance.now(), lastPaint = 0, dirty = true;
   const viewport = $('viewport'), world = $('world'), carrier = $('artifact-carrier');
-  const intro = window.PresentationIntro?.mount($('film'));
-  if (!intro || !window.ComponentDemos) {
+  if (!window.PresentationIntro || !window.ComponentDemos) {
     $('scene-title').textContent = 'Presentation files are missing. Open the complete folder.';
     $('play').disabled = true;
     return;
   }
   window.ComponentDemos.mount({ nodes });
+  const intro = window.PresentationIntro.mount(nodes.source);
   const demo = options => window.ComponentDemos.render(options);
   const duration = () => shots[index].seconds / playbackSpeed;
   const routeUses = [...document.querySelectorAll('.moving-routes use')];
@@ -57,9 +57,10 @@
 
   function focusRect(rect, snap = false) {
     const [x, y, width, height] = rect;
-    const fitted = Math.min(viewport.clientWidth / width, viewport.clientHeight / height) * .94;
-    // Before Diljot's closing section, never expose the complete architecture.
-    const scale = index < 8 ? Math.max(fitted, viewport.clientWidth / 2750) : fitted;
+    const fitted = Math.min(viewport.clientWidth / width, viewport.clientHeight / height) * .98;
+    // The opening overview is explicit; detailed chapters stay cropped until the closing reveal.
+    const beforeClosing = index < shots.findIndex(shot => shot.key === 'architecture');
+    const scale = beforeClosing && shots[index].key !== 'system' ? Math.max(fitted, viewport.clientWidth / 2750) : fitted;
     target = { x: x + width / 2, y: y + height / 2, z: Math.log(Math.max(.01, scale)) };
     if (reduced.matches || snap) { camera = { ...target }; velocity = { x: 0, y: 0, z: 0 }; }
     dirty = true;
@@ -68,8 +69,8 @@
     const shot = shots[index];
     if (shot.rect) focusRect(shot.rect, snap);
     else if (shot.node) {
-      const b = nodeBounds[shot.node], margin = innerWidth < 600 ? 25 : 75;
-      focusRect([b[0] - margin, b[1] - 50, b[2] + margin * 2, b[3] + 100], snap);
+      const b = nodeBounds[shot.node], margin = innerWidth < 600 ? 12 : 24;
+      focusRect([b[0] - margin, b[1] - 12, b[2] + margin * 2, b[3] + 24], snap);
     }
   }
   function activate(roles = [], overview = false) {
@@ -93,24 +94,26 @@
     index = clamp(Math.trunc(next), 0, shots.length - 1);
     elapsed = 0; loops = 0;
     const shot = shots[index], info = story[index], isIntro = shot.intro != null;
-    document.body.dataset.stage = isIntro ? 'intro' : 'architecture';
+    document.body.dataset.stage = 'architecture';
+    nodes.source.classList.toggle('problem-view', isIntro);
     document.body.dataset.shot = shot.key;
     document.body.dataset.loopCount = '0';
-    viewport.inert = isIntro;
-    viewport.setAttribute('aria-hidden', String(isIntro));
+    viewport.inert = false;
+    viewport.setAttribute('aria-hidden', 'false');
     intro.hidden = !isIntro;
     intro.style.opacity = '1'; intro.style.filter = 'none';
-    viewport.style.setProperty('--architecture-opacity', isIntro ? '0' : '1');
-    world.classList.toggle('show-future', index >= 9);
-    nodes.network.setAttribute('aria-hidden', String(index < 9));
-    nodes.shares.setAttribute('aria-hidden', String(index < 9));
-    $('scene-title').textContent = shot.heading || '';
+    viewport.style.setProperty('--architecture-opacity', '1');
+    const showFuture = ['network', 'shares', 'closing'].includes(shot.key);
+    world.classList.toggle('show-future', showFuture);
+    nodes.network.setAttribute('aria-hidden', String(!showFuture));
+    nodes.shares.setAttribute('aria-hidden', String(!showFuture));
+    $('scene-title').textContent = info.heading;
     $('speaker').textContent = info.speaker;
     $('chapter').textContent = info.chapter;
     $('scene-count').textContent = `${index + 1} / ${shots.length}`;
     $('notes-title').textContent = `${info.speaker} · ${info.chapter}`;
     $('notes-text').textContent = info.notes;
-    $('demo-label').textContent = index === 9 || index === 10 ? 'Future scope · proposed demonstration' : 'Illustrative demonstration';
+    $('demo-label').textContent = shot.key === 'network' || shot.key === 'shares' ? 'Future scope · proposed demonstration' : 'Illustrative demonstration';
     $('context-label').textContent = isIntro ? '' : 'quarterly-report.pdf · synthetic example';
     $('previous').disabled = index === 0;
     $('next').disabled = index === shots.length - 1;
@@ -141,7 +144,7 @@
     // The whole-system loop ends approved. The manager slide separately shows denial.
     demo({ node: 'manager', time: (reduced.matches ? 1 : segment(p, .85, 1)) * .65,
       duration: 1, reduced: false, overview: false, playing: playing && !reduced.matches });
-    if (index === 11) {
+    if (shots[index].key === 'closing') {
       draw('network', segment(p, .10, .60));
       draw('shares', segment(p, .45, .95));
     }

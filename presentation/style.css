@@ -24,9 +24,9 @@ button svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke
 button:disabled { cursor: default; opacity: .3; }
 button:disabled:active { transform: none; }
 #film { position: absolute; inset: 66px 0 112px; overflow: hidden; }
-#scene-title { position: absolute; inset: 0 0 auto; margin: 0; z-index: 10; font-weight: 500; font-size: 36px; letter-spacing: -.025em; text-align: center; pointer-events: none; }
+#scene-title { position: absolute; inset: 0 0 auto; margin: 0; z-index: 10; font-weight: 500; font-size: 36px; line-height: 1.1; padding-inline: 20px; letter-spacing: -.025em; text-align: center; pointer-events: none; }
 #scene-title:empty { display: none; }
-#viewport { position: absolute; inset: 18px 0 35px; overflow: hidden; filter: blur(calc(var(--motion-blur, 0px) + var(--cycle-blur, 0px))); will-change: filter; opacity: var(--architecture-opacity, 1); }
+#viewport { position: absolute; inset: 72px 0 35px; overflow: hidden; filter: blur(calc(var(--motion-blur, 0px) + var(--cycle-blur, 0px))); will-change: filter; opacity: var(--architecture-opacity, 1); }
 #world { position: absolute; width: 3500px; height: 2500px; transform-origin: 0 0; will-change: transform; }
 body[data-stage="intro"] #viewport { visibility: hidden; pointer-events: none; }
 body[data-stage="intro"] .film-caption { display: none; }
@@ -42,7 +42,7 @@ body[data-stage="intro"] .film-caption { display: none; }
 .return-route { stroke-dasharray: 9 9; }
 .moving-routes use { fill: none; stroke: #fff; stroke-width: 4; opacity: .75; }
 #connections text { fill: var(--muted); font: inherit; font-size: 23px; }
-.engine, .future-engine, .engine-group { position: absolute; left: var(--x); top: var(--y); width: var(--w); height: var(--h); border: 1.5px solid var(--line); border-radius: 16px; background: var(--surface); overflow: hidden; transition: opacity .7s, background .7s, border-color .7s; }
+.engine, .future-engine, .engine-group { position: absolute; left: var(--x); top: var(--y); width: var(--w); height: var(--h); border: 1.5px solid var(--line); border-radius: 16px; background: var(--surface); overflow: hidden; transition: opacity .7s, background .7s, border-color .7s, width .5s, height .5s, top .5s; }
 .engine:not(.active), .engine-group:not(.active) { opacity: .35; }
 .engine.active { opacity: 1; border-color: transparent; background: transparent; }
 .engine-group { background: #161616; overflow: visible; }

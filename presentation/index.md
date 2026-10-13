@@ -2,9 +2,9 @@
 
 - `index.html`: persistent grouped architecture, synthetic-demo containers, notes and accessible presenter controls.
 - `style.css`: monochrome SF Pro world, spring-camera surface, 44px responsive controls and print notes.
-- `presentation.js`: selected-slide loop clock, 12 manually advanced scenes, saved speed, connected fixed framing, camera transitions, blur, pause/seek, keyboard controls and notes.
-- `intro.js`: separate team introduction and approved mark assembly driven by the current scene clock.
-- `intro.css`: responsive introduction geometry, mark assembly, document transformation and transient blur.
+- `presentation.js`: selected-slide loop clock, 12 manually advanced scenes, starting with a full-system overview, saved speed, connected fixed framing, camera transitions, blur, pause/seek, keyboard controls and notes.
+- `intro.js`: boxed original/protected/evidence upload demonstration driven by the current scene clock.
+- `intro.css`: responsive expanded-upload geometry, document transformation and transient blur.
 - `component-demos.js`: ten independent functional SVG/DOM demonstrations, driven by the parent clock; synthetic state metadata supports verification.
 - `component-demos.css`: extraction regions, classifier rails, rule matching, masks, verification, lineage, decisions and proposed gateway/share effects.
 - `story.js`: agreed speaker order, chapter metadata and explanatory speaker notes; no paragraph walls on the canvas.

@@ -102,7 +102,7 @@ dialog > p { font-size: 14px; line-height: 1.6; color: var(--muted); max-width: 
   #film { inset: 56px 0 105px; }
   #presenter-tools { right: 12px; bottom: 108px; }
   #scene-title { font-size: 27px; top: 5px; }
-  #viewport { inset: 32px 0 30px; }
+  #viewport { inset: 84px 0 30px; }
   .film-caption { left: 16px; right: 16px; font-size: 11px; }
   #context-label { display: none; }
   .controls { padding: 13px 12px; gap: 4px; height: 100px; }

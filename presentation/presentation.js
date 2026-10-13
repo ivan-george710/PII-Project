@@ -67,7 +67,8 @@
   }
   function frameScene(snap = false) {
     const shot = shots[index];
-    if (shot.rect) focusRect(shot.rect, snap);
+    if (shot.key === 'overview' && innerWidth < 600) focusRect([100, 370, 640, 860], snap);
+    else if (shot.rect) focusRect(shot.rect, snap);
     else if (shot.node) {
       const b = nodeBounds[shot.node], margin = innerWidth < 600 ? 12 : 24;
       focusRect([b[0] - margin, b[1] - 12, b[2] + margin * 2, b[3] + 24], snap);

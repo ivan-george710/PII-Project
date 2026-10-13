@@ -129,3 +129,7 @@
 #source-engine .intro-document-stage { inset: 34px 0 40px; transform: none; }
 #source-engine .intro-overview-outcome { bottom: 7px; font-size: 17px; }
 #source-engine .intro-folio-label { font-size: 19px; }
+
+@media (max-width: 600px) {
+  #source-engine.problem-view { width: 600px; height: 840px; }
+}

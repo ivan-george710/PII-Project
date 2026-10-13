@@ -109,6 +109,15 @@ async function review(action = 'Confirm as PII') {
 }
 
 describe('React privacy review product', () => {
+  it('restores a full original text demo from the attachment menu', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    await user.click(screen.getByRole('button', { name: 'Add attachment' }));
+    await user.click(screen.getByRole('button', { name: 'Text message' }));
+    expect(screen.getByRole('textbox', { name: 'Message' })).toHaveValue('Hi, I am Dana Mercer (EMP-02048). My email is dana@example.com and my phone is +1 (202) 555-0147.');
+    expect(screen.getByRole('button', { name: 'Add attachment' })).toHaveAttribute('aria-expanded', 'false');
+  });
+
   it('renders the local enterprise shell and an honest initial upload flow', async () => {
     render(<App />);
     expect(screen.getByRole('navigation', { name: 'Chat history' })).toBeInTheDocument();

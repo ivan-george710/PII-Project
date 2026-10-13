@@ -1,5 +1,19 @@
 # Cadence PII Guard
 
+## Current demo: local employee, cloud manager
+
+On macOS, from the repository root:
+
+```bash
+.venv/bin/python run.py
+```
+
+This opens employee processing at http://127.0.0.1:8765 and the single cloud manager at https://pii-guard-mu.vercel.app/manager. No login is required. Only affected snippets/crops and report metadata go to the manager; full files and engines stay local. Pending/outage downloads are available; an explicit denial blocks a result. The cloud manager requires its Vercel PostgreSQL `DATABASE_URL`.
+
+For a completely local/offline demo, use `.venv/bin/python run.py --local-manager`; the manager opens on http://127.0.0.1:8766/manager. Stop an existing server before launching. The plus menu creates fictional text PDFs, scans, mixed PDFs, images, faces and Office examples automatically in ignored `demo/samples/`. It also includes any existing local sample documents there. Rebuild edited UI with `npm --prefix frontend run build`.
+
+The engine reports below describe earlier phases; the current manager/demo behavior is described above.
+
 Cadence PII Guard extracts document text, detects personal information, and redacts confirmed spans while preserving internal audit metadata.
 
 ## Architecture

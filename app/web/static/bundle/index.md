@@ -2,8 +2,8 @@
 
 `Strands-BlYSm1nj.css`: compiled UI styles.
 
-`Strands-Dh7IOHWT.js`: compiled application or lazy animation module.
+`Strands-iaat1x88.js`: compiled application or lazy animation module.
 
-`index-Bm1ZtyoQ.css`: compiled UI styles.
+`index-CgrKWyBk.css`: compiled UI styles.
 
-`index-CB0fheT6.js`: compiled application or lazy animation module.
+`index-kNrCbWvw.js`: compiled application or lazy animation module.

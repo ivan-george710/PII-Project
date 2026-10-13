@@ -278,13 +278,16 @@ def create_app(*, work_dir=None, pipeline=None, max_upload_bytes=MAX_UPLOAD, all
     @app.get('/api/samples')
     def samples():
         folder=Path(os.getenv('DEMO_SAMPLE_DIR',str(PROJECT_ROOT/'demo'/'samples')))
+        if not os.getenv('DEMO_SAMPLE_DIR'):
+            from scripts.create_demo_samples import ensure_demo_samples
+            ensure_demo_samples(folder)
         return {'items':[{'filename':p.name,'label':p.stem.replace('-',' ')+' · '+p.suffix[1:].upper()} for p in sorted(folder.glob('*')) if p.is_file() and p.suffix in FORMATS]}
 
     @app.get('/api/samples/{filename}')
     def sample(filename:str):
         folder=Path(os.getenv('DEMO_SAMPLE_DIR',str(PROJECT_ROOT/'demo'/'samples'))).resolve();path=(folder/filename).resolve()
         if path.parent!=folder or path.suffix not in FORMATS or not path.is_file():raise HTTPException(404,'Sample unavailable.')
-        return FileResponse(path,media_type=MIME[FORMATS[path.suffix]],filename=path.name)
+        return FileResponse(path,media_type='image/jpeg' if path.suffix in {'.jpg','.jpeg'} else MIME[FORMATS[path.suffix]],filename=path.name)
 
     @app.get("/api/documents", response_model=list[DocumentState])
     def documents():

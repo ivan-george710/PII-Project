@@ -1,6 +1,6 @@
-"""Start the trusted local demo. Access logs are disabled to keep review inputs private."""
-import uvicorn
+"""Open the local employee application and its cloud manager."""
+from pathlib import Path
+import runpy
 
 if __name__ == "__main__":
-    uvicorn.run("app.main:app", host="127.0.0.1", port=8765, access_log=False,
-                log_level="warning", proxy_headers=False, limit_concurrency=4)
+    runpy.run_path(str(Path(__file__).parent / 'scripts' / 'run-demo.py'), run_name='__main__')

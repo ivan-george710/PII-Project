@@ -26,3 +26,5 @@ Subdirectories contain their own manifests when touched. Engine implementation a
 | `test_manager_service.py` | Implemented; verified (7 passed) | Affected-only payload, immutable revision, stale decision, readiness, denial-only downloads, safe transport and manager rule validation tests. |
 
 | `test_mixed_privacy.py` | Implemented | Real OCR and independent returned-artifact OCR checks for mixed PDF, embedded Office images, PNG/JPEG and original short-alias/ID/mail/password regressions. |
+
+| `test_demo_samples.py` | Implemented | Verify native versus scanned versus mixed PDFs, embedded Office images, sample downloads, MIME types and preservation of user-provided files. |

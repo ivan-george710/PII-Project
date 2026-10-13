@@ -10,7 +10,7 @@
 | `README.md` | Existing | Engine behavior, setup and supported limits. |
 | `createfile.py` | Existing | Existing application module; preserve its behavior unless explicitly changed. |
 | `requirements.txt` | Existing | Existing project asset or configuration; preserve its behavior unless explicitly changed. |
-| `run.py` | Existing | Existing application module; preserve its behavior unless explicitly changed. |
+| `run.py` | Implemented | Launch employee locally and open the cloud manager; `--local-manager` selects offline mode. |
 | `scratch_docling.py` | Existing | Existing application module; preserve its behavior unless explicitly changed. |
 | `scratch_extraction.py` | Existing | Existing application module; preserve its behavior unless explicitly changed. |
 | `scratch_hybrid.py` | Existing | Existing application module; preserve its behavior unless explicitly changed. |
@@ -28,3 +28,6 @@ Subdirectories contain their own manifests when touched. Engine implementation a
 
 
 `wrangler.presentation.jsonc`: static presentation Worker configuration. Run `node presentation/build.mjs`, then `wrangler deploy --config wrangler.presentation.jsonc`; generated assets and credentials are excluded from Git.
+
+| `scripts/create_demo_samples.py` | Implemented | Generate fictional text/image/scan/face/mixed PDF and Office samples locally. |
+| `.github/workflows/deploy-manager.yml` | Implemented | Deploy isolated manager after main CI and verify public manager APIs/database. |

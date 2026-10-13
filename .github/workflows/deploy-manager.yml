@@ -1,0 +1,69 @@
+name: Deploy cloud manager
+
+on:
+  workflow_dispatch:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: cloud-manager-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    if: >-
+      (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main') ||
+      (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success')
+    runs-on: ubuntu-latest
+    env:
+      VERCEL_ORG_ID: ${{ vars.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID }}
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '22'
+      - name: Install deployment CLI
+        run: npm install -g vercel@63.1.0
+      - name: Package only cloud manager source
+        run: |
+          python3 - <<'PY'
+          import os, shutil, pathlib, json
+          target = pathlib.Path(os.environ['RUNNER_TEMP']) / 'manager-deploy'
+          target.mkdir()
+          for folder in ('frontend', 'manager'):
+              shutil.copytree(folder, target / folder, ignore=shutil.ignore_patterns('node_modules', 'dist', '__pycache__', '.env*'))
+          shutil.copyfile('vercel.json', target / 'vercel.json')
+          link = target / '.vercel'
+          link.mkdir()
+          (link / 'project.json').write_text(json.dumps({'projectId': os.environ['VERCEL_PROJECT_ID'], 'orgId': os.environ['VERCEL_ORG_ID']}))
+          PY
+      - name: Deploy manager to existing production project
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        run: |
+          set -euo pipefail
+          vercel deploy --prod --yes --scope lqsky7s-projects --cwd "$RUNNER_TEMP/manager-deploy" > "$RUNNER_TEMP/manager-url.txt"
+          printf 'Manager: https://pii-guard-mu.vercel.app/manager\n' >> "$GITHUB_STEP_SUMMARY"
+      - name: Verify public manager API and database
+        run: |
+          python3 - <<'PY'
+          import json, urllib.request
+          origin = 'https://pii-guard-mu.vercel.app'
+          def get(path):
+              with urllib.request.urlopen(origin + path, timeout=30) as response:
+                  return json.load(response)
+          health = get('/api/health')
+          assert health.get('mode') == 'manager', 'Production is serving the wrong backend'
+          assert isinstance(get('/api/manager/reports').get('items'), list), 'Manager database unavailable'
+          assert isinstance(get('/api/manager/rules').get('items'), list), 'Manager rules unavailable'
+          print('Cloud manager health, reports database and rules verified.')
+          PY

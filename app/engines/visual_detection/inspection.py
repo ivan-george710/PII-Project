@@ -18,6 +18,7 @@ R='{http://schemas.openxmlformats.org/officeDocument/2006/relationships}'
 
 
 def read_unit(path, unit):
+    if unit.kind=='standalone_image':return Path(path).read_bytes()
     if unit.kind=='office_media':
         with ZipFile(path) as z:
             if z.getinfo(unit.source_ref).file_size>MAX_BYTES:raise ValueError('Oversized media')
@@ -148,7 +149,10 @@ class VisualInspectionEngine:
 
     def inspect(self,extraction):
         started=perf_counter();issues=Counter();result=VisualInspection(source_hash(extraction.source_path));cache={}
-        sources=_pdf_sources(extraction,issues) if extraction.file_type=='pdf' else _office_sources(extraction,issues)
+        if extraction.file_type=='image':
+            sources=[('standalone_image','original','display',[dict(location=1,mapped=True)],Path(extraction.source_path).read_bytes())]
+        else:
+            sources=_pdf_sources(extraction,issues) if extraction.file_type=='pdf' else _office_sources(extraction,issues)
         for kind,ref,frame,uses,data in sources:
             try:
                 image=decode(data,frame)

@@ -97,7 +97,7 @@ class ArtifactResult:
                       "alternative_text", "external_relationships", "document_properties",
                       "annotations_or_notes_parts", "charts_or_diagrams", "pdf_annotations_or_attachments", "pdf_images_without_ocr"}
         from app.engines.visual_detection.models import VISUAL_ISSUES
-        return {"format": self.format if self.format in {"pdf", "docx", "pptx"} else None,
+        return {"format": self.format if self.format in {"pdf", "docx", "pptx", "image"} else None,
                 "page_count_preserved": self.page_count_preserved,
                 "redaction_completed": self.redaction_completed,
                 "verification_completed": self.verification_completed, "reopened": self.reopened,
@@ -188,6 +188,8 @@ def _span_segments(extraction, record):
 def _segment_edits(extraction, redaction):
     edits, issues = defaultdict(list), []
     for record in redaction.redactions:
+        if next(p for p in extraction.pages if p.page_number == record.page_number).extraction_method == "media_ocr":
+            continue
         matches = _span_segments(extraction, record)
         if not matches:
             issues.append(ArtifactMappingIssue(record.page_number, record.original_start,
@@ -222,6 +224,10 @@ class OfficeArtifactEngine:
         from .visual_artifacts import prepare_visual
         visual_plans=prepare_visual(extraction,result)
         visual_members={unit.source_ref:data for unit,data,_ in visual_plans.values()}
+        from .media_artifacts import media_plans, update_face_checks
+        media = media_plans(extraction, redaction, visual_members)
+        update_face_checks(visual_plans, media)
+        visual_members.update({part: data for part,(data,_) in media.items()})
         roots = {part: parse_xml(members[part]) for part in {s.part for s in extraction.structure.segments}}
         pages = {p.page_number: p for p in extraction.pages}
         segment_nodes = {}
@@ -301,6 +307,7 @@ class OfficeArtifactEngine:
                 else:
                     mapped_parts = {s.part for s in extraction.structure.segments}
                     visual_parts={c['source_ref'] for c in checked.visual_checks if c['kind']=='office_media'}
+                    visual_parts.update(p.media_source['part'] for p in extraction.pages if p.media_source)
                     for part in source.namelist():
                         original, modified = source.read(part), generated.read(part)
                         if original == modified:
@@ -312,9 +319,10 @@ class OfficeArtifactEngine:
             edits, issues = _segment_edits(extraction, redaction)
             checked.verification_failures += len(issues)
             original_pages = {p.page_number: p.text for p in extraction.pages}
-            if len(extraction.pages) != len(output.pages):
+            native_pages = [p for p in extraction.pages if p.extraction_method != "media_ocr"]
+            if len(native_pages) != len(output.pages):
                 checked.verification_failures += 1
-            checked.page_count_preserved = len(extraction.pages) == len(output.pages)
+            checked.page_count_preserved = len(native_pages) == len(output.pages)
             for index, (segment, generated) in enumerate(zip(extraction.structure.segments, output.structure.segments)):
                 expected = original_pages[segment.page_number][segment.start:segment.end]
                 for start, end, tag in sorted(edits[index], reverse=True):
@@ -330,8 +338,12 @@ class OfficeArtifactEngine:
             checked.residual_confirmed_values = sum(output.full_text.count(v) for v in values)
             checked.residual_sensitive_patterns = len(re.findall(
                 r"\bEMP-\d{5}\b|\b[\w.+-]+@[\w.-]+\.[A-Za-z]{2,}\b|\b\d{3}-\d{2}-\d{4}\b", output.full_text))
+            from .media_artifacts import verify_media
+            verify_media(extraction, redaction, checked)
             checked.supported_content_verified = checked.verification_failures == 0
             checked.unsupported_structures = output.structure.limitations
+            if any(p.media_source for p in extraction.pages):
+                checked.unsupported_structures.pop("media_without_ocr", None)
         except Exception:
             checked.verification_failures += 1
             checked.supported_content_verified = False

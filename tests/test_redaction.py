@@ -162,7 +162,10 @@ def test_unresolved_decisions_block_in_both_collections(metadata, collection):
     d = finding(text, text, **metadata)
     result = run(extraction(text), *([d] if collection == "detections" else []),
                  rejected=[d] if collection == "rejected" else [])
-    assert result.full_text == text
+    if metadata.get("validation_decision") in {"AMBIGUOUS", "REVIEW"} or metadata.get("llm_decision") == "REVIEW":
+        assert result.full_text == "[PERSON_001]"
+    else:
+        assert result.full_text == text
     assert not result.redaction_complete
     assert not result.safe_for_llm
 

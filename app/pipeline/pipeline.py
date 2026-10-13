@@ -77,7 +77,7 @@ class DocumentPipeline:
 
     def _extract(self, metadata):
         if ((metadata.file_type == "pdf" and metadata.extraction_strategy not in {"text", "ocr", "hybrid"})
-                or metadata.file_type not in {"pdf", "docx", "pptx"}):
+                or metadata.file_type not in {"pdf", "docx", "pptx", "image"}):
             raise _UnsupportedExtraction()
         engine = self._engine("extraction", ExtractionEngine)
         if self._default_extraction:
@@ -96,7 +96,7 @@ class DocumentPipeline:
         return result
 
     def _office_stages(self, result):
-        if result.failure or result.audit_result is None or result.extraction_result.file_type not in {"pdf", "docx", "pptx"}:
+        if result.failure or result.audit_result is None or result.extraction_result.file_type not in {"pdf", "docx", "pptx", "image"}:
             return
         artifact_extraction=deepcopy(result.extraction_result)
         artifact_extraction.visual=result.audit_result.visual_result
@@ -142,6 +142,8 @@ class DocumentPipeline:
             lambda: self._engine("audit", AuditEngine).create_audit(
                 result.extraction_result, result.detection_result, result.redaction_result), AuditResult)
         self._office_stages(result)
+        if self._default_extraction and result.extraction_result and result.extraction_result.file_type=='pdf' and not result.failure:
+            self._stage(result,'residual_verification',lambda:self._repair_pdf_residuals(result))
         return self._finish(result, started)
 
     def apply_feedback(self, result: PipelineResult, feedback: ReviewerFeedback) -> PipelineResult:
@@ -190,3 +192,26 @@ class DocumentPipeline:
             result.redaction_result = audit.redaction_result
             self._office_stages(result)
         return self._finish(result, started)
+
+    def _repair_pdf_residuals(self,result):
+        """Verify visible known PII, retain original-crop evidence, then regenerate.
+
+        Two repair rounds are bounded. Persistent leaks fail the processing stage;
+        manager availability and pending approval never change this engine check.
+        """
+        from app.engines.extraction.residual import residual_blocks
+        extraction=result.extraction_result
+        if not any(p.extraction_method=='ocr' for p in extraction.pages):return
+        for attempt in range(3):
+            pending=residual_blocks(extraction,result.artifact_result,result.redaction_result,self.extraction.ocr_engine)
+            if not pending:return
+            if attempt==2:raise ValueError('Known sensitive pixels remain after bounded PDF repairs')
+            for number,block in pending:
+                page=next(p for p in extraction.pages if p.page_number==number)
+                page.blocks.append(block)
+                page.text='\n'.join(b.text for b in page.blocks)
+            result.detection_result=self.detection.detect(extraction)
+            result.redaction_result=self.redaction.redact(extraction,result.detection_result)
+            result.audit_result=self.audit.create_audit(extraction,result.detection_result,result.redaction_result)
+            self._office_stages(result)
+            if result.failure:raise ValueError('Residual repair could not regenerate verified artifact')

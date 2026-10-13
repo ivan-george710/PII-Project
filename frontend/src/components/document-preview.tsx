@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { FileText, X, ExternalLink, ChevronLeft, ChevronRight, CheckCircle2, ShieldAlert, Download, Copy, Check } from 'lucide-react';
+import { X, ExternalLink, ChevronLeft, ChevronRight, CheckCircle2, Download, Copy, Check } from 'lucide-react';
 import type { DocumentState, Identity, PreviewPagesResponse } from '@/lib/types';
 import { api, documentUrl } from '@/lib/api';
 
@@ -11,36 +11,55 @@ interface DocumentPreviewProps {
 }
 
 export function DocumentPreview({ mode, state, identity, onClose }: DocumentPreviewProps) {
-  const [activeTab, setActiveTab] = useState<'visual' | 'text'>(state.format === 'pdf' ? 'visual' : 'text');
+  const [activeTab, setActiveTab] = useState<'visual' | 'text'>(['pdf','image'].includes(state.format) ? 'visual' : 'text');
+  const [media,setMedia]=useState<{original:string[];redacted:string[];unsupported:number}>({original:[],redacted:[],unsupported:0});
   const [data, setData] = useState<PreviewPagesResponse | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [copied, setCopied] = useState(false);
+  const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     let active = true;
     setLoading(true);
-    api<PreviewPagesResponse>(`${documentUrl(state.document_session_id)}/preview-pages`)
+    setError('');
+    setData(null);
+    api<PreviewPagesResponse>(`${documentUrl(state.document_session_id)}/preview-pages?revision=${state.revision??0}`)
       .then(res => {
         if (active) {
           setData(res);
           setCurrentPage(1);
         }
       })
-      .catch(() => {})
+      .catch(() => {if(active)setError('Could not load this preview. Close it and try again.');})
       .finally(() => {
         if (active) setLoading(false);
       });
     return () => { active = false; };
-  }, [state.document_session_id]);
+  }, [state.document_session_id,state.revision]);
+
+  useEffect(()=>{
+    setMedia({original:[],redacted:[],unsupported:0});
+    if(['pdf','image'].includes(state.format))return;
+    let active=true;
+    type MediaResponse={items:{url:string}[];unsupported_count:number};
+    const load=(variant:string)=>api<MediaResponse>(`${documentUrl(state.document_session_id)}/preview-media?variant=${variant}&revision=${state.revision??0}`);
+    void Promise.allSettled([load('original'),load('redacted')]).then(([original,redacted])=>{
+      if(!active)return;
+      const before=original.status==='fulfilled'?original.value:null;
+      const after=redacted.status==='fulfilled'?redacted.value:null;
+      setMedia({original:before?.items?.map(item=>item.url)??[],redacted:after?.items?.map(item=>item.url)??[],unsupported:(before?.unsupported_count??0)+(after?.unsupported_count??0)});
+      if(!before||!after)setError('Some embedded images could not load. Open the file to view them.');
+    });
+    return()=>{active=false;};
+  },[state.document_session_id,state.revision,state.format]);
+  function gallery(urls:string[],label:string){return urls.length>0?<section className="preview-media-gallery" aria-label={`${label} embedded images`}><h4>Embedded images</h4>{urls.map((url,index)=><img key={url} src={url} alt={`${label} embedded image ${index+1}`} loading="lazy" onError={()=>setError('An embedded image could not load. Open the file to view it.')} />)}</section>:null;}
 
   const totalPages = data?.total_pages || identity?.location_count || 1;
   const pageItem = data?.pages.find(p => p.page_number === currentPage) || data?.pages[0];
 
-  function copyText(text: string) {
-    void navigator.clipboard?.writeText(text);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+  async function copyText(text: string) {
+    try{await navigator.clipboard.writeText(text);setCopied(true);setTimeout(()=>setCopied(false),2000);}catch{setError('Could not copy this text.');}
   }
 
   function renderFormattedContent(text: string) {
@@ -102,8 +121,8 @@ export function DocumentPreview({ mode, state, identity, onClose }: DocumentPrev
     );
   }
 
-  const formatColorClass = state.format === 'pdf' ? 'badge-pdf' : state.format === 'pptx' ? 'badge-pptx' : 'badge-docx';
-  const downloadUrl = `${documentUrl(state.document_session_id)}/${mode === 'original' ? 'original' : 'artifact'}`;
+  const formatColorClass = ['pdf','image'].includes(state.format) ? 'badge-pdf' : state.format === 'pptx' ? 'badge-pptx' : 'badge-docx';
+  const downloadUrl = `${documentUrl(state.document_session_id)}/${mode === 'original' ? 'original' : `artifact?revision=${state.revision??0}`}`;
 
   return (
     <div className="preview-modal-backdrop" role="dialog" aria-modal="true" aria-label={`${mode} document preview`} onClick={e => { if (e.target === e.currentTarget) onClose(); }}>
@@ -114,15 +133,15 @@ export function DocumentPreview({ mode, state, identity, onClose }: DocumentPrev
             <div>
               <h3>{identity?.display_name ?? `${mode} document`}</h3>
               <p>
-                {mode === 'original' ? 'Original document source' : 'Redacted output artifact'} · {totalPages} {data?.location_kind ?? 'section'}{totalPages > 1 ? 's' : ''}
+                {mode === 'original' ? 'Original document source' : 'Redacted output artifact'} · {`${totalPages} ${data?.location_kind ?? 'section'}${totalPages > 1 ? 's' : ''}`}
               </p>
             </div>
           </div>
 
           <div className="preview-header-actions">
-            {state.format === 'pdf' && (
+            {['pdf','image'].includes(state.format) && (
               <div className="preview-tab-pills">
-                <button className={activeTab === 'visual' ? 'active' : ''} onClick={() => setActiveTab('visual')}>Visual PDF</button>
+                <button className={activeTab === 'visual' ? 'active' : ''} onClick={() => setActiveTab('visual')}>{state.format==='image'?'Image':'PDF pages'}</button>
                 <button className={activeTab === 'text' ? 'active' : ''} onClick={() => setActiveTab('text')}>Extracted Text</button>
               </div>
             )}
@@ -141,12 +160,15 @@ export function DocumentPreview({ mode, state, identity, onClose }: DocumentPrev
         </header>
 
         <main className="preview-modal-body">
-          {activeTab === 'visual' && state.format === 'pdf' ? (
-            <div className="preview-iframe-wrapper">
-              <iframe
-                title={`${mode} document visual preview`}
-                src={`${documentUrl(state.document_session_id)}/${mode === 'original' ? 'original' : 'artifact?inline=true'}`}
-              />
+          {error&&<p role="alert">{error}</p>}{media.unsupported>0&&<p role="status">Some embedded formats need the document app to display.</p>}
+          {activeTab === 'visual' && ['pdf','image'].includes(state.format) ? (
+            <div className="preview-image-wrapper">
+              <nav className="preview-page-controls" aria-label="PDF pages">
+                <button className="icon-button" disabled={currentPage<=1} aria-label="Previous page" onClick={()=>setCurrentPage(page=>page-1)}><ChevronLeft size={18}/></button>
+                <span>Page {currentPage} of {totalPages}</span>
+                <button className="icon-button" disabled={currentPage>=totalPages} aria-label="Next page" onClick={()=>setCurrentPage(page=>page+1)}><ChevronRight size={18}/></button>
+              </nav>
+              <img key={`${mode}-${currentPage}-${state.revision}`} alt={`${mode==='original'?'Original':'Redacted'} PDF page ${currentPage}`} src={`${documentUrl(state.document_session_id)}/preview-image?variant=${mode}&page=${currentPage}&revision=${state.revision??0}`} onError={()=>setError('Could not render this page. Try extracted text or open the file.')} />
             </div>
           ) : (
             <div className="preview-content-layout">
@@ -217,17 +239,17 @@ export function DocumentPreview({ mode, state, identity, onClose }: DocumentPrev
                           <small>Unredacted source</small>
                         </div>
                         <div className="pane-body">
-                          {renderFormattedContent(pageItem?.original_text ?? '')}
+                          {renderFormattedContent(pageItem?.original_text ?? '')}{gallery(media.original,'Original')}
                         </div>
                       </div>
 
                       <div className="preview-pane redacted-pane">
                         <div className="pane-header">
                           <span className="pane-tag success">Redacted Result</span>
-                          <small>Protected output</small>
+                          <small>{pageItem?.redacted_text==null?'Local review required':'Redacted text'}</small>
                         </div>
                         <div className="pane-body">
-                          {renderFormattedContent(pageItem?.redacted_text ?? '')}
+                          {renderFormattedContent(pageItem?.redacted_text ?? '')}{gallery(media.redacted,'Returned')}
                         </div>
                       </div>
                     </div>

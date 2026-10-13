@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { ArrowLeft, ExternalLink, Sun, Moon, FileText, CheckCircle2, ShieldAlert } from 'lucide-react';
+import { ArrowLeft, ExternalLink, Sun, Moon } from 'lucide-react';
 import { BrandMark } from './brand-mark';
 import { Pipeline, DetectionFunnel, Entities, ReviewBurden, PrivacyMap } from './analytics';
 import { ReviewWorkspace, type Filters } from './review-workspace';
@@ -8,8 +8,8 @@ import { VisualPrivacy } from './visual-privacy';
 import { AIBoundary, AIAccess } from './product-story';
 import { ArtifactDownload } from './artifact-download';
 import { LoadingIndicator } from './loading-indicator';
-import type { DocumentState, Identity, Finding, AuditView, Screen, Decision } from '@/lib/types';
-import { api, documentUrl } from '@/lib/api';
+import type { DocumentState, Identity, Finding, AuditView, Screen, ManagerReport, Config } from '@/lib/types';
+import { api, documentUrl, allFindings } from '@/lib/api';
 
 interface InspectionPageProps {
   documentId: string;
@@ -30,6 +30,10 @@ export function InspectionPage({ documentId }: InspectionPageProps) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
+  const [managerUrl,setManagerUrl]=useState('http://127.0.0.1:8766');
+  const [approval,setApproval]=useState<ManagerReport['status']>();
+  useEffect(()=>{void api<Config>('/api/config').then(config=>setManagerUrl(config.manager_url??'http://127.0.0.1:8766')).catch(()=>{});},[]);
+  useEffect(()=>{setApproval(undefined);let live=true;const refresh=()=>api<ManagerReport>(`${documentUrl(documentId)}/manager`).then(report=>{if(live)setApproval(report.status);}).catch(()=>{if(live)setApproval(undefined);});void refresh();const timer=setInterval(()=>{if(document.visibilityState==='visible')void refresh();},5000);return()=>{live=false;clearInterval(timer);};},[documentId,state?.revision]);
 
   useEffect(() => {
     const query = window.matchMedia('(prefers-color-scheme: dark)');
@@ -49,7 +53,7 @@ export function InspectionPage({ documentId }: InspectionPageProps) {
       const [docState, docIdent, docFindings, docAudit] = await Promise.all([
         api<DocumentState>(documentUrl(documentId)),
         api<Identity>(`${documentUrl(documentId)}/review`).catch(() => null),
-        api<{ items: Finding[] }>(`${documentUrl(documentId)}/findings?limit=100`).then(r => r.items).catch(() => []),
+        allFindings(documentId).catch(() => []),
         api<AuditView>(`${documentUrl(documentId)}/audit`).catch(() => null)
       ]);
       setState(docState);
@@ -109,10 +113,10 @@ export function InspectionPage({ documentId }: InspectionPageProps) {
         </div>
 
         <div className="inspection-header-right">
-          <button className="icon-button" aria-label="Appearance" onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}>
+          <button className="icon-button" aria-label="Appearance" onClick={() => setTheme(document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark')}>
             {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
           </button>
-          <a href="/manager" target="_blank" rel="noopener noreferrer" className="manager-page-link">
+          <a href={`${managerUrl}/manager`} target="_blank" rel="noopener noreferrer" className="manager-page-link">
             <span>Manager Portal</span>
             <ExternalLink size={13} />
           </a>
@@ -134,7 +138,7 @@ export function InspectionPage({ documentId }: InspectionPageProps) {
             </div>
 
             <div className="inspection-hero-actions">
-              <ArtifactDownload state={state} approval={state.manager_approval} />
+              <ArtifactDownload state={{...state,manager_approval:approval}} approval={state.manager_approval} />
             </div>
           </div>
         )}
@@ -218,7 +222,7 @@ export function InspectionPage({ documentId }: InspectionPageProps) {
                 />
               )}
 
-              {screen === 'Artifact Verification' && <Verification state={state} />}
+              {screen === 'Artifact Verification' && <Verification state={{...state,manager_approval:approval}} />}
             </>
           )}
         </div>

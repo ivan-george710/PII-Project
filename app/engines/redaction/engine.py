@@ -87,6 +87,8 @@ class RedactionEngine:
                 elif decision == "REJECT":
                     result.rejected.append(d)
                 else:
+                    if decision == "REVIEW":
+                        confirmed[d.page_number].append(d)
                     result.issues.append(RedactionIssue(
                         "review_required" if decision == "REVIEW" else "unknown_decision",
                         d.page_number, d))

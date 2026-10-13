@@ -10,6 +10,6 @@ export function ArtifactDownload({state,regenerating=false,latest=false,approval
   {regenerating?<Button disabled>Regenerating redacted copy...</Button>:available?
    <Button asChild><a href={artifactUrl(state.document_session_id,state.revision)} download><Download size={16}/>{latest?'Download Latest Redacted Review Copy':'Download Redacted Review Copy'}</a></Button>:
    <><Button disabled>{approval==='denied'?'Download denied':'Redacted copy unavailable'}</Button><p role="status">{state.issue_message??(approval==='denied'?'This document was denied by manager.':'No redacted artifact is available.')}</p></>}
-  
+  {available&&(!state.summary.human_review_complete||!state.summary.artifact?.supported_content_verified)&&<p role="status">Some findings or verification checks still need review.</p>}
  </div>;
 }

@@ -48,7 +48,7 @@ def test_creation_counts_traceability_and_stability():
     assert audit == audit_for(extraction, *detections)
     assert len(audit.records) == audit.counts["raw_detection_count"] == 3
     assert (audit.counts["confirmed"], audit.counts["rejected"], audit.counts["review"]) == (1, 1, 1)
-    assert [r.redaction_status for r in audit.records] == ["APPLIED", "REJECTED", "REVIEW_REQUIRED"]
+    assert [r.redaction_status for r in audit.records] == ["APPLIED", "REJECTED", "APPLIED"]
     r = audit.records[0]
     assert r.tag == "[PERSON_001]" and r.original_detection == detections[0]
     assert r.effective_detection.confidence == .9

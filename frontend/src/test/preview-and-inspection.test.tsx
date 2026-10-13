@@ -1,6 +1,6 @@
-import { render, screen, waitFor } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import { render, screen } from '@testing-library/react';
 import { beforeEach, expect, it, vi } from 'vitest';
+import { ChatDocument } from '../components/chat-document';
 import { DocumentPreview } from '../components/document-preview';
 import { InspectionPage } from '../components/inspection-page';
 import type { DocumentState, Identity, PreviewPagesResponse } from '../lib/types';
@@ -119,4 +119,14 @@ it('renders InspectionPage with full tabs, hero card, and back link', async () =
   expect(await screen.findByText('Overview & Pipeline')).toBeInTheDocument();
   expect(screen.getByText('Audit History')).toBeInTheDocument();
   expect(screen.getByText('Artifact Verification')).toBeInTheDocument();
+});
+
+for(const format of ['pdf','image','docx','pptx'])it(`shows a returned ${format} preview without exposing original text`,async()=>{
+ render(<ChatDocument state={{...mockState,format}} mode="redacted" name="sample" label="Redacted" onOpen={()=>{}}/>);
+ if(['pdf','image'].includes(format)){expect(screen.getByAltText('redacted sample preview')).toHaveAttribute('src',expect.stringContaining('variant=redacted'));}
+ else{expect(await screen.findByText(/Executive summary by \[PERSON_001\]/)).toBeInTheDocument();expect(screen.queryByText(/Desmond Achterberg/)).not.toBeInTheDocument();}
+});
+it('does not fetch or display a denied returned preview',()=>{
+ render(<ChatDocument state={mockState} mode="redacted" name="sample" label="Denied" disabled onOpen={()=>{}}/>);
+ expect(screen.getByRole('button')).toBeDisabled();expect(fetch).not.toHaveBeenCalled();expect(screen.queryByRole('img')).not.toBeInTheDocument();
 });

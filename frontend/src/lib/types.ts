@@ -20,7 +20,7 @@ export type Screen = 'Overview'|'Documents'|'Review Queue'|'Audit'|'Detector Qua
 
 export interface ManagerPart { finding_id:string;category:string;original:string;redacted:string|null;original_image?:string|null;redacted_image?:string|null;truncated:boolean }
 export interface ManagerReport { id:string;filename:string;revision:number;artifact_sha256:string|null;ready:boolean;parts?:ManagerPart[];counts:Record<string,number>;status:'pending'|'approved'|'denied';submitted_at:string;decided_at:string|null }
-export interface CustomRule { id:string;name:string;pattern:string;entity_type:string;action:'redact'|'block';is_regex:boolean;created_at?:string }
+export interface CustomRule { id:string;name:string;pattern:string;entity_type:string;action:'redact';is_regex:boolean;created_at?:string }
 
-export interface PreviewPageItem { page_number:number; kind:string; original_text:string; redacted_text:string; extraction_method:string }
+export interface PreviewPageItem { page_number:number; kind:string; original_text:string; redacted_text:string|null; extraction_method:string }
 export interface PreviewPagesResponse { format:string; filename:string; location_kind:string; total_pages:number; pages:PreviewPageItem[]; redactions:{tag:string;entity_type:string;original_text:string;page_number:number}[] }

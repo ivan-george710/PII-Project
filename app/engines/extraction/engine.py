@@ -24,11 +24,22 @@ class ExtractionEngine:
 
         if metadata.file_type == "docx":
             from .docx import extract_docx
-            return extract_docx(path)
+            return self._extract_media(extract_docx(path))
 
         if metadata.file_type == "pptx":
             from .pptx import extract_pptx
-            return extract_pptx(path)
+            return self._extract_media(extract_pptx(path))
+
+        if metadata.file_type == "image":
+            from .models import ExtractedPage
+            from app.engines.visual_detection.images import decode
+            from tempfile import TemporaryDirectory
+            with decode(path.read_bytes(), 'display') as image, TemporaryDirectory() as directory:
+                rendered = Path(directory) / 'image.png'
+                image.save(rendered)
+                blocks = self.ocr_engine.extract_image(rendered)
+            return ExtractionResult(path, path.name, 'image',
+                [ExtractedPage(1, '\n'.join(b.text for b in blocks), 'ocr', blocks)])
 
         raise NotImplementedError(
             f"Extraction for '{metadata.file_type}' "
@@ -42,7 +53,7 @@ class ExtractionEngine:
     ) -> ExtractionResult:
 
         if strategy == "text":
-            return extract_text_pdf(path)
+            return self._extract_hybrid_pdf(path)
 
         if strategy == "ocr":
             return self.ocr_engine.extract_pdf(path)
@@ -65,3 +76,7 @@ class ExtractionEngine:
         path,
         self.ocr_engine,
     )
+
+    def _extract_media(self, extraction):
+        from .media import extract_media
+        return extract_media(extraction, self.ocr_engine)

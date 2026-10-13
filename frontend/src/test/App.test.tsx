@@ -114,7 +114,7 @@ describe('React privacy review product', () => {
     expect(screen.getByRole('navigation', { name: 'Chat history' })).toBeInTheDocument();
     expect(await screen.findByRole('button', { name: 'Send message' })).toBeDisabled();
     expect(screen.getByText('What would you like to redact?')).toBeInTheDocument();
-    expect(screen.getByText('Processed locally. Redacted copy is sent back immediately.')).toBeInTheDocument();
+    expect(screen.getByText('Processed locally. Your files stay on this device.')).toBeInTheDocument();
   });
 
   it('uploads multipart with the existing local boundary header', async () => {
@@ -218,10 +218,11 @@ describe('React privacy review product', () => {
   });
 
   it('creates only opaque revision-aware download and inline PDF URLs', async () => {
+    state.summary.human_review_complete=true;
     const user = userEvent.setup();
     render(<App />);
     await user.click(await screen.findByRole('button', { name: /Document 1/ }));
-    expect(screen.getAllByRole('link', { name: 'Download Redacted Review Copy' })[0]).toHaveAttribute('href', artifactUrl(id, 0));
+    expect(await screen.findByRole('link', { name: 'Download Redacted Review Copy' })).toHaveAttribute('href', artifactUrl(id, 0));
   });
 
   it('shows evaluation metrics with a visible synthetic-only disclaimer', async () => {
@@ -362,7 +363,7 @@ describe('Phase 10B.1 review and prominent download regression', () => {
     expect(await screen.findByText('Known review queue complete')).toBeVisible();
     expect(screen.getAllByText('No findings currently require human review.').length).toBeGreaterThan(0);
     expect(await screen.findByText('Select a finding to review.')).toBeVisible();
-    expect(screen.getByRole('link', { name: 'Download Latest Redacted Review Copy' })).toHaveAttribute('href', artifactUrl(id, 1));
+    expect(await screen.findByRole('link', { name: 'Download Latest Redacted Review Copy' })).toHaveAttribute('href', artifactUrl(id, 1));
     expect(screen.getByText('Coverage verification remains NOT ESTABLISHED.')).toBeVisible();
   });
 
@@ -374,12 +375,14 @@ describe('Phase 10B.1 review and prominent download regression', () => {
     expect(screen.queryByText('Known review queue complete')).not.toBeInTheDocument();
   });
 
-  it.each(['pdf', 'docx', 'pptx'])('provides a top-level opaque %s artifact link', async format => {
+  it.each(['pdf', 'docx', 'pptx'])('provides a top-level opaque %s artifact link for an approved ready result', async format => {
     state.format = format;
+    state.summary.human_review_complete = true;
+    state.summary.audit!.human_review_complete = true;
     const user = userEvent.setup();
     render(<App />);
     await user.click(await screen.findByRole('button', { name: /Document 1/ }));
-    expect(screen.getByRole('link', { name: 'Download Redacted Review Copy' })).toHaveAttribute('href', artifactUrl(id, 0));
+    expect(await screen.findByRole('link', { name: 'Download Redacted Review Copy' })).toHaveAttribute('href', artifactUrl(id, 0));
   });
 
   it('has no active download before a document is loaded', async () => {
@@ -405,13 +408,13 @@ describe('Phase 10B.2 privacy gateway presentation', () => {
     expect(screen.getByText('Completed · 2.50s')).toBeInTheDocument();
   });
 
-  it('shows the blocked gateway alongside verified mappings and unverified coverage', async () => {
+  it('shows local redaction and review status without a nonexistent LLM gate', async () => {
     await loaded();
-    expect(screen.getByRole('region', { name: 'Business artifact to AI processing boundary' })).toBeInTheDocument();
-    expect(screen.getAllByText('BLOCKED').length).toBeGreaterThan(0);
+    expect(screen.getByRole('region', { name: 'Local document redaction flow' })).toBeInTheDocument();
+    expect(screen.getByText('GENERATED')).toBeInTheDocument();
     expect(screen.getByText('Supported mappings verified')).toBeInTheDocument();
     expect(screen.getByText('1 textual unresolved')).toBeInTheDocument();
-    expect(screen.getByText('No AI connection is enabled')).toBeInTheDocument();
+    expect(screen.getByText('Full files stay local')).toBeInTheDocument();
   });
 
   it('makes the output and distribution purposeful without a safety score', async () => {
@@ -485,17 +488,17 @@ describe('Phase 11 visual privacy presentation', () => {
 });
 
 describe('Manager approval and chat interaction', () => {
-  it('allows immediate download when pending and disables when denied', async () => {
+  it('allows pending downloads and blocks explicit manager denial', async () => {
     managerApprovalStatus = 'pending';
     const user = userEvent.setup();
     render(<App />);
     await user.click(await screen.findByRole('button', { name: /Document 1/ }));
-    expect(screen.getByRole('link', { name: 'Download Redacted Review Copy' })).toBeInTheDocument();
+    expect(await screen.findByRole('link', { name: 'Download Redacted Review Copy' })).toBeInTheDocument();
 
     managerApprovalStatus = 'denied';
     await user.click(screen.getByRole('button', { name: 'New chat' }));
     await user.click(await screen.findByRole('button', { name: /Document 1/ }));
-    expect(screen.getByRole('button', { name: 'Download denied' })).toBeDisabled();
+    expect(await screen.findByRole('button', { name: 'Download denied' })).toBeDisabled();
     expect(screen.queryByRole('link', { name: /Download/ })).not.toBeInTheDocument();
   });
 
@@ -518,4 +521,17 @@ describe('Manager approval and chat interaction', () => {
     // Verify it was NOT auto-sent
     expect(screen.queryByText('Your document')).not.toBeInTheDocument();
   });
+});
+
+
+it('retains a failed attachment for retry and never shows the previous result as its output',async()=>{
+  const user=await loaded();
+  await user.click(screen.getByRole('button',{name:/^Close inspection$/}));
+  failed=true;
+  await user.upload(screen.getByLabelText('Upload document'),new File(['bad'],'retry.docx'));
+  await user.click(screen.getByRole('button',{name:/^Send message$/}));
+  expect(await screen.findByRole('alert')).toBeInTheDocument();
+  expect(screen.getByRole('button',{name:'Remove attachment'})).toBeInTheDocument();
+  expect(screen.queryByRole('link',{name:/Download Redacted/})).not.toBeInTheDocument();
+  expect(screen.getByRole('button',{name:/^Send message$/})).toBeEnabled();
 });

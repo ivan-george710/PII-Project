@@ -47,7 +47,7 @@ def extract_hybrid_pdf(
 
         text = page.extract_text() or ""
 
-        if text.strip():
+        if text.strip() and not page.images:
             pages.append(
                 ExtractedPage(
                     page_number=page_number,
@@ -59,7 +59,7 @@ def extract_hybrid_pdf(
             ocr_result = ocr_engine.extract_pdf_page(
                 path,
                 page_number,
-                dpi=150,
+                dpi=200,
             )
 
             pages.append(ocr_result)
@@ -69,5 +69,5 @@ def extract_hybrid_pdf(
         filename=path.name,
         file_type="pdf",
         pages=pages,
-        pdf_source=PDFSourceMap(source_hash(path), {str(p.page_number): 150 for p in pages if p.extraction_method == "ocr"}),
+        pdf_source=PDFSourceMap(source_hash(path), {str(p.page_number): 200 for p in pages if p.extraction_method == "ocr"}),
     )

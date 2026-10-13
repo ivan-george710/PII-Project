@@ -1,22 +1,22 @@
 # Product alignment
 
-Latest correction 2026-10-12: pseudofix is the engine base. Its UI is being restyled while preserving charts, diagrams and non-text evidence. One static manager page replaces auth/company account setup. Employee processing/full content remain local; manager-only reports/decisions go to Vercel. Manager approval gates the verified redacted download and cannot clear engine failures or unresolved findings.
+## Current contract — 2026-10-13
 
-Existing: teammate extraction, detection, redaction, audit/review, artifact verification and visualisations. Read README.md/phase reports for the actual format and detection limits.
+Local employee chat, one static manager page, no auth or LLM. Full files and original chat remain local. Only affected snippets/crops, filename/time, counts and decisions go to the manager service. Pending downloads and manager outages remain allowed; explicit denial blocks them. Actual engine processing failures block artifact access. Uncertain PII/faces are masked by default and remain reviewable; false-positive feedback can restore them.
 
-Planned in this work: sparse chat theme, shared approved SVG, dark mode/loading/motion, mobile manager queue, revision-bound remote approval and local launcher. Update this status after end-to-end verification. Network interception and universal PII/document coverage remain unimplemented claims.
+The interface keeps SF Pro, grayscale, dark mode, larger headings, the approved SVG/send arrow, small Strands loading, restrained springs/reduced motion, previews and the teammate's graphs/diagrams.
 
-## Evidence from the current checkpoint
+## Locally verified
 
-Implemented and verified:
-- Employee chat and Details inspection overlay with focus trapping, Escape dismiss, and focus return.
-- Static manager comparison queue, report publication, and approval service.
-- Local artifact gate tied to audit revision and exact artifact SHA-256 (stale revision rejects approval with 409, download blocked until both local verification passes and manager approves).
-- Full backend test suite passing: 312 passed in pytest (100%), including in-process manager integration and revision gating across PDF, DOCX, and PPTX formats.
-- Full frontend test suite passing: 44 passed in vitest (100%), covering App chat/Details flows, manager page, decision filtering, and verification boundary.
-- Both frontend modes pass TypeScript checks and Vite builds (`npm --prefix frontend run build` to `app/web/static`, `npm --prefix frontend run build -- --mode manager` to `frontend/dist`).
-- Impeccable UI defect detection verified: 0 defects (`[]`).
-- Preserved engine gap documented: `jane.smith@example.test` remained in returned text while the phone number was redacted. The engine classified/rejected the email-like value as URL; it has not been changed in this work, preserving the teammate engine and models.
-- Standalone execution: `/Users/caf/Desktop/Run-PII-Guard.command` updated to point directly to `PII-Project` with `scripts/run-demo.py` runner.
-- CI pipeline: `.github/workflows/test.yml` tests backend, frontend (both builds), and manager isolation. Hosted Vercel deployment remains pending actual deployment credentials.
+- Mixed PDFs receive OCR even with selectable text/page numbers. OCR uses original embedded pixels and verified transforms to the output raster.
+- Embedded PNG/JPEG text in DOCX/PPTX, standalone PNG/JPEG, scanned and native PDFs all reach actual detection and destructive artifact redaction.
+- Labeled passwords/account lists, addresses, DOB/MAC/IP, employee IDs and reserved-domain mailboxes are covered alongside Presidio/spaCy recognizers. Explicit introductions use spaCy token matching; OCR spacing maps classifier spans back to original offsets.
+- Repeated sensitive values/crossing spans are protected. Saved PDFs receive bounded independent OCR residual checks; surviving regions are masked with original-source evidence, then rechecked. Failure is explicit.
+- 24 supported demo files processed without mapping/verification errors. Tests also re-OCR returned artifacts and exercise saved-PDF leak repair and verifier failure. Final counts/evidence are in `review-2026-10-13.md`.
+- Manager original/returned comparisons, rules, decisions and local-only files are verified locally. PDFs and Office raster images have real clickable previews.
 
+## Honest limits
+
+This establishes the tested fixtures and recognized PII, not universal detection. OCR/NER can miss unknown PII; uncertain findings and conservative coarse image masks require review. Unsupported legacy DOC, TXT file uploads, TIFF/GIF/vector images, embedded objects and complex unsupported Office structures are not complete coverage. Typed text remains supported. Native Office layout/vector/smart-art rendering is not implemented.
+
+Built-in per-rule toggles remain absent; custom exact/regex redaction is implemented, with validation/timeouts. Block actions are rejected. Hosted manager/PostgreSQL promotion remains unverified in this task; local Vercel TLS validation failed and was not bypassed. Production/main differs from this local `pseudofix` work. Network interception, complete hosted samples and the finished project presentation remain outstanding.

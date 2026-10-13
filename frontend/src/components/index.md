@@ -24,3 +24,8 @@ Subdirectories contain their own manifests when touched. Engine implementation a
 | `loading-indicator.tsx` | Implemented; integration in progress | Small lazy animation with reduced-motion fallback. |
 
 | `manager-page.tsx` | Implemented; integration in progress | Static mobile manager queue, affected-content comparison, appearance and approval/denial controls. |
+
+| `document-preview.tsx` | Implemented | Real local PDF page renders and Office extracted-text/raster-image comparisons with revision binding, honest error states, keyboard focus and copy feedback. |
+| `inspection-page.tsx` | Implemented | Standalone inspection, paginated finding fetch, remote manager link and revision-specific approval polling. |
+
+`chat-document.tsx`: clickable inline original/returned PDF and image previews, or real Office text and embedded media excerpts. Returned content never falls back to source content.

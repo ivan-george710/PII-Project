@@ -4,7 +4,7 @@ from enum import Enum
 
 from .models import DetectedPII
 
-DETECTOR_POLICY_VERSION = "1.1"
+DETECTOR_POLICY_VERSION = "1.2"
 
 
 class ValidationDecision(str, Enum):
@@ -16,7 +16,9 @@ class ValidationDecision(str, Enum):
 PII_ENTITY_TYPES = frozenset({
     "PERSON", "EMAIL_ADDRESS", "PHONE_NUMBER", "EMPLOYEE_ID", "US_SSN",
     "US_PASSPORT", "US_DRIVER_LICENSE", "US_ITIN", "US_BANK_NUMBER",
-    "IBAN_CODE", "CREDIT_CARD", "MEDICAL_LICENSE",
+    "IBAN_CODE", "CREDIT_CARD", "MEDICAL_LICENSE", "LOCATION", "NRP",
+    "IP_ADDRESS", "UK_NHS", "CREDENTIAL", "AU_ABN", "AU_ACN", "AU_TFN", "AU_MEDICARE",
+    "ADDRESS", "DATE_OF_BIRTH", "MAC_ADDRESS", "IN_AADHAAR", "IN_PAN", "IN_PASSPORT", "IN_VOTER", "IN_VEHICLE_REGISTRATION",
 })
 CUSTOM_ENTITY_TYPES = frozenset({"CUSTOM_BLOCKED", "CUSTOM_RULE"})
 
@@ -30,9 +32,13 @@ BUSINESS_WORDS = frozenset({
     "bank", "account", "number", "department", "compliance", "delivery", "offshore",
     "speak", "up", "unsupported", "component", "components", "on", "control",
     "controls", "review", "business", "operations", "human", "resources",
+    "approved", "by", "residual", "appetite", "root", "cause", "impact", "context",
+    "standards", "alignment", "related", "documents", "board", "taxonomy", "key", "indicators",
+    "email", "phone", "password", "username", "contact", "passport", "driver", "license", "ssn", "dob", "employee", "identifier",
+    "home", "address", "date", "birth", "market", "asset", "identify", "risks", "approves", "has", "it",
 })
 NAME_PARTICLES = frozenset({"de", "del", "da", "di", "van", "von", "der", "la", "le"})
-BUSINESS_ACRONYMS = frozenset({"NED", "RCSA"})
+BUSINESS_ACRONYMS = frozenset({"NED", "RCSA", "PII"})
 DRIVER_LICENSE_CONTEXT = (
     "driver license", "driver's license", "drivers license", "driving license",
     "dl number", "license number", "licence number",
@@ -62,7 +68,7 @@ def _name_tokens(value: str) -> list[str]:
 
 
 def _looks_like_person_name(value: str) -> bool:
-    tokens = _name_tokens(value)
+    tokens = _name_tokens(re.sub(r"(?<=[a-z])(?=[A-Z])", " ", value))
     if len(tokens) < 2:
         return False
     for token in tokens:
@@ -100,14 +106,16 @@ def validate_detection(detection: DetectedPII, context: str = "", *, context_sta
         return ValidationDecision.REJECT, "entity_type_not_in_pii_policy"
     left, right = _adjacent(detection, context, context_start)
     if detection.entity_type == "EMPLOYEE_ID":
-        if re.fullmatch(r"EMP-[0-9]{5}", detection.text):
+        if re.fullmatch(r"EMP-[0-9]{4,8}", detection.text):
             if (left and (left[-1].isalnum() or left[-1] in "_-")) or (right and (right[0].isalnum() or right[0] in "_-")):
                 return ValidationDecision.AMBIGUOUS, "employee_id_partial_span"
             return ValidationDecision.CONFIRM, "documented_employee_id_format"
         return ValidationDecision.REJECT, "invalid_employee_id_format"
     if detection.entity_type == "PERSON":
         value = detection.text.strip()
-        if _business_label(value) or value in BUSINESS_ACRONYMS:
+        if detection.recognizer == "IntroductionRecognizer":
+            return ValidationDecision.CONFIRM, "explicit_introduction_token"
+        if _business_label(value) or value.translate(str.maketrans({"l":"I"})).upper() in BUSINESS_ACRONYMS:
             return ValidationDecision.REJECT, "business_label_or_acronym"
         if "@" in value:
             return ValidationDecision.REJECT, "person_span_contains_email"
@@ -115,7 +123,7 @@ def validate_detection(detection: DetectedPII, context: str = "", *, context_sta
             return ValidationDecision.REJECT, "not_a_person_name"
         # An institutional suffix inside the candidate is positive non-person
         # evidence. Nearby institutions alone do not invalidate a person's name.
-        if re.search(r"\b(?:committee|department|team|holdings|limited|corporation|inc|ltd)\.?$", value, re.I):
+        if re.search(r"\b(?:committee|department|team|holdings|limited|corporation|inc|ltd|group)\.?$", re.sub(r"(?<=[a-z])(?=[A-Z])", " ", value), re.I):
             return ValidationDecision.REJECT, "institutional_person_span"
         if detection.confidence < .5:
             return ValidationDecision.AMBIGUOUS, "low_confidence_person"

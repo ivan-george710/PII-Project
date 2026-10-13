@@ -1,5 +1,4 @@
 """Send affected parts only; employee artifacts and engine execution remain local."""
-from hashlib import sha256
 import json
 import os
 from urllib.request import Request,urlopen
@@ -20,8 +19,8 @@ class ManagerClient:
     def call(self,path,body=None):
         if self.client is not None:
             payload=body
-            if body is not None and len(json.dumps(body).encode())>2*1024*1024:
-                raise HTTPException(413,'Manager report is too large. Download stays blocked.')
+            if body is not None and len(json.dumps(body).encode())>4*1024*1024:
+                raise HTTPException(413,'Manager report is too large. The local result remains available unless denied.')
             try:
                 if body is not None:
                     response=self.client.post('/api/manager'+path,json=payload,headers={'X-Cadence-Local':'1'})
@@ -34,22 +33,25 @@ class ManagerClient:
             except HTTPException:
                 raise
             except Exception:
-                raise HTTPException(503,'Manager service is unavailable. Download stays blocked.') from None
+                raise HTTPException(503,'Manager service is unavailable. The local result remains available unless denied.') from None
         payload=json.dumps(body).encode() if body is not None else None
-        if payload and len(payload)>2*1024*1024:raise HTTPException(413,'Manager report is too large. Download stays blocked.')
+        if payload and len(payload)>4*1024*1024:raise HTTPException(413,'Manager report is too large. The local result remains available unless denied.')
         try:
-            with urlopen(Request(self.url+'/api/manager'+path,data=payload,headers={'Content-Type':'application/json','X-Cadence-Local':'1'}),timeout=10) as response:return json.loads(response.read(3*1024*1024))
-        except (HTTPError,URLError,TimeoutError,ValueError):raise HTTPException(503,'Manager service is unavailable. Download stays blocked.') from None
+            with urlopen(Request(self.url+'/api/manager'+path,data=payload,headers={'Content-Type':'application/json','X-Cadence-Local':'1'}),timeout=10) as response:return json.loads(response.read(5*1024*1024))
+        except (HTTPError,URLError,TimeoutError,ValueError):raise HTTPException(503,'Manager service is unavailable. The local result remains available unless denied.') from None
     def publish(self,body):return self.call('/reports',body)
-    def status(self,identifier):return self.call('/reports/'+identifier)
+    def status(self,identifier):return self.call('/reports/'+identifier+'/status')
     def get_rules(self):
         try:
-            res = self.call('/rules')
-            return res.get('items', []) if isinstance(res, dict) else []
-        except Exception:
-            return []
-    def require_approved(self,identifier,revision,path):
-        decision=self.status(identifier)
-        if decision['revision']!=revision or decision['artifact_sha256']!=sha256(path.read_bytes()).hexdigest():raise HTTPException(409,'The redacted result changed and needs a new approval.')
-        if decision['status']!='approved':raise HTTPException(403,'Manager approval is required to download this result.')
-        if not decision['ready']:raise HTTPException(409,'The engine has not verified this result.')
+            response=self.call('/rules')
+            if not isinstance(response,dict) or not isinstance(response.get('items'),list):raise ValueError()
+            self._last_rules=response['items']
+        except (HTTPException,ValueError):
+            # Employee processing is intentionally independent of manager uptime.
+            pass
+        return list(getattr(self,'_last_rules',[]))
+    def check_denial(self,identifier):
+        try:decision=self.status(identifier)
+        except HTTPException:return
+        if isinstance(decision,dict) and decision.get('status')=='denied':
+            raise HTTPException(403,'Artifact download was denied by manager.')

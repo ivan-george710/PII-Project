@@ -1,9 +1,3 @@
-# app/web/static
+# Built local interface
 
-## Files
-
-| Filename | Status | Responsibility |
-|---|---|---|
-| `bundle` | Built asset | Compiled styles and JavaScript chunks for the employee chat interface. |
-| `index.html` | Built asset | HTML root for the local employee application. |
-| `index.md` | Existing | Directory manifest for built static assets. |
+`index.html` boots the local chat, previews and inspection. `bundle/` contains generated CSS/JS. The Vite build regenerates these manifests and removes obsolete bundles. Hosted manager builds go to frontend/dist.

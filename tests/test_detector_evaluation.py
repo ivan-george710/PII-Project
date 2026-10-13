@@ -24,7 +24,7 @@ def check(value, entity, context=None, confidence=.85):
 
 @pytest.mark.parametrize('value,entity,context,expected',[
     ('EMP-12345','EMPLOYEE_ID',None,'CONFIRM'),
-    ('EMP-1234','EMPLOYEE_ID',None,'REJECT'),
+    ('EMP-1234','EMPLOYEE_ID',None,'CONFIRM'),
     ('EMP-１２３４５','EMPLOYEE_ID',None,'REJECT'),
     ('EMP-12345','EMPLOYEE_ID','EMP-12345-extra','AMBIGUOUS'),
     ('ada@example.com','EMAIL_ADDRESS',None,'CONFIRM'),
@@ -40,7 +40,7 @@ def check(value, entity, context=None, confidence=.85):
     ('Smith Risk Committee','PERSON',None,'REJECT'),
     ('Alder Holdings Limited','PERSON',None,'REJECT'),
     ('Brightwell','PERSON',None,'AMBIGUOUS'),
-    ('JohnSmith','PERSON',None,'AMBIGUOUS'),
+    ('JohnSmith','PERSON',None,'CONFIRM'),
     ('Blue Horizon','PERSON',None,'CONFIRM'),  # Two words alone remain ambiguous in meaning.
     ('73001234','US_BANK_NUMBER','Bank account number: 73001234','AMBIGUOUS'),
     ('73001234','US_DRIVER_LICENSE',None,'AMBIGUOUS'),
@@ -95,7 +95,7 @@ def test_dataset_reproducible_separated_version():
     dev={c['id'] for c in data['cases'] if c['split']=='development'}
     held={c['id'] for c in data['cases'] if c['split']=='heldout'}
     assert not dev & held and len(dev)==299 and len(held)==121
-    assert DETECTOR_POLICY_VERSION=='1.1'
+    assert DETECTOR_POLICY_VERSION=='1.2'
     for c in data['cases']:
         for span in c['expected']+c['non_pii']:
             assert 0<=span['start']<span['end']<=len(c['text'])

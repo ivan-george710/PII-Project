@@ -6,6 +6,7 @@ class OCRTextBlock:
     text: str
     confidence: float
     bounding_box: list[list[float]]
+    mask_only: bool = False
 
 
 @dataclass
@@ -50,6 +51,7 @@ class ExtractedPage:
     text: str
     extraction_method: str
     blocks: list[OCRTextBlock] | None = None
+    media_source: dict | None = None
 
 
 @dataclass

@@ -29,7 +29,7 @@ export interface FunnelStage {
   color?: string;
   /**
    * Apply a linear gradient to this segment.
-   * Provide an array of color stops, e.g. `[{ offset: "0%", color: "#8B5CF6" }, { offset: "100%", color: "#3B82F6" }]`.
+   * Provide an array of color stops, e.g. `[{ offset: "0%", color: "#717171" }, { offset: "100%", color: "#7b7b7b" }]`.
    * When set, this takes priority over the segment and chart-level `color` for the innermost ring.
    * Outer halo rings use the first stop color as their solid color.
    */

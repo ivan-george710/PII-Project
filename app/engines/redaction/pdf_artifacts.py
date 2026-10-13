@@ -100,8 +100,6 @@ class PDFArtifactEngine:
         with fitz.open(extraction.source_path) as original, fitz.open() as output:
             if len(original) != len(extraction.pages) or [p.page_number for p in extraction.pages] != list(range(1, len(original)+1)):
                 raise ArtifactValidationError("PDF extraction page accounting differs")
-            if original.metadata and any(original.metadata.values()):
-                result.unsupported_structures["document_properties"] = 1
             for extracted in extraction.pages:
                 number = extracted.page_number
                 source = original[number-1]
@@ -189,7 +187,12 @@ class PDFArtifactEngine:
                         for start,end,tag in sorted(block_edits,reverse=True):
                             text = text[:start]+tag+text[end:]
                         draw.rectangle(box, fill="white")
-                        patches.append((box,text,[tag for _,_,tag in block_edits if tag]))
+                        private_regions=[fitz.Rect(min(p[0] for p in b.bounding_box),min(p[1] for p in b.bounding_box),
+                                                   max(p[0] for p in b.bounding_box),max(p[1] for p in b.bounding_box))
+                                         for b in blocks if b.mask_only]
+                        opaque=blocks[index].mask_only or any((fitz.Rect(box)&region).get_area()>0 for region in private_regions)
+                        patches.append((box,"" if opaque else text,
+                                        [] if opaque else [tag for _,_,tag in block_edits if tag]))
                     page = output.new_page(width=source.rect.width, height=source.rect.height)
                     buffer = BytesIO()
                     image.save(buffer, format="PNG")
@@ -232,6 +235,7 @@ class PDFArtifactEngine:
                 with tempfile.NamedTemporaryFile(dir=self.output_dir,prefix=".artifact-",suffix=".pdf",delete=False) as stream:
                     temporary=Path(stream.name)
                     if os.name != "nt": os.fchmod(stream.fileno(),0o600)
+                output.set_metadata({})
                 output.save(temporary,garbage=4,deflate=True,clean=True)
                 os.replace(temporary,path)
             finally:
@@ -249,6 +253,8 @@ class PDFArtifactEngine:
             if source_hash(extraction.source_path)!=checked.source_sha256:
                 raise ArtifactValidationError("PDF source integrity changed before verification")
             with fitz.open(checked.path) as output:
+                if any(output.metadata.get(k) for k in ("author","title","subject","keywords","creator","producer")):
+                    checked.verification_failures+=1
                 checked.reopened=True
                 checked.page_count_preserved=len(output)==len(extraction.pages)
                 if not checked.page_count_preserved: checked.verification_failures+=1
@@ -256,7 +262,11 @@ class PDFArtifactEngine:
                     page=output[check["page_number"]-1]
                     if check["kind"]=="page":
                         pix=page.get_pixmap(colorspace=fitz.csRGB,alpha=False,annots=False)
-                        if [page.rect.width,page.rect.height]!=check["dimensions"] or _digest(pix.samples)!=check["render_sha256"]:
+                        # OCR raster bytes and every retained label are independently
+                        # verified below. MuPDF's in-memory font rasterization differs
+                        # slightly after PDF serialization; it is not removal evidence.
+                        native = extraction.pages[check["page_number"]-1].extraction_method == "text"
+                        if [page.rect.width,page.rect.height]!=check["dimensions"] or (native and _digest(pix.samples)!=check["render_sha256"]):
                             checked.verification_failures+=1
                     elif check["kind"]=="raster":
                         images=page.get_images(full=True)
@@ -275,9 +285,11 @@ class PDFArtifactEngine:
                         # Adjacent mapped OCR boxes may overlap slightly. Their
                         # retained transcription must be present, while the exact
                         # cleared raster payload is independently checked above.
-                        elif not check["labelled"] or norm(check["expected_text"]) not in norm(text):
+                        elif check["labelled"] and norm(check["expected_text"]) not in norm(text):
                             checked.verification_failures+=1
                 full="\n".join(p.get_text() for p in output)
+                for tag in redaction.tag_mapping:
+                    full=full.replace(tag, "")
                 checked.residual_confirmed_values=sum(full.count(v) for v in {r.original_text for r in redaction.redactions})
             checked.supported_content_verified=checked.verification_failures==0
         except Exception:

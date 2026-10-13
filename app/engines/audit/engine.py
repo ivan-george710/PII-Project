@@ -225,6 +225,15 @@ class AuditEngine:
                 record.redacted_start, record.redacted_end = span.redacted_start, span.redacted_end
         blocking = []
         for issue in redacted.issues:
+            if issue.code == "review_required":
+                record = next(r for r in records if _key(r.effective_detection) == _key(issue.detection))
+                if record.redaction_status == "APPLIED":
+                    blocking.append((issue.code, record))
+                    continue
+                if any(other.code != "review_required" and _key(other.detection) == _key(issue.detection)
+                       for other in redacted.issues):
+                    blocking.append((issue.code, record))
+                    continue
             record = by_id[available[_key(issue.detection)].popleft()]
             if issue.code == "superseded_overlap":
                 covering = applied[_key(issue.superseded_by)][0]
@@ -337,7 +346,7 @@ class AuditEngine:
             source = data["extraction"]
             extraction = ExtractionResult(Path(source["source_path"]), source["filename"], source["file_type"], [
                 ExtractedPage(p["page_number"], p["text"], p["extraction_method"],
-                              [OCRTextBlock(**b) for b in p["blocks"]] if p["blocks"] is not None else None)
+                              [OCRTextBlock(**b) for b in p["blocks"]] if p["blocks"] is not None else None, p.get("media_source"))
                 for p in source["pages"]], restore_structure(source.get("structure")),
                 PDFSourceMap(**source["pdf_source"]) if source.get("pdf_source") else None)
             from app.engines.visual_detection.models import restore_visual

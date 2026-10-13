@@ -10,7 +10,7 @@ from typing import Literal
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import JSONResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 class Part(BaseModel):
     model_config=ConfigDict(extra='forbid')
@@ -29,7 +29,7 @@ class Report(BaseModel):
     revision:int=Field(ge=0,strict=True)
     artifact_sha256:str|None=Field(default=None,pattern=r'^[a-f0-9]{64}$')
     ready:bool
-    parts:list[Part]=Field(default_factory=list,max_length=500)
+    parts:list[Part]=Field(default_factory=list,max_length=5000)
     counts:dict[str,int]=Field(default_factory=dict,max_length=100)
 
 class Decision(BaseModel):
@@ -43,10 +43,15 @@ class CustomRule(BaseModel):
     id:str|None=Field(default=None,max_length=80)
     name:str=Field(min_length=1,max_length=120)
     pattern:str=Field(min_length=1,max_length=500)
-    entity_type:str=Field(default='CUSTOM_BLOCKED',max_length=80)
-    action:Literal['redact','block']=Field(default='redact')
+    entity_type:str=Field(default='CUSTOM_BLOCKED',max_length=80,pattern=r'^[A-Z][A-Z0-9_]*$')
+    action:Literal['redact']=Field(default='redact')
     is_regex:bool=Field(default=False)
     created_at:str|None=Field(default=None)
+    @field_validator('pattern')
+    @classmethod
+    def valid_pattern(cls,value):
+        if not value.strip():raise ValueError('Enter a nonempty pattern.')
+        return value
 
 class Store:
     def __init__(self,path=None):
@@ -71,28 +76,17 @@ class Store:
     def initialize(self,connection):
         connection.execute('CREATE TABLE IF NOT EXISTS manager_reviews (id TEXT PRIMARY KEY, payload TEXT NOT NULL, status TEXT NOT NULL, submitted_at TEXT NOT NULL, decided_at TEXT)')
         connection.execute('CREATE TABLE IF NOT EXISTS custom_rules (id TEXT PRIMARY KEY, name TEXT NOT NULL, pattern TEXT NOT NULL, entity_type TEXT NOT NULL, action TEXT NOT NULL, is_regex INTEGER NOT NULL, created_at TEXT NOT NULL)')
-        try:
-            cur = connection.execute('SELECT COUNT(*) FROM custom_rules')
-            row = cur.fetchone()
-            count = row[0] if row else 0
-            if count == 0:
-                defaults = [
-                    ('cs-rule-1', 'Cadence Financial Group', 'Cadence Financial Group', 'CUSTOM_BLOCKED', 'redact', 0, datetime.now(timezone.utc).isoformat()),
-                    ('cs-rule-2', 'OneTrust TPRM Solution', 'OneTrust TPRM', 'CUSTOM_BLOCKED', 'redact', 0, datetime.now(timezone.utc).isoformat()),
-                    ('cs-rule-3', 'Optiv Security Partner', 'Optiv', 'CUSTOM_BLOCKED', 'redact', 0, datetime.now(timezone.utc).isoformat()),
-                    ('cs-rule-4', 'Cadence TPRM Training', 'Cadence TPRM Training', 'CUSTOM_BLOCKED', 'redact', 0, datetime.now(timezone.utc).isoformat()),
-                    ('cs-rule-5', 'Risk Management Policy', 'Cadence Group Risk Management Policy', 'CUSTOM_BLOCKED', 'redact', 0, datetime.now(timezone.utc).isoformat()),
-                ]
-                connection.executemany('INSERT INTO custom_rules (id, name, pattern, entity_type, action, is_regex, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)', defaults)
-                connection.commit()
-        except Exception:
-            pass
     def list_rules(self):
         with self.lock,self.connection() as connection:
             self.initialize(connection)
             rows=self.execute(connection,'SELECT * FROM custom_rules ORDER BY created_at DESC').fetchall()
             return [{'id':r['id'],'name':r['name'],'pattern':r['pattern'],'entity_type':r['entity_type'],'action':r['action'],'is_regex':bool(r['is_regex']),'created_at':r['created_at']} for r in rows]
     def add_rule(self,body:CustomRule):
+        if body.is_regex:
+            import re
+            try:compiled=re.compile(body.pattern)
+            except re.error:raise HTTPException(422,'Invalid regular expression.') from None
+            if compiled.search('') is not None:raise HTTPException(422,'The pattern must match nonempty content.')
         from uuid import uuid4
         rule_id=body.id or uuid4().hex
         created_at=body.created_at or datetime.now(timezone.utc).isoformat()
@@ -109,7 +103,7 @@ class Store:
             return {'status':'deleted','id':rule_id}
     def upsert(self,body):
         payload=body.model_dump_json()
-        if len(payload.encode())>2*1024*1024:raise HTTPException(413,'The affected-content report is too large.')
+        if len(payload.encode())>4*1024*1024:raise HTTPException(413,'The affected-content report is too large.')
         with self.lock,self.connection() as connection:
             self.initialize(connection)
             row=self.execute(connection,'SELECT * FROM manager_reviews WHERE id=?',(body.id,)).fetchone()
@@ -162,7 +156,7 @@ def create_app(path=None):
             if request.headers.get('x-cadence-local')!='1':return __import__('starlette.responses',fromlist=['JSONResponse']).JSONResponse({'detail':'Use the manager application.'},status_code=403)
             try:size=int(request.headers.get('content-length','0'))
             except ValueError:return JSONResponse({'detail':'Invalid request size.'},status_code=400)
-            if size<0 or size>2*1024*1024:return JSONResponse({'detail':'Report too large.'},status_code=413)
+            if size<0 or size>4*1024*1024:return JSONResponse({'detail':'Report too large.'},status_code=413)
         response=await next(request);response.headers['Cache-Control']='no-store';response.headers['X-Content-Type-Options']='nosniff';return response
     @app.get('/api/health')
     def health():return {'status':'ok','mode':'manager','commit':os.getenv('VERCEL_GIT_COMMIT_SHA')}
@@ -170,6 +164,10 @@ def create_app(path=None):
     def publish(body:Report):return store.upsert(body)
     @app.get('/api/manager/reports')
     def reports():return {'items':store.list()}
+    @app.get('/api/manager/reports/{identifier}/status')
+    def report_status(identifier:str):
+        report=store.get(identifier)
+        return {key:report.get(key) for key in ('id','revision','status','ready','artifact_sha256')}
     @app.get('/api/manager/reports/{identifier}')
     def detail(identifier:str):return store.get(identifier)
     @app.post('/api/manager/reports/{identifier}/decision')

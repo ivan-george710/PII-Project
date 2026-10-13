@@ -101,7 +101,7 @@ def test_upload_get_findings_context_artifact_and_no_path_leaks(api,kind):
     assert detail["candidate"]=="Brightwell"
     assert sum(len(detail[k]) for k in ["before","candidate","after"])<=480
 
-    # Initial redacted artifact is available immediately without awaiting review/approval
+    # Downloads are intentionally immediate while local review is pending.
     assert client.get(f"/api/documents/{sid}/artifact").status_code==200
 
     # Manager report is pending and unready; manager cannot approve unready engine results
@@ -123,15 +123,15 @@ def test_upload_get_findings_context_artifact_and_no_path_leaks(api,kind):
     sha=m_status["artifact_sha256"]
     assert sha is not None
 
-    # Redacted artifact is available immediately without awaiting manager approval
-    download=client.get(f"/api/documents/{sid}/artifact")
-    assert download.status_code==200 and download.content
-    assert ("redacted-private-name."+kind) in download.headers["content-disposition"]
+    # A pending manager decision is intentionally not a download gate.
+    assert client.get(f"/api/documents/{sid}/artifact").status_code==200
 
     # Manager approves revision 1
     approve=mgr_tc.post(f"/api/manager/reports/{sid}/decision",headers=HEADERS,json={"revision":rev1,"artifact_sha256":sha,"action":"approved"})
     assert approve.status_code==200
-    assert client.get(f"/api/documents/{sid}/artifact").status_code==200
+    download=client.get(f"/api/documents/{sid}/artifact")
+    assert download.status_code==200 and download.content
+    assert ("redacted-private-name."+kind) in download.headers["content-disposition"]
 
     # Manager denies -> download blocked (403)
     deny=mgr_tc.post(f"/api/manager/reports/{sid}/decision",headers=HEADERS,json={"revision":rev1,"artifact_sha256":sha,"action":"denied"})
@@ -350,14 +350,14 @@ def test_comparison_is_actual_bounded_redaction_without_private_paths(api, kind)
     assert "source_sha256" not in response.text
 
 
-def test_comparison_does_not_invent_a_replacement_for_unresolved_finding(api):
+def test_comparison_shows_actual_mask_for_review_finding(api):
     client, app, *_ = api
     sid = upload(client).json()["document_session_id"]
     record = next(r for r in app.state.sessions[sid].result.audit_result.records if r.effective_decision == "REVIEW")
     response = client.get(f"/api/documents/{sid}/findings/{record.detection_id}/comparison")
     assert response.status_code == 200
-    assert response.json()["redacted_context"] is None
-    assert response.json()["replacement"] is None
+    assert "Brightwell" not in response.json()["redacted_context"]
+    assert response.json()["replacement"] == "[PERSON_002]"
     assert client.get(f"/api/documents/{sid}/findings/unknown/comparison").status_code == 404
 
 
@@ -378,21 +378,16 @@ def test_saved_feedback_timeline_survives_reload_without_detection(api):
     assert analyzer.calls == calls
 
 
-def test_manager_unavailable_does_not_block_local_download(tmp_path):
-    root = tmp_path / "private-app"
-    analyzer = Analyzer()
-    pipeline = DocumentPipeline(extraction=SimpleNamespace(extract=lambda p: extract_docx(p)), detection=PIIDetectionEngine(analyzer=analyzer),
-        audit=AuditEngine(root / "audits"), artifact_output_dir=root / "artifacts")
-    unreachable_client = ManagerClient(url="http://127.0.0.1:59999")
-    app = create_app(work_dir=root, pipeline=pipeline, allow_test_host=True, manager_client=unreachable_client)
-    client = TestClient(app)
-    res = upload(client, "docx")
-    assert res.status_code == 200
-    sid = res.json()["document_session_id"]
-    finding = client.get(f"/api/documents/{sid}/findings?decision=REVIEW").json()["items"][0]
-    client.post(f"/api/documents/{sid}/feedback", headers=HEADERS, json={"expected_revision": 0, "finding_id": finding["finding_id"], "action": "CONFIRM_PII"})
-    down = client.get(f"/api/documents/{sid}/artifact")
-    assert down.status_code == 200
+def test_manager_unavailable_keeps_local_processing_and_download_available(tmp_path):
+    client,app,_,_=setup(tmp_path)
+    sid=upload(client,'docx').json()['document_session_id']
+    finding=client.get(f'/api/documents/{sid}/findings?decision=REVIEW').json()['items'][0]
+    client.post(f'/api/documents/{sid}/feedback',headers=HEADERS,json={'expected_revision':0,'finding_id':finding['finding_id'],'action':'CONFIRM_PII'})
+    # Existing local result remains available if the report/decision store is down.
+    app.state.manager_test_client.get=lambda *args,**kwargs: (_ for _ in ()).throw(ConnectionError())
+    assert client.get(f'/api/documents/{sid}/artifact').status_code==200
+    # Offline processing keeps the last loaded custom rules.
+    assert upload(client,'docx').status_code==200
 
 
 def test_revision_reset_resets_approval_and_blocks_stale_download(api):
@@ -412,8 +407,10 @@ def test_revision_reset_resets_approval_and_blocks_stale_download(api):
     client.post(f"/api/documents/{sid}/feedback", headers=HEADERS, json={"expected_revision": 1, "finding_id": rec["finding_id"], "action": "FALSE_POSITIVE"})
     assert client.get(f"/api/documents/{sid}").json()["revision"] == 2
 
-    # Deny blocks download
+    # Manager review is advisory until an explicit denial.
+    assert client.get(f"/api/documents/{sid}/artifact").status_code == 200
     m_status2 = client.get(f"/api/documents/{sid}/manager").json()
+    assert client.get(f"/api/documents/{sid}/artifact").status_code == 200
     deny = mgr_tc.post(f"/api/manager/reports/{sid}/decision", headers=HEADERS, json={"revision": 2, "artifact_sha256": m_status2["artifact_sha256"], "action": "denied"})
     assert deny.status_code == 200
     assert client.get(f"/api/documents/{sid}/artifact").status_code == 403
@@ -447,3 +444,56 @@ def test_text_message_manager_approval_and_sanitized_txt_download(api):
     assert "Brightwell" not in text
     assert "EMP-00001" not in text
     assert "please." in text
+
+def test_preview_returns_actual_applied_redactions_with_revision_binding(api):
+    client,*_=api
+    sid=upload(client).json()['document_session_id']
+    preview=client.get(f'/api/documents/{sid}/preview-pages?revision=0')
+    assert preview.status_code==200
+    assert all('EMP-00001' not in (page['redacted_text'] or '') for page in preview.json()['pages'])
+    assert client.get(f'/api/documents/{sid}/preview-pages?revision=1').status_code==409
+
+
+def test_advisory_manager_approval_does_not_clear_local_review(api):
+    client,app,*_=api
+    sid=upload(client).json()['document_session_id']
+    app.state.manager_test_client.get=lambda *args,**kwargs: __import__('httpx').Response(200,json={'status':'approved','ready':True,'revision':0,'artifact_sha256':'a'*64})
+    assert client.get(f'/api/documents/{sid}/artifact?revision=0').status_code==200
+    assert not client.get(f'/api/documents/{sid}').json()['summary']['human_review_complete']
+
+def test_visual_pdf_preview_renders_and_respects_denial(api):
+    client,app,*_=api
+    sid=upload(client,'pdf').json()['document_session_id']
+    from PIL import Image
+    from io import BytesIO
+    for variant in ('original','redacted'):
+        response=client.get(f'/api/documents/{sid}/preview-image?variant={variant}&revision=0')
+        assert response.status_code==200 and response.headers['content-type']=='image/png'
+        assert Image.open(BytesIO(response.content)).width>100
+    assert client.get(f'/api/documents/{sid}/preview-image?page=999').status_code==404
+    app.state.manager_test_client.post(f'/api/manager/reports/{sid}/decision',headers=HEADERS,json={'revision':0,'artifact_sha256':None,'action':'denied'})
+    assert client.get(f'/api/documents/{sid}/preview-image?variant=redacted').status_code==403
+    assert client.get(f'/api/documents/{sid}/preview-image?variant=original').status_code==200
+
+@pytest.mark.parametrize('kind',['docx','pptx'])
+def test_office_embedded_images_preview_actual_pixels_and_enforce_denial(api,kind):
+    from PIL import Image
+    image=BytesIO();Image.new('RGB',(32,24),'black').save(image,format='PNG')
+    stream=BytesIO()
+    if kind=='docx':
+        doc=Document();doc.add_paragraph('Fictional image');image.seek(0);doc.add_picture(image);doc.save(stream)
+    else:
+        doc=Presentation();slide=doc.slides.add_slide(doc.slide_layouts[6]);image.seek(0);slide.shapes.add_picture(image,Inches(1),Inches(1));doc.save(stream)
+    client,app,*_=api
+    response=client.post('/api/documents',headers=HEADERS,files={'file':('image.'+kind,stream.getvalue())})
+    assert response.status_code==200
+    sid=response.json()['document_session_id'];revision=response.json()['revision']
+    for variant in ('original','redacted'):
+        manifest=client.get(f'/api/documents/{sid}/preview-media?variant={variant}&revision={revision}')
+        assert manifest.status_code==200
+        picture=client.get(manifest.json()['items'][0]['url'])
+        assert picture.status_code==200 and Image.open(BytesIO(picture.content)).size==(32,24)
+    assert client.get(f'/api/documents/{sid}/preview-media/99').status_code==404
+    report=client.get(f'/api/documents/{sid}/manager').json()
+    app.state.manager_test_client.post(f'/api/manager/reports/{sid}/decision',headers=HEADERS,json={'revision':revision,'artifact_sha256':report['artifact_sha256'],'action':'denied'})
+    assert client.get(f'/api/documents/{sid}/preview-media?variant=redacted').status_code==403

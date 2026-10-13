@@ -302,12 +302,15 @@ def test_real_presidio_office_pipeline(tmp_path, kind):
 
 
 @pytest.mark.parametrize("kind", ["docx", "pptx"])
-def test_extraction_engine_routes_office_without_ocr(tmp_path, monkeypatch, kind):
+def test_extraction_engine_routes_office_with_media_ocr(tmp_path, monkeypatch, kind):
     path = tmp_path / ("routed." + kind)
     (docx_fixture if kind == "docx" else pptx_fixture)(path)
     monkeypatch.setattr(OCREngine, "__init__", lambda self: None)
     monkeypatch.setattr(OCREngine, "extract_pdf", Mock(side_effect=AssertionError("No Office OCR")))
+    calls = []
+    monkeypatch.setattr(OCREngine, "extract_image", lambda self,p: calls.append(p) or [])
     result = ExtractionEngine().extract(path)
+    assert calls and any(p.extraction_method == "media_ocr" for p in result.pages)
     assert result.file_type == kind and result.structure is not None
 
 

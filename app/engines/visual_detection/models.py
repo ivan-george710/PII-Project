@@ -60,7 +60,7 @@ class VisualInspection:
             raise ValueError('Duplicate visual identifiers')
         units={u.unit_id:u for u in self.units}
         for u in self.units:
-            if (u.kind not in {'office_media','pdf_raster','pdf_image'} or type(u.width) is not int or type(u.height) is not int
+            if (u.kind not in {'office_media','pdf_raster','pdf_image','standalone_image'} or type(u.width) is not int or type(u.height) is not int
                 or u.width<=0 or u.height<=0 or not 0<u.width*u.height<=16_777_216 or not re.fullmatch(r'I\d{6,}',u.unit_id)
                 or type(u.mapped) is not bool or u.frame not in {'raw','display'}
                 or not re.fullmatch(r'[0-9a-f]{64}',u.image_sha256) or not re.fullmatch(r'[0-9a-f]{64}',u.pixel_sha256)):

@@ -18,3 +18,5 @@ psycopg[binary]>=3.2,<4
 httpx>=0.28
 pytest>=8
 reportlab>=4
+
+regex>=2024.11

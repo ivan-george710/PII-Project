@@ -70,7 +70,7 @@ def test_order_actual_outputs_counts_and_sanitization(tmp_path):
     assert result.processing_status == ProcessingStatus.PROCESSED_REVIEW_REQUIRED
     assert len(result.review_queue) == 1
     assert result.audit_result.counts["raw_detection_count"] == 2
-    assert result.audit_result.counts["applied_redactions"] == 1
+    assert result.audit_result.counts["applied_redactions"] == 2
     assert set(result.stage_timings) == {c[0] for c in calls} | {"artifact_redaction", "artifact_verification", "face_detection"}
     assert all(t >= 0 for t in result.stage_timings.values())
     assert result.total_runtime >= sum(result.stage_timings.values())
@@ -106,7 +106,7 @@ def test_invalid_engine_result_is_failure(tmp_path, stage, method):
     assert p.process(path).failure.stage == stage
 
 
-@pytest.mark.parametrize("kind", ["image"])
+@pytest.mark.parametrize("kind", ["svg"])
 def test_recognized_unimplemented_format(tmp_path, kind):
     p, path, *_ = fixture_pipeline(tmp_path)
     m = p.file_intelligence.analyze(str(path))

@@ -53,7 +53,7 @@ def analyze_pdf(path: Path) -> dict:
         else:
             blank_pages += 1
 
-    if image_only_pages > 0 and text_pages > 0:
+    if mixed_pages > 0 or (image_only_pages > 0 and text_pages > 0):
         extraction_strategy = "hybrid"
     elif image_only_pages > 0:
         extraction_strategy = "ocr"
@@ -66,6 +66,6 @@ def analyze_pdf(path: Path) -> dict:
         "image_only_pages": image_only_pages,
         "mixed_pages": mixed_pages,
         "blank_pages": blank_pages,
-        "requires_ocr": image_only_pages > 0,
+        "requires_ocr": image_only_pages > 0 or mixed_pages > 0,
         "extraction_strategy": extraction_strategy,
     }

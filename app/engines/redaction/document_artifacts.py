@@ -11,6 +11,9 @@ class DocumentArtifactEngine:
         if extraction.file_type=="pdf":
             from .pdf_artifacts import PDFArtifactEngine
             return PDFArtifactEngine(self.output_dir)
+        if extraction.file_type == "image":
+            from .image_artifacts import ImageArtifactEngine
+            return ImageArtifactEngine(self.output_dir)
         return self.office
 
     def redact(self, extraction, detection, redaction):

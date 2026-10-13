@@ -25,8 +25,8 @@ from .models import (DocumentState, StageState, Finding, FindingList, FindingDet
 MAX_UPLOAD = 30 * 1024 * 1024
 STATIC = Path(__file__).parent / "static"
 STAGES = ["file_intelligence", "extraction", "detection", "face_detection", "redaction", "audit", "artifact_redaction", "artifact_verification"]
-FORMATS = {".pdf": "pdf", ".docx": "docx", ".pptx": "pptx"}
-MIME = {"pdf": "application/pdf", "docx": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+FORMATS = {".pdf": "pdf", ".docx": "docx", ".pptx": "pptx", ".png": "image", ".jpg": "image", ".jpeg": "image"}
+MIME = {"image": "image/png", "pdf": "application/pdf", "docx": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
         "pptx": "application/vnd.openxmlformats-officedocument.presentationml.presentation"}
 
 
@@ -150,7 +150,7 @@ def create_app(*, work_dir=None, pipeline=None, max_upload_bytes=MAX_UPLOAD, all
         if any(p.is_symlink() or getattr(p, "is_junction", lambda: False)() for p in [path, *path.parents]):
             raise HTTPException(409, "Artifact access is unavailable.")
         resolved = path.resolve()
-        if not resolved.is_relative_to(root / "artifacts") or not resolved.is_file() or resolved.suffix != "." + s.format:
+        if not resolved.is_relative_to(root / "artifacts") or not resolved.is_file() or resolved.suffix != (".png" if s.format == "image" else "." + s.format):
             raise HTTPException(409, "Artifact access is unavailable.")
         return resolved
 
@@ -176,14 +176,14 @@ def create_app(*, work_dir=None, pipeline=None, max_upload_bytes=MAX_UPLOAD, all
                     issue_message = "The original upload changed or is missing. Upload a new copy before regenerating the artifact."
         for name in STAGES:
             completed = name in result.stage_timings
-            failed = result.failure is not None and result.failure.stage == name
+            failed = result.failure is not None and (result.failure.stage == name or (name == "artifact_verification" and result.failure.stage == "residual_verification"))
             if name == "artifact_verification" and result.artifact_result and result.artifact_result.verification_failures:
                 failed = True
             stages.append(StageState(name=name, state="Failed" if failed else "Completed" if completed else "Pending",
                                      seconds=result.stage_timings.get(name)))
         return DocumentState(document_session_id=s.session_id, format=s.format,
             revision=result.audit_result.revision if result.audit_result else None, saved_revision=s.saved_revision,
-            artifact_available=available, summary=result.sanitized_summary(), stages=stages, issue_message=issue_message, input_text=s.input_text, output_text=(result.redaction_result.full_text if s.input_text and result.redaction_result and not result.failure else s.input_text if s.input_text else None))
+            artifact_available=available, summary=result.sanitized_summary(), stages=stages, issue_message=issue_message, input_text=s.input_text, output_text=(result.redaction_result.full_text if s.input_text and result.redaction_result and not result.failure else None))
 
     def report(s):
         current=s.result.audit_result;summary=s.result.sanitized_summary();parts=[]
@@ -200,6 +200,28 @@ def create_app(*, work_dir=None, pipeline=None, max_upload_bytes=MAX_UPLOAD, all
                     return 'data:image/png;base64,'+__import__('base64').b64encode(buffer.getvalue()).decode()
                 part['original_image']=image(False)
                 part['redacted_image']=image(True) if value.finding.protected else None
+            elif record.effective_detection.source_block is not None and s.result.extraction_result.file_type=='pdf':
+                extraction=s.result.extraction_result
+                page=next(p for p in extraction.pages if p.page_number==record.effective_detection.page_number)
+                block=page.blocks[record.effective_detection.source_block]
+                if block.mask_only:
+                    import pymupdf as fitz
+                    from PIL import Image
+                    from io import BytesIO
+                    import base64
+                    points=block.bounding_box
+                    box=(int(min(p[0] for p in points)),int(min(p[1] for p in points)),
+                         int(max(p[0] for p in points)),int(max(p[1] for p in points)))
+                    def region(after):
+                        path=s.result.artifact_result.path if after else extraction.source_path
+                        with fitz.open(path) as document:
+                            pixels=document[page.page_number-1].get_pixmap(dpi=extraction.pdf_source.ocr_dpi_by_page[str(page.page_number)],colorspace=fitz.csRGB,alpha=False,annots=False)
+                            with Image.frombytes('RGB',(pixels.width,pixels.height),pixels.samples) as raster:
+                                with raster.crop(box) as crop:
+                                    crop.thumbnail((1200,300));buffer=BytesIO();crop.save(buffer,format='PNG')
+                        return 'data:image/png;base64,'+base64.b64encode(buffer.getvalue()).decode()
+                    part['original_image']=region(False)
+                    part['redacted_image']=region(True) if s.result.artifact_result and s.result.artifact_result.path else None
             parts.append(part)
         artifact=summary.get('artifact') or {}
         ready=bool(not s.result.failure and summary.get('human_review_complete') and artifact.get('verification_completed') and artifact.get('supported_content_verified'))
@@ -251,12 +273,12 @@ def create_app(*, work_dir=None, pipeline=None, max_upload_bytes=MAX_UPLOAD, all
 
     @app.get("/api/config")
     def config():
-        return {"manager_url": manager.url, "max_upload_bytes": max_upload_bytes, "supported_formats": list(FORMATS.values()), "trusted_local_only": True}
+        return {"manager_url": manager.url, "max_upload_bytes": max_upload_bytes, "supported_formats": list(dict.fromkeys(FORMATS.values())), "trusted_local_only": True}
 
     @app.get('/api/samples')
     def samples():
         folder=Path(os.getenv('DEMO_SAMPLE_DIR',str(PROJECT_ROOT/'demo'/'samples')))
-        return {'items':[{'filename':p.name,'label':p.stem.replace('-',' ')} for p in sorted(folder.glob('*')) if p.is_file() and p.suffix in FORMATS]}
+        return {'items':[{'filename':p.name,'label':p.stem.replace('-',' ')+' · '+p.suffix[1:].upper()} for p in sorted(folder.glob('*')) if p.is_file() and p.suffix in FORMATS]}
 
     @app.get('/api/samples/{filename}')
     def sample(filename:str):
@@ -276,7 +298,7 @@ def create_app(*, work_dir=None, pipeline=None, max_upload_bytes=MAX_UPLOAD, all
             raise HTTPException(400, "Choose a file with a simple document filename.")
         extension = Path(name).suffix.lower()
         if extension not in FORMATS:
-            raise HTTPException(415, "Supported uploads are PDF, DOCX and PPTX.")
+            raise HTTPException(415, "Supported uploads are PDF, DOCX, PPTX, PNG and JPEG.")
         identifier = uuid4().hex
         path = root / "uploads" / (uuid4().hex + extension)
         size = 0
@@ -297,14 +319,12 @@ def create_app(*, work_dir=None, pipeline=None, max_upload_bytes=MAX_UPLOAD, all
             except Exception:
                 raise HTTPException(400, "Document content is corrupt, unsupported or does not match its extension.") from None
             with lock:
-                try:
-                    if hasattr(engine, 'set_custom_rules'): engine.set_custom_rules(manager.get_rules())
-                except Exception: pass
+                if hasattr(engine, 'set_custom_rules'):engine.set_custom_rules(manager.get_rules())
                 result = engine.process(path)
                 s = ReviewSession(identifier, name, FORMATS[extension], result)
                 sessions[identifier] = s
                 try:report(s)
-                except Exception:pass
+                except HTTPException:pass
                 return state(s)
         except Exception:
             path.unlink(missing_ok=True)
@@ -321,12 +341,10 @@ def create_app(*, work_dir=None, pipeline=None, max_upload_bytes=MAX_UPLOAD, all
         for paragraph in body.text.split('\n'):document.add_paragraph(paragraph)
         document.save(path);os.chmod(path,0o600)
         with lock:
-            try:
-                if hasattr(engine, 'set_custom_rules'): engine.set_custom_rules(manager.get_rules())
-            except Exception: pass
+            if hasattr(engine, 'set_custom_rules'):engine.set_custom_rules(manager.get_rules())
             result=engine.process(path);s=ReviewSession(identifier,'Text message','docx',result,input_text=body.text);sessions[identifier]=s
             try:report(s)
-            except Exception:pass
+            except HTTPException:pass
             return state(s)
 
     @app.get("/api/documents/{identifier}", response_model=DocumentState)
@@ -339,7 +357,7 @@ def create_app(*, work_dir=None, pipeline=None, max_upload_bytes=MAX_UPLOAD, all
             s = session(identifier)
             pages = s.result.extraction_result.pages if s.result.extraction_result else []
             return ReviewIdentity(display_name=s.display_name,
-                location_kind={"pdf": "page", "docx": "logical segment", "pptx": "slide"}[s.format], location_count=len(pages))
+                location_kind={"pdf": "page", "docx": "logical segment", "pptx": "slide", "image": "image"}[s.format], location_count=len(pages))
 
     @app.get("/api/documents/{identifier}/findings", response_model=FindingList)
     def findings(identifier: str, decision: str = Query("ALL", pattern="^(ALL|CONFIRM|REJECT|REVIEW)$"),
@@ -455,9 +473,11 @@ def create_app(*, work_dir=None, pipeline=None, max_upload_bytes=MAX_UPLOAD, all
             return FileResponse(path,media_type=MIME[s.format],filename=s.display_name,content_disposition_type='inline' if s.format=='pdf' else 'attachment')
 
     @app.get('/api/documents/{identifier}/preview-pages')
-    def preview_pages(identifier: str):
+    def preview_pages(identifier: str, expected: int | None = Query(None, alias="revision")):
         with lock:
             s = session(identifier)
+            if expected is not None:revision(s, expected)
+            complete=bool(s.result.redaction_result and not s.result.failure)
             ext_pages = s.result.extraction_result.pages if s.result.extraction_result else []
             red_pages = s.result.redaction_result.pages if s.result.redaction_result else []
             kind = {"pdf": "page", "docx": "section", "pptx": "slide"}.get(s.format, "page")
@@ -468,7 +488,7 @@ def create_app(*, work_dir=None, pipeline=None, max_upload_bytes=MAX_UPLOAD, all
                     "page_number": ep.page_number,
                     "kind": kind,
                     "original_text": ep.text,
-                    "redacted_text": rp.text if rp else ep.text,
+                    "redacted_text": rp.text if rp and complete else None,
                     "extraction_method": getattr(ep, 'extraction_method', 'native'),
                 })
             applied = [
@@ -489,24 +509,94 @@ def create_app(*, work_dir=None, pipeline=None, max_upload_bytes=MAX_UPLOAD, all
                 "redactions": applied,
             }
 
+    def media_file(s,variant):
+        if s.format not in {'docx','pptx'}:raise HTTPException(415,'Embedded-image previews are available for Office documents.')
+        if variant=='redacted':
+            path=file_for(s);manager.check_denial(s.session_id)
+            return path
+        path=Path(s.result.extraction_result.source_path) if s.result.extraction_result else None
+        if not path or path.is_symlink() or not path.resolve().is_relative_to(root/'uploads') or not path.is_file():raise HTTPException(404,'Original preview unavailable.')
+        return path
+
+    def media_entries(archive,format):
+        prefix='word/media/' if format=='docx' else 'ppt/media/'
+        entries=sorted([entry for entry in archive.infolist() if entry.filename.startswith(prefix) and not entry.is_dir()],key=lambda entry:entry.filename)
+        if len(entries)>100:raise HTTPException(413,'Too many embedded images for an inline preview. Open the file instead.')
+        return entries
+
+    @app.get('/api/documents/{identifier}/preview-media')
+    def preview_media(identifier:str,variant:str=Query('original',pattern='^(original|redacted)$'),expected:int|None=Query(None,alias='revision')):
+        from zipfile import ZipFile
+        with lock:
+            s=session(identifier)
+            if expected is not None:revision(s,expected)
+            with ZipFile(media_file(s,variant)) as archive:
+                entries=media_entries(archive,s.format)
+                supported={'.png','.jpg','.jpeg','.gif','.bmp','.tif','.tiff','.webp'}
+                return {'items':[{'index':index,'url':f'/api/documents/{identifier}/preview-media/{index}?variant={variant}&revision={audit(s).revision}'} for index,entry in enumerate(entries) if Path(entry.filename).suffix.lower() in supported and entry.file_size<=12*1024*1024],
+                    'unsupported_count':sum(Path(entry.filename).suffix.lower() not in supported or entry.file_size>12*1024*1024 for entry in entries)}
+
+    @app.get('/api/documents/{identifier}/preview-media/{index}')
+    def preview_media_image(identifier:str,index:int,variant:str=Query('original',pattern='^(original|redacted)$'),expected:int|None=Query(None,alias='revision')):
+        from zipfile import ZipFile
+        from io import BytesIO
+        from PIL import Image
+        with lock:
+            s=session(identifier)
+            if expected is not None:revision(s,expected)
+            with ZipFile(media_file(s,variant)) as archive:
+                entries=media_entries(archive,s.format)
+                if not 0<=index<len(entries):raise HTTPException(404,'Embedded image not found.')
+                entry=entries[index]
+                if entry.file_size>12*1024*1024:raise HTTPException(413,'This image is too large for an inline preview.')
+                try:
+                    image=Image.open(BytesIO(archive.read(entry)))
+                    if image.width*image.height>20_000_000:raise ValueError()
+                    image=image.convert('RGB');image.thumbnail((1200,1200))
+                    output=BytesIO();image.save(output,format='PNG')
+                    return Response(output.getvalue(),media_type='image/png')
+                except Exception:raise HTTPException(415,'This embedded image cannot be previewed. Open the document instead.') from None
+
+    @app.get('/api/documents/{identifier}/preview-image')
+    def preview_image(identifier:str,page:int=Query(1,ge=1),variant:str=Query('original',pattern='^(original|redacted)$'),expected:int|None=Query(None,alias='revision')):
+        with lock:
+            s=session(identifier)
+            if expected is not None:revision(s,expected)
+            if s.format not in {'pdf','image'}:raise HTTPException(415,'Visual page rendering is available for PDFs and images.')
+            if variant=='redacted':
+                path=file_for(s);manager.check_denial(s.session_id)
+            else:
+                path=Path(s.result.extraction_result.source_path) if s.result.extraction_result else None
+                if not path or not path.resolve().is_relative_to(root/'uploads') or not path.is_file():raise HTTPException(404,'Original preview unavailable.')
+            if s.format=='image':
+                if page!=1:raise HTTPException(404,'Page not found.')
+                from app.engines.visual_detection.images import decode,encode
+                with decode(path.read_bytes(),'display') as image:
+                    image.thumbnail((1400,1400))
+                    return Response(encode(image),media_type='image/png')
+            import pymupdf as fitz
+            try:
+                with fitz.open(path) as document:
+                    if page>len(document):raise HTTPException(404,'Page not found.')
+                    source=document[page-1]
+                    scale=min(1.5,1400/max(source.rect.width,source.rect.height))
+                    if source.rect.width<=0 or source.rect.height<=0:raise ValueError()
+                    pixels=source.get_pixmap(matrix=fitz.Matrix(scale,scale),alpha=False)
+                    return Response(pixels.tobytes('png'),media_type='image/png')
+            except HTTPException:raise
+            except Exception:raise HTTPException(409,'This page could not be rendered.') from None
+
     @app.get("/api/documents/{identifier}/artifact")
     def artifact(identifier: str, inline: bool = False, expected: int | None = Query(None, alias="revision")):
         with lock:
             s = session(identifier)
             if expected is not None:revision(s, expected)
             path = file_for(s)
-            try:
-                decision = manager.status(identifier)
-                if isinstance(decision, dict) and decision.get('status') == 'denied':
-                    raise HTTPException(403, 'Artifact download was denied by manager.')
-            except HTTPException as e:
-                if e.status_code == 403: raise
-            except Exception:
-                pass
+            manager.check_denial(s.session_id)
             if s.input_text is not None:
                 content = s.result.redaction_result.full_text if s.result.redaction_result else ""
                 return Response(content,media_type="text/plain",headers={"Content-Disposition":"attachment; filename=redacted-message.txt"})
-            return FileResponse(path,media_type=MIME[s.format],filename="redacted-"+s.display_name,
+            return FileResponse(path,media_type=MIME[s.format],filename="redacted-"+(Path(s.display_name).stem+".png" if s.format=="image" else s.display_name),
                 content_disposition_type="inline" if inline and s.format=="pdf" else "attachment")
 
     @app.get("/api/documents/{identifier}/audit", response_model=AuditView)

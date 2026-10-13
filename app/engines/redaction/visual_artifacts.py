@@ -22,7 +22,7 @@ def prepare_visual(extraction,result):
     result.known_review_complete=result.known_review_complete and not inspection.unsupported and not any(f.final_decision=='REVIEW' for f in inspection.faces)
     groups=defaultdict(list)
     for f in inspection.faces:
-        if f.final_decision=='CONFIRM':groups[f.unit_id].append(f)
+        if f.final_decision in {'CONFIRM','REVIEW'}:groups[f.unit_id].append(f)
     plans={}
     for unit in inspection.units:
         if not groups[unit.unit_id]:continue
@@ -59,6 +59,7 @@ def native_images(page,doc,unit,data,check):
 
 
 def _output_image(extraction,result,unit,check):
+    if unit.kind=='standalone_image':return decode(Path(result.path).read_bytes(),'raw')
     if unit.kind=='office_media':
         with ZipFile(result.path) as z:data=z.read(unit.source_ref)
         if sha256(data).hexdigest()!=check['expected_sha256']:raise ValueError('Encoded media differs')
@@ -120,6 +121,17 @@ def verify_visual(extraction,result,redaction=None):
         # Recompute from original/current effective decisions, independently read
         # the generated file, and reject missing/extra/tampered generation evidence.
         plans=prepare_visual(extraction,expected)
+        if extraction.file_type in {'docx','pptx'}:
+            from .media_artifacts import media_plans, update_face_checks
+            media = media_plans(extraction, redaction, {u.source_ref:data for u,data,_ in plans.values()})
+            update_face_checks(plans, media)
+        if extraction.file_type=='image':
+            from .image_artifacts import composed_image
+            with composed_image(extraction,redaction,plans) as image:
+                payload=encode(image)
+                for unit,_,check in plans.values():
+                    check['pixel_sha256']=pixel_hash(image)
+                    check['expected_sha256']=sha256(payload).hexdigest()
         for unit,data,check in plans.values():
             if unit.kind=='pdf_raster':
                 with _compose_raster(extraction,redaction,unit,data,result.mapping_issues) as image:
@@ -146,14 +158,14 @@ def verify_visual(extraction,result,redaction=None):
                 for info in z.infolist():
                     if any(payload in z.read(info) for payload in original_payloads):
                         result.face_verification_failures+=1
-        else:
+        elif extraction.file_type=='pdf':
             with fitz.open(result.path) as doc:
                 for xref in range(1,doc.xref_length()):
                     if not doc.xref_is_image(xref):continue
                     try:
                         with decode(doc.extract_image(xref)['image'],'raw') as image:
                             if any(u.kind=='pdf_image' and image.size==(u.width,u.height) and pixel_hash(image)==u.pixel_sha256
-                                   for u in inspection.units if any(f.unit_id==u.unit_id and f.final_decision=='CONFIRM' for f in inspection.faces)):
+                                   for u in inspection.units if any(f.unit_id==u.unit_id and f.final_decision in {'CONFIRM','REVIEW'} for f in inspection.faces)):
                                 result.face_verification_failures+=1
                     except Exception:continue
         if not result.reopened:result.face_verification_failures+=1

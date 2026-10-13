@@ -6,27 +6,27 @@
 }
 * { box-sizing: border-box; }
 body { margin: 0; overflow: hidden; background: var(--bg); color: var(--fg); }
-button, input { font: inherit; color: inherit; }
+button, input, select { font: inherit; color: inherit; }
 input { caret-color: var(--fg); }
 #notes, dialog { scrollbar-color: #666 var(--surface); scrollbar-width: thin; }
 button { cursor: pointer; border: 0; background: transparent; min-width: 44px; min-height: 44px; border-radius: 12px; transition: background .2s, transform .2s; }
 button:hover { background: #262626; }
 button:active { transform: scale(.95); }
-button:focus-visible, a:focus-visible, input:focus-visible { outline: 2px solid var(--fg); outline-offset: 4px; }
+button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible { outline: 2px solid var(--fg); outline-offset: 4px; }
 a { color: inherit; text-underline-offset: 4px; }
 ::selection { color: var(--bg); background: var(--fg); }
 svg { display: block; }
 button svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
-.masthead { position: fixed; inset: 0 0 auto; display: flex; align-items: center; gap: 25px; padding: 20px 3vw; z-index: 20; background: var(--bg); }
-.wordmark { display: flex; align-items: center; gap: 10px; font-size: 17px; font-weight: 550; text-decoration: none; }
-.wordmark svg { width: 27px; height: 27px; stroke: currentColor; stroke-width: 5; fill: none; }
-#speaker { margin-left: auto; font-size: 15px; color: var(--muted); }
-.tools { display: flex; gap: 5px; }
-.tools button { display: grid; place-items: center; }
-#film { position: absolute; inset: 80px 0 112px; overflow: hidden; }
+.masthead { position: fixed; inset: 0 0 auto; height: 64px; display: grid; place-items: center; z-index: 20; background: var(--bg); }
+#speaker { font-size: 17px; font-weight: 500; color: var(--fg); }
+#presenter-tools { position: fixed; right: 3vw; bottom: 112px; z-index: 35; display: flex; gap: 4px; padding: 6px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); }
+#presenter-tools button { display: grid; place-items: center; width: 44px; }
+button:disabled { cursor: default; opacity: .3; }
+button:disabled:active { transform: none; }
+#film { position: absolute; inset: 66px 0 112px; overflow: hidden; }
 #scene-title { position: absolute; inset: 0 0 auto; margin: 0; z-index: 10; font-weight: 500; font-size: 36px; letter-spacing: -.025em; text-align: center; pointer-events: none; }
 #scene-title:empty { display: none; }
-#viewport { position: absolute; inset: 18px 0 35px; overflow: hidden; filter: blur(var(--motion-blur, 0px)); will-change: filter; opacity: var(--architecture-opacity, 1); }
+#viewport { position: absolute; inset: 18px 0 35px; overflow: hidden; filter: blur(calc(var(--motion-blur, 0px) + var(--cycle-blur, 0px))); will-change: filter; opacity: var(--architecture-opacity, 1); }
 #world { position: absolute; width: 3500px; height: 2500px; transform-origin: 0 0; will-change: transform; }
 body[data-stage="intro"] #viewport { visibility: hidden; pointer-events: none; }
 body[data-stage="intro"] .film-caption { display: none; }
@@ -90,20 +90,17 @@ dialog > p { font-size: 14px; line-height: 1.6; color: var(--muted); max-width: 
 .solid:hover { background: #bbb; }
 #timing-form { display: grid; margin: 20px 0; }
 #timing-form label { display: flex; align-items: center; justify-content: space-between; gap: 15px; padding: 12px 0; border-bottom: 1px solid var(--line); font-size: 14px; }
-#timing-form input { width: 90px; padding: 10px; background: var(--surface); border: 1px solid #555; border-radius: 6px; }
+#timing-form select { min-width: 110px; min-height: 44px; padding: 10px; background: var(--surface); border: 1px solid #555; border-radius: 6px; }
 #chapters { display: grid; }
 #chapters button { display: flex; justify-content: space-between; gap: 20px; border-bottom: 1px solid var(--line); border-radius: 0; text-align: left; padding: 15px 0; }
 #chapters small { color: var(--muted); }
 [hidden] { display: none !important; }
 #print-deck { display: none; }
 @media (max-width: 600px) {
-  .masthead { padding: 14px 16px; gap: 12px; }
-  .wordmark { font-size: 14px; gap: 7px; }
-  .wordmark svg { width: 22px; height: 22px; }
-  #speaker { font-size: 12px; }
-  .tools { gap: 0; }
-  .tools button { width: 44px; min-width: 44px; }
-  #film { inset: 70px 0 105px; }
+  .masthead { height: 54px; }
+  #speaker { font-size: 16px; }
+  #film { inset: 56px 0 105px; }
+  #presenter-tools { right: 12px; bottom: 108px; }
   #scene-title { font-size: 27px; top: 5px; }
   #viewport { inset: 32px 0 30px; }
   .film-caption { left: 16px; right: 16px; font-size: 11px; }
@@ -114,10 +111,8 @@ dialog > p { font-size: 14px; line-height: 1.6; color: var(--muted); max-width: 
   .play span { display: none; }
   .transport { margin: 0 5px; }
   #chapter { font-size: 11px; }
-  #replay { display: none; }
   #notes { left: 15px; right: 15px; bottom: 110px; }
 }
-@media (max-width: 360px) { .wordmark span { display: none; } }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { transition: none !important; animation: none !important; }
   .moving-routes { display: none; }
@@ -126,7 +121,7 @@ dialog > p { font-size: 14px; line-height: 1.6; color: var(--muted); max-width: 
 }
 @media print {
   body { overflow: visible; background: #fff; color: #111; }
-  .masthead, #film, .controls, #notes, dialog { display: none !important; }
+  .masthead, #film, .controls, #presenter-tools, #notes, dialog { display: none !important; }
   #print-deck { display: block; }
   .print-slide { height: 180mm; break-after: page; padding: 15mm; }
   .print-slide h1 { font-size: 35pt; }

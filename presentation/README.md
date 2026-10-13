@@ -1,34 +1,41 @@
-# Automatic architecture film
+# Architecture presentation
 
 ```sh
 python3 -m http.server 8767 --bind 127.0.0.1 --directory presentation
 ```
 
-Open http://127.0.0.1:8767 and press **Start film** once. Speakers talk while the camera and demonstrations run automatically.
+Open http://127.0.0.1:8767. **Play loops only the current slide. It never advances slides.** Use Next/Previous, arrow keys or the chapter picker when ready.
 
-The introduction is a separate stage: team introduction, then a synthetic upload becoming a protected copy and affected manager evidence. Only afterward does the camera enter the persistent architecture.
+The top bar contains only the speaker name. Bottom controls provide playback, the current loop position and slide navigation. The three-dot tools menu contains notes, speed, fullscreen and restart. `N` opens notes; `F` toggles fullscreen; Home/End select the first/last slide. Space toggles playback when the page body is focused. Opening settings/chapters or leaving the tab pauses playback.
 
-Twelve scenes follow the agreed order: Diljot introduction → Ivan engines 1–2 and protection → Adarsh custom rules → Shambavi audit → Anubhav integration and manager decisions → Diljot full architecture and future scope. Default runtime is **8:38**. The clock button accepts 15–3,600 seconds per speaking slot, distributes it across that speaker's scenes, and saves it locally. Existing older timings migrate by speaker totals.
+Demonstrations repeat in 6–12 seconds at default speed, with a short hold on the result. The speed setting offers 0.75×, 1×, 1.5× and 2× and persists locally. The timeline scrubs only the selected animation; its end cannot change the slide. There is no fixed total speaking time.
 
-Eight outer components contain ten distinct demonstrations:
+The twelve slides retain the speaker order: Diljot introduction → Ivan engines/protection → Adarsh rules → Shambavi audit → Anubhav integration/manager → Diljot architecture/future. The team introduction is separate. The problem uses the original three-part document/evidence visual. All examples follow the same synthetic quarterly report. Anubhav’s integration view shows only handoffs and manager review; the first complete architecture reveal belongs to Diljot’s closing section. Extraction and detection stay visible together. A camera transition happens on manual slide changes; within the slide, functional animations loop under fixed framing. The architecture reveal zooms out into the same complete system.
 
-| Component | Automatic action |
+| Component | Repeating demonstration |
 | --- | --- |
-| Upload | Attach → sent original → returned copy; chart retained. |
-| Understand | Native/scanned/embedded content becomes source coordinates; regions become five classified findings. |
-| Company rules | Exact and regex matching lead to replacements. |
-| Protect | Text/face masks preserve the chart; saved-output scanning finds, repairs and rechecks a known remnant. |
-| Trace | Source region joins a finding, replacement, revision and artifact. |
-| Manager review | Affected comparison opens; pending/outage availability → approval → denial blocking. |
-| Network enforcement | Proposed gateway sanitises a payload before delivery. |
-| Shared conversations | Proposed sharing path protects text and face content before creating a link. |
+| Upload | Attach/send original, then protected return after verification. |
+| Understand | Native/scanned/embedded content becomes source coordinates and classified findings. |
+| Company rules | Exact/regex matching becomes a configured replacement. |
+| Protect | Text/face masking retains the chart; saved-copy scanning repairs and rechecks a known remnant. |
+| Trace | Source → finding → replacement → revision-bound artifact. |
+| Manager | Affected comparison; pending/outage availability → approval → denial blocking. |
+| Network | Proposed gateway sanitises before delivery. |
+| Shares | Proposed text/face protection before creating a link. |
 
-The final reveal zooms out into the same architecture, then introduces the two proposed extensions. Every moving camera/local morph uses transient blur and becomes sharp at rest. Reduced motion uses finished, sharp snapshots and direct camera changes. Mobile controls are at least 44px.
+Camera/local motion uses transient blur and becomes sharp at rest. Reduced motion retains sharp completed states. Mobile controls remain at least 44px. Monochrome SF Pro and the approved diamond-loop mark are preserved.
 
-Space pauses/resumes when the page body is focused. Arrow keys, Home/End, the timeline and replay are rehearsal controls. `N` opens notes; `F` toggles fullscreen. Timing/overview and leaving the tab pause playback. Explanations and real-app links live in notes. No sound plays.
+All assets are local. Open `index.html` directly for offline use; no CDN, API or model connection is required. Print provides speaker notes. Notes link to the real employee/manager apps if running.
 
-Open `index.html` directly for offline use. All scripts, styles and assets are bundled: no CDN, library, API or model connection. Print provides a speaker-notes backup. The website uses monochrome SF Pro with the approved diamond-loop SVG.
+Examples are labeled simulations: no real redaction, policy edits or manager actions occur in the presentation. The app has no LLM/auth, keeps full files and processing local, and sends affected evidence to the manager. Pending/outage downloads stay available; explicit denial blocks. Network and shared-chat interception are future scope. Private policy files are excluded.
 
-All examples are synthetic simulations. The film performs no real redaction, policy edits or manager actions. The current app uses no LLM or auth; processing/full files stay local, affected evidence goes to the manager. Pending/outage downloads remain available; explicit denial blocks. Network and shared-chat interception are future scope. No private policy files are bundled.
+Published presentation: https://pii-guard-presentation.catinice.workers.dev/
 
-Verification: the revised 12-scene film completed an uninterrupted compressed 90-second local rehearsal, covering all ten roles and the closing architecture, with no script exceptions. Camera blur cleared to 0px at rest. Desktop, 390px mobile and the actual 1280px viewport were inspected. Component-state checks covered source maps, known-remnant repair, decision availability and sanitisation before future delivery/sharing. These checks verify the presentation simulation, not universal engine PII recall or browser performance on other hardware.
+Update the hosted copy with:
+
+```sh
+node presentation/build.mjs
+wrangler deploy --config wrangler.presentation.jsonc
+```
+
+The build publishes only ten website assets. Wrangler uses its existing local login; credentials and generated output stay outside Git. The frontend regression test covers three loops per slide, pause, timeline-end behavior, manual navigation, and reserving the full architecture for the closing section. The live problem slide completed 26 loops without advancing.

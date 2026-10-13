@@ -26,3 +26,5 @@ Subdirectories contain their own manifests when touched. Engine implementation a
 | `scripts/run-demo.py` | Implemented | Start local engine and separate manager UI; open both; safely stop owned child processes. |
 | `scripts/setup-local.sh` | Implemented | Install system/Python/frontend dependencies and default spaCy model. |
 
+
+`wrangler.presentation.jsonc`: static presentation Worker configuration. Run `node presentation/build.mjs`, then `wrangler deploy --config wrangler.presentation.jsonc`; generated assets and credentials are excluded from Git.

@@ -30,3 +30,7 @@ frontend/dist/
 apps/
 manager-mobile-preview.png
 /demo/samples/
+
+# Generated presentation hosting assets and Wrangler state
+/.presentation-dist/
+.wrangler/

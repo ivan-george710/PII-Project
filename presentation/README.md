@@ -4,16 +4,31 @@
 python3 -m http.server 8767 --bind 127.0.0.1 --directory presentation
 ```
 
-Open http://127.0.0.1:8767 and press **Start film** once. Camera movements, engine demonstrations, manager decisions and final architecture reveal run automatically. Nobody needs to operate their section.
+Open http://127.0.0.1:8767 and press **Start film** once. Speakers talk while the camera and demonstrations run automatically.
 
-The 14 scenes run for 8 minutes 38 seconds by default. The clock button accepts 15–3,600 seconds for each of the six speaking slots and distributes that time across its scenes. Timings are saved locally in the browser. Space pauses/resumes when page body is focused. Timeline, previous/next and replay are contingency/rehearsal tools. Notes (`N`) and fullscreen (`F`) are available. Opening timing/overview or leaving the tab pauses the film.
+The introduction is a separate stage: team introduction, then a synthetic upload becoming a protected copy and affected manager evidence. Only afterward does the camera enter the persistent architecture.
 
-The sequence is Diljot introduction → Ivan engines 1–2 → Adarsh custom rules → Shambavi audit → Anubhav integration and manager decisions → Diljot architecture and future scope.
+Twelve scenes follow the agreed order: Diljot introduction → Ivan engines 1–2 and protection → Adarsh custom rules → Shambavi audit → Anubhav integration and manager decisions → Diljot full architecture and future scope. Default runtime is **8:38**. The clock button accepts 15–3,600 seconds per speaking slot, distributes it across that speaker's scenes, and saves it locally. Existing older timings migrate by speaker totals.
 
-Works offline by opening index.html; all scripts, styles and assets are bundled with no CDN/API dependency. Speaker-note links open the actual app/manager if running. The film itself demonstrates synthetic data and makes no real manager decisions or policy changes. Network enforcement and shared-conversation protection are proposed extensions. The current prototype uses no LLM or authentication. Reduced motion keeps completed visual states, fixes packet positions and the document angle, hides the moving routes/caret, and jumps the camera directly.
+Eight outer components contain ten distinct demonstrations:
 
-Browser Print / Save as PDF gives a speaker-notes backup, not a reproduction of the film's animation. Fullscreen film is the primary artifact.
+| Component | Automatic action |
+| --- | --- |
+| Upload | Attach → sent original → returned copy; chart retained. |
+| Understand | Native/scanned/embedded content becomes source coordinates; regions become five classified findings. |
+| Company rules | Exact and regex matching lead to replacements. |
+| Protect | Text/face masks preserve the chart; saved-output scanning finds, repairs and rechecks a known remnant. |
+| Trace | Source region joins a finding, replacement, revision and artifact. |
+| Manager review | Affected comparison opens; pending/outage availability → approval → denial blocking. |
+| Network enforcement | Proposed gateway sanitises a payload before delivery. |
+| Shared conversations | Proposed sharing path protects text and face content before creating a link. |
 
-Motion blur is transient: sharp settled views, blur during pans/zooms and local morphs. No sound is played. The film uses DOM/SVG plus a small local Canvas face-pixelation demonstration, with no graphics library or network model.
+The final reveal zooms out into the same architecture, then introduces the two proposed extensions. Every moving camera/local morph uses transient blur and becomes sharp at rest. Reduced motion uses finished, sharp snapshots and direct camera changes. Mobile controls are at least 44px.
 
-Local desktop verification completed all 14 scenes in a compressed 90-second rehearsal. The animation-frame counter reported about 60 fps; camera blur reached 5.5px during movement and cleared to 0px at rest. A six-second manager scene showed pending, approved and denied states, and a 3,600-second speaker setting survived reload. These observations apply to the tested local desktop browser.
+Space pauses/resumes when the page body is focused. Arrow keys, Home/End, the timeline and replay are rehearsal controls. `N` opens notes; `F` toggles fullscreen. Timing/overview and leaving the tab pause playback. Explanations and real-app links live in notes. No sound plays.
+
+Open `index.html` directly for offline use. All scripts, styles and assets are bundled: no CDN, library, API or model connection. Print provides a speaker-notes backup. The website uses monochrome SF Pro with the approved diamond-loop SVG.
+
+All examples are synthetic simulations. The film performs no real redaction, policy edits or manager actions. The current app uses no LLM or auth; processing/full files stay local, affected evidence goes to the manager. Pending/outage downloads remain available; explicit denial blocks. Network and shared-chat interception are future scope. No private policy files are bundled.
+
+Verification: the revised 12-scene film completed an uninterrupted compressed 90-second local rehearsal, covering all ten roles and the closing architecture, with no script exceptions. Camera blur cleared to 0px at rest. Desktop, 390px mobile and the actual 1280px viewport were inspected. Component-state checks covered source maps, known-remnant repair, decision availability and sanitisation before future delivery/sharing. These checks verify the presentation simulation, not universal engine PII recall or browser performance on other hardware.

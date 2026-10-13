@@ -1,15 +1,13 @@
 # Automatic presentation website
 
-`index.html`: one persistent architecture world, embedded demonstrations and accessible presenter controls.
-
-`style.css`: monochrome SF Pro diagram, layered document/region effects, responsive transport and print fallback.
-
-`presentation.js`: automatic timeline, six speaker timing slots, spring camera, source-to-mask/evidence choreography, notes and rehearsal controls.
-
-`story.js`: speaker notes and chapter metadata in the agreed order; explanatory paragraphs remain in notes, while the canvas contains diagram labels and illustrative document content.
-
-`assets/`: approved brand mark and existing public test portrait, documented in assets/index.md.
-
-`BRIEF.md`: approved direction and factual boundaries.
-
-`README.md`: launch and presenting instructions.
+- `index.html`: persistent grouped architecture, synthetic-demo containers, notes and accessible presenter controls.
+- `style.css`: monochrome SF Pro world, spring-camera surface, 44px responsive controls and print notes.
+- `presentation.js`: sole animation clock, 12 scenes, six saved speaker timings, automatic component beats, camera, blur, pause/seek, keyboard controls and notes.
+- `intro.js`: separate team introduction and original/protected/evidence demonstration driven by the film's clock.
+- `intro.css`: responsive introduction geometry, mark assembly, document transformation and transient blur.
+- `component-demos.js`: ten independent functional SVG/DOM demonstrations, driven by the parent clock; synthetic state metadata supports verification.
+- `component-demos.css`: extraction regions, classifier rails, rule matching, masks, verification, lineage, decisions and proposed gateway/share effects.
+- `story.js`: agreed speaker order, chapter metadata and explanatory speaker notes; no paragraph walls on the canvas.
+- `assets/`: approved mark and existing public portrait fixture, with provenance in `assets/index.md`.
+- `BRIEF.md`: approved surface direction and factual boundaries.
+- `README.md`: launch, timing, controls, offline use and scoped verification evidence.

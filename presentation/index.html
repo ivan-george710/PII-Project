@@ -1,25 +1,73 @@
-<!doctype html><html lang="en" data-theme="dark"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#101010"><title>PII Guard · Architecture film</title><link rel="icon" href="assets/mark.svg"><link rel="stylesheet" href="style.css"></head><body>
-<header class="masthead"><a class="wordmark" href="#0" aria-label="Restart at introduction"><svg viewBox="0 0 64 64" aria-hidden="true"><rect x="16" y="16" width="32" height="32" rx="10" transform="rotate(45 32 32)"/></svg><span>PII Guard</span></a><span id="speaker">Diljot</span><div class="tools"><button id="notes-toggle" aria-label="Speaker notes" aria-expanded="false"><svg viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg></button><button id="timing-toggle" aria-label="Adjust speaker timing"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 6v6l4 2"/></svg></button><button id="fullscreen" aria-label="Enter fullscreen"><svg viewBox="0 0 24 24"><path d="M3 8V3h5m8 0h5v5M3 16v5h5m8 0h5v-5"/></svg></button></div></header>
-<main id="film"><h1 id="scene-title">PII Guard.</h1><div id="viewport"><div id="world">
- <div class="local-boundary"><span>Employee device</span><small>Full files stay local</small></div><div class="remote-boundary"><span>Manager service</span><small>Affected evidence only</small></div>
- <svg id="connections" viewBox="0 0 3400 1800" aria-hidden="true"><defs><marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="m1 1 6 3-6 3"/></marker></defs><g class="routes">
-  <path id="edge-extract" d="M550 690H700"/><path id="edge-detect" d="M1200 690H1360"/><path id="edge-redact" d="M1860 690H2020"/><path id="edge-rules" d="M1610 300V400"/><path id="edge-verify" d="M2270 980V1200"/><path id="edge-audit" d="M2020 1415H1860"/><path id="edge-report" d="M1610 1630V1670Q1610 1700 1640 1700H2630Q2660 1700 2660 1670V1050Q2660 1010 2700 1010H2730"/><path id="edge-decision" class="return-route" d="M2730 690H2520"/>
- </g><g class="moving-routes"><use href="#edge-extract"/><use href="#edge-detect"/><use href="#edge-redact"/><use href="#edge-rules"/><use href="#edge-verify"/><use href="#edge-audit"/><use href="#edge-report"/><use href="#edge-decision"/></g><text x="1940" y="1675">Report snippets + revision</text><text x="2560" y="655">Decision</text></svg>
- <section class="engine source-engine" id="source-engine" style="--x:100px;--y:400px;--w:450px;--h:580px"><h2>Upload</h2><div class="source-chips"><span>PDF</span><span>Word</span><span>Slides</span><span>Image</span></div><div class="source-ghost"></div><span class="node-note">Original content</span></section>
- <section class="engine" id="extract-engine" style="--x:700px;--y:400px;--w:500px;--h:580px"><h2>Extract</h2><div class="extraction-stack"><div class="extraction-layer text-layer"><span>Native text</span><div class="lines"><i></i><i></i><i></i><i></i></div></div><div class="extraction-layer scan-layer"><span>Scanned content</span><div class="scan-image"><p>Name: Dana Ellis</p><p>Password: demo_123</p><div class="scan-beam"></div><div class="ocr-box"></div></div></div><div class="extraction-layer image-layer"><span>Embedded images</span><img src="assets/face.png" alt="Public sample portrait inside a document"><div class="image-frame"></div></div></div><div class="extraction-output"><span>Text</span><span>Coordinates</span><span>Source</span></div></section>
- <section class="engine" id="detect-engine" style="--x:1360px;--y:400px;--w:500px;--h:580px"><h2>Detect</h2><div class="classifier"><div class="classifier-row"><span>Dana Ellis</span><b>PERSON</b></div><div class="classifier-row"><span>dana@example.test</span><b>EMAIL</b></div><div class="classifier-row"><span>EMP-2048</span><b>EMPLOYEE ID</b></div><div class="classifier-row"><span>demo_123</span><b>PASSWORD</b></div></div><div class="face-detector"><img src="assets/face.png" alt="Face detection demonstration"><div class="face-box"><i></i><i></i><i></i><i></i></div><span>FACE</span></div></section>
- <section class="engine rules-engine" id="rules-engine" style="--x:1360px;--y:40px;--w:500px;--h:260px"><h2>Company rules</h2><div class="rule-entry"><span id="rule-typing">Orion</span><span class="rule-caret"></span><span class="rule-switch"></span></div><div class="rule-result"><span>Orion</span><svg viewBox="0 0 32 16"><path d="M0 8h29m-6-6 6 6-6 6"/></svg><b>[CUSTOM]</b></div></section>
- <section class="engine" id="redact-engine" style="--x:2020px;--y:400px;--w:500px;--h:580px"><h2>Redact</h2><div class="returned-ghost"></div><div class="redaction-tags"><span>[PERSON]</span><span>[EMAIL]</span><span>[EMPLOYEE ID]</span></div><span class="node-note">Useful content stays</span></section>
- <section class="engine verify-engine" id="verify-engine" style="--x:2020px;--y:1200px;--w:500px;--h:430px"><h2>Verify saved output</h2><div class="verification-sheet"><div class="verify-lines"><i></i><i></i><i></i><i></i></div><div class="verify-sweep"></div><div class="verify-check"><svg viewBox="0 0 80 80"><circle cx="40" cy="40" r="30"/><path d="m25 40 10 11 22-24"/></svg></div></div><div class="verify-label">Reopen → inspect → repair</div></section>
- <section class="engine audit-engine" id="audit-engine" style="--x:1360px;--y:1200px;--w:500px;--h:430px"><h2>Audit & traceability</h2><div class="audit-strips"><div><span>Source</span><strong>Page 1 · region 3</strong></div><div><span>Finding</span><strong>D000001 · PERSON</strong></div><div><span>Replacement</span><strong>[PERSON_001]</strong></div><div><span>Revision</span><strong>0 · exact artifact</strong></div></div><div class="audit-connector"></div></section>
- <section class="engine manager-engine" id="manager-engine" style="--x:2730px;--y:540px;--w:510px;--h:620px"><h2>Manager review</h2><div class="manager-filename">quarterly-report.pdf <small>Just now</small></div><div class="manager-evidence"><div><span>Original part</span><strong>Dana Ellis</strong></div><div><span>Redacted part</span><strong>[PERSON_001]</strong></div></div><div class="manager-actions"><span id="approve-demo">Approve</span><span id="deny-demo">Deny</span></div><div class="manager-status"><svg viewBox="0 0 24 24"><path id="lock-shape" d="M6 11h12v10H6zm3 0V7a3 3 0 0 1 6 0"/></svg><span id="manager-result">Pending · download available</span></div><div class="report-crop"><span>Only affected content</span><div>Dana Ellis <span>→</span> [PERSON_001]</div></div></section>
- <div id="traveler"><article class="paper"><header><span>Quarterly report</span><span>Q3</span></header><h3>Project review</h3><div class="paper-content"><p>By <span data-tag="[PERSON]" class="pii pii-name">Dana Ellis</span></p><p><span data-tag="[EMAIL]" class="pii pii-email">dana@example.test</span></p><p><span data-tag="[EMPLOYEE ID]" class="pii pii-id">EMP-2048</span></p><p>Project <span data-tag="[CUSTOM]" class="pii pii-custom">Orion</span></p></div><div class="paper-visual"><svg class="business-chart" viewBox="0 0 280 80" role="img" aria-label="Business chart preserved through redaction"><path class="chart-grid" d="M0 20h280M0 50h280M0 78h280"/><path class="chart-curve" d="M4 68 42 59 77 62 112 35 155 42 196 23 235 31 277 8"/></svg><div class="paper-portrait"><img src="assets/face.png" alt="Public portrait sample in the document"><canvas class="portrait-blur" width="76" height="76" aria-label="Illustrative face pixelation"></canvas></div></div><footer>Illustrative document</footer></article></div>
- <section class="future-engine" id="gateway" style="--x:520px;--y:1900px;--w:730px;--h:480px"><h2>Network enforcement</h2><div class="network-flow"><span>Employee</span><svg viewBox="0 0 80 20"><path d="M0 10h75m-7-7 7 7-7 7"/></svg><div class="gateway-mark"><svg viewBox="0 0 64 64"><rect x="16" y="16" width="32" height="32" rx="10" transform="rotate(45 32 32)"/></svg></div><svg viewBox="0 0 80 20"><path d="M0 10h75m-7-7 7 7-7 7"/></svg><span>Destination</span></div><div class="network-packets"><i></i><i></i><i></i></div><small>Managed HTTPS inspection + endpoint policy</small><span class="planned">Future scope</span></section>
- <section class="future-engine" id="shared-chat" style="--x:1500px;--y:1900px;--w:730px;--h:480px"><h2>Shared conversations</h2><div class="shared-original">Contact dana@example.test</div><div class="shared-returned">Contact <span>[EMAIL]</span></div><span class="planned">Future scope</span></section>
- <svg class="future-links" viewBox="0 0 3400 2500" aria-hidden="true"><path d="M1060 1730V1790Q1060 1840 1010 1840H885V1900M1800 1730V1830H1865V1900"/></svg>
- </div><div id="curtain" aria-hidden="true"></div></div><div class="film-caption"><span id="demo-label">Illustrative demonstration</span><span id="context-label">No LLM · local redaction</span></div></main>
-<aside id="notes" hidden aria-label="Speaker notes"><button id="notes-close" aria-label="Close speaker notes">×</button><h2 id="notes-title"></h2><p id="notes-text"></p><a href="http://127.0.0.1:8765/" target="_blank" rel="noreferrer">Open actual employee app</a><a href="http://127.0.0.1:8766/manager" target="_blank" rel="noreferrer">Open actual manager page</a></aside>
-<dialog id="timing"><header><h2>Speaker timing</h2><button id="timing-close" aria-label="Close timing">×</button></header><p>The entire film runs automatically. Set speaking time before starting.</p><form id="timing-form"></form><button id="timing-save" class="solid">Save timing</button></dialog>
-<dialog id="overview"><header><h2>The sequence</h2><button id="overview-close" aria-label="Close overview">×</button></header><nav id="chapters"></nav></dialog>
-<footer class="controls"><button id="overview-toggle" aria-label="Open chapter overview"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></button><button id="play" class="play" aria-label="Start automatic presentation"><svg viewBox="0 0 24 24"><path d="m8 5 11 7-11 7Z"/></svg><span id="play-label">Start film</span></button><div class="transport"><span id="chapter">Introduction</span><input type="range" id="scrub" aria-label="Presentation timeline" min="0" max="1000" value="0"><div class="transport-meta"><span id="clock">0:00 / 8:38</span><span id="scene-count">1 / 14</span></div></div><button id="previous" aria-label="Previous scene"><svg viewBox="0 0 24 24"><path d="m14 6-6 6 6 6"/></svg></button><button id="next" aria-label="Next scene"><svg viewBox="0 0 24 24"><path d="m10 6 6 6-6 6"/></svg></button><button id="replay" aria-label="Replay current demonstration"><svg viewBox="0 0 24 24"><path d="M4 9a8 8 0 1 1 0 6M4 3v6h6"/></svg></button></footer>
-<script src="story.js"></script><script src="presentation.js"></script></body></html>
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#101010"><title>PII Guard · Architecture film</title>
+  <link rel="icon" href="assets/mark.svg">
+  <link rel="stylesheet" href="style.css"><link rel="stylesheet" href="intro.css"><link rel="stylesheet" href="component-demos.css">
+</head>
+<body>
+<header class="masthead">
+  <a class="wordmark" href="#0" aria-label="Restart at introduction"><svg viewBox="0 0 64 64" aria-hidden="true"><rect x="16" y="16" width="32" height="32" rx="10" transform="rotate(45 32 32)"/></svg><span>PII Guard</span></a>
+  <span id="speaker">Diljot</span>
+  <div class="tools">
+    <button id="notes-toggle" aria-label="Speaker notes" aria-expanded="false"><svg viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg></button>
+    <button id="timing-toggle" aria-label="Adjust speaker timing"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 6v6l4 2"/></svg></button>
+    <button id="fullscreen" aria-label="Enter fullscreen"><svg viewBox="0 0 24 24"><path d="M3 8V3h5m8 0h5v5M3 16v5h5m8 0h5v-5"/></svg></button>
+  </div>
+</header>
+<main id="film" aria-label="Automatic team presentation">
+  <h1 id="scene-title"></h1>
+  <div id="viewport" aria-label="Continuous architecture diagram">
+    <div id="world">
+      <div class="local-boundary"><span>Employee device</span><small>Full files stay local</small></div>
+      <div class="remote-boundary"><span>Manager service</span><small>Affected evidence only</small></div>
+      <svg id="connections" viewBox="0 0 3500 1800" aria-hidden="true">
+        <defs><marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="m1 1 6 3-6 3"/></marker></defs>
+        <g class="routes">
+          <path id="edge-extract" d="M570 730H740"/><path id="edge-detect" d="M1240 730H1360"/>
+          <path id="edge-redact" d="M1860 730H2070"/><path id="edge-rules" d="M1610 300V440"/>
+          <path id="edge-verify" d="M2320 1020V1075"/>
+          <path id="edge-audit" d="M2070 1290H1980Q1940 1290 1940 1330V1395Q1940 1435 1900 1435H1860"/>
+          <path id="edge-report" d="M1610 1650V1700Q1610 1740 1650 1740H2720Q2760 1740 2760 1700V1060Q2760 1020 2800 1020H2830"/>
+          <path id="edge-decision" class="return-route" d="M2830 730H2570"/>
+        </g>
+        <g class="moving-routes"><use href="#edge-extract"/><use href="#edge-detect"/><use href="#edge-redact"/><use href="#edge-rules"/><use href="#edge-verify"/><use href="#edge-audit"/><use href="#edge-report"/><use href="#edge-decision"/></g>
+        <text x="1920" y="1717">Affected evidence + revision</text><text x="2640" y="697">Decision</text>
+      </svg>
+      <section class="engine" id="source-engine" style="--x:120px;--y:440px;--w:450px;--h:580px"><h2>Upload</h2></section>
+      <section class="engine-group" id="understand-group" style="--x:680px;--y:350px;--w:1240px;--h:730px" aria-label="Understand: extraction and detection">
+        <h2 class="group-heading">Understand</h2>
+        <section class="engine" id="extract-engine" style="--x:60px;--y:90px;--w:500px;--h:580px"><h2>Extract</h2></section>
+        <section class="engine" id="detect-engine" style="--x:680px;--y:90px;--w:500px;--h:580px"><h2>Detect</h2></section>
+      </section>
+      <section class="engine" id="rules-engine" style="--x:1360px;--y:40px;--w:500px;--h:260px"><h2>Company rules</h2></section>
+      <section class="engine-group" id="protect-group" style="--x:2010px;--y:350px;--w:620px;--h:1210px" aria-label="Protect: redaction and verification">
+        <h2 class="group-heading">Protect</h2>
+        <section class="engine" id="redact-engine" style="--x:60px;--y:90px;--w:500px;--h:580px"><h2>Redact</h2></section>
+        <section class="engine" id="verify-engine" style="--x:60px;--y:725px;--w:500px;--h:430px"><h2>Verify</h2></section>
+      </section>
+      <section class="engine" id="audit-engine" style="--x:1360px;--y:1220px;--w:500px;--h:430px"><h2>Trace</h2></section>
+      <section class="engine" id="manager-engine" style="--x:2830px;--y:500px;--w:510px;--h:620px"><h2>Manager review</h2></section>
+      <div id="artifact-carrier" aria-hidden="true"><svg viewBox="0 0 70 90"><rect x="2" y="2" width="66" height="86" rx="5"/><path d="M15 22h40M15 34h40M15 46h25M15 68h40"/></svg></div>
+      <section class="future-engine" id="gateway" style="--x:540px;--y:1930px;--w:730px;--h:480px"><h2>Network enforcement</h2></section>
+      <section class="future-engine" id="shared-chat" style="--x:1670px;--y:1930px;--w:730px;--h:480px"><h2>Shared conversations</h2></section>
+      <svg class="future-links" viewBox="0 0 3500 2500" aria-hidden="true"><path d="M1060 1780V1850H905V1930M1800 1780V1850H2035V1930"/></svg>
+    </div>
+  </div>
+  <div class="film-caption"><span id="demo-label">Illustrative demonstration</span><span id="context-label">No LLM · local redaction</span></div>
+</main>
+<aside id="notes" hidden aria-label="Speaker notes"><button id="notes-close" aria-label="Close speaker notes"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button><h2 id="notes-title"></h2><p id="notes-text"></p><a href="http://127.0.0.1:8765/" target="_blank" rel="noreferrer">Open actual employee app</a><a href="http://127.0.0.1:8766/manager" target="_blank" rel="noreferrer">Open actual manager page</a></aside>
+<dialog id="timing"><header><h2>Speaker timing</h2><button id="timing-close" aria-label="Close timing"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button></header><p>Set speaking time before starting. Every demonstration plays automatically.</p><form id="timing-form"></form><button id="timing-save" class="solid">Save timing</button></dialog>
+<dialog id="overview"><header><h2>The sequence</h2><button id="overview-close" aria-label="Close overview"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button></header><nav id="chapters" aria-label="Presentation scenes"></nav></dialog>
+<footer class="controls">
+  <button id="overview-toggle" aria-label="Open chapter overview"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></button>
+  <button id="play" class="play" aria-label="Start automatic presentation"><svg viewBox="0 0 24 24"><path d="m8 5 11 7-11 7Z"/></svg><span id="play-label">Start film</span></button>
+  <div class="transport"><span id="chapter">Introduction</span><input type="range" id="scrub" aria-label="Presentation timeline" min="0" max="1000" value="0"><div class="transport-meta"><span id="clock">0:00 / 8:38</span><span id="scene-count">1 / 12</span></div></div>
+  <button id="previous" aria-label="Previous scene"><svg viewBox="0 0 24 24"><path d="m14 6-6 6 6 6"/></svg></button>
+  <button id="next" aria-label="Next scene"><svg viewBox="0 0 24 24"><path d="m10 6 6 6-6 6"/></svg></button>
+  <button id="replay" aria-label="Replay current demonstration"><svg viewBox="0 0 24 24"><path d="M4 9a8 8 0 1 1 0 6M4 3v6h6"/></svg></button>
+</footer>
+<script src="story.js"></script><script src="intro.js"></script><script src="component-demos.js"></script><script src="presentation.js"></script>
+</body>
+</html>
